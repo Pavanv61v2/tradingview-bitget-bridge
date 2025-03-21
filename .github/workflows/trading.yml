@@ -61,7 +61,7 @@ jobs:
               
               // Create the signature
               const timestamp = Date.now().toString();
-              const requestPath = '/api/v2/spot/trade/orders';
+              const requestPath = '/api/spot/v1/trade/orders';
               const method = 'POST';
               
               // Create the pre-hash string
@@ -76,7 +76,7 @@ jobs:
               console.log("Making request to Bitget API...");
               const response = await axios({
                 method: 'POST',
-                url: 'https://api.bitget.com/api/mix/v1/order/placeOrder',
+                url: 'https://api.bitget.com/api/spot/v1/trade/orders',
                 headers: {
                   'ACCESS-KEY': apiKey,
                   'ACCESS-SIGN': signature,
