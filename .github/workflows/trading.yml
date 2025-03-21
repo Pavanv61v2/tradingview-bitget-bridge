@@ -43,13 +43,14 @@ jobs:
                 symbol = symbol.replace('USD', 'USDT');
               }
               
-              // Create order parameters
+              // Create order parameters based on Bitget's API format
+              // Documentation: https://bitgetlimited.github.io/apidoc/en/spot/#place-order
               const payload = {
                 symbol: symbol,
                 side: signal.action.toLowerCase(),
                 orderType: signal.orderType.toLowerCase(),
                 force: 'normal',
-                size: signal.quantity.toString()
+                quantity: signal.quantity.toString()
               };
               
               // Add price for limit orders
@@ -59,24 +60,44 @@ jobs:
               
               console.log("Order payload:", payload);
               
-              // Create the signature
+              // Create the signature according to Bitget's requirements
               const timestamp = Date.now().toString();
-              const requestPath = '/api/spot/v1/trade/orders';
+              const endpoint = '/api/spot/v1/trade/orders';
               const method = 'POST';
               
-              // Create the pre-hash string
-              const preHash = timestamp + method + requestPath + JSON.stringify(payload);
+              // Bitget requires specific signature format
+              let preHashString = '';
+              if (Object.keys(payload).length > 0) {
+                preHashString = timestamp + method + endpoint + JSON.stringify(payload);
+              } else {
+                preHashString = timestamp + method + endpoint;
+              }
+              
+              console.log("Pre-hash string:", preHashString);
               
               // Create the signature
               const signature = crypto.createHmac('sha256', apiSecret)
-                .update(preHash)
+                .update(preHashString)
                 .digest('hex');
+              
+              // Create passphrase signature
+              const passphraseEncrypted = crypto.createHmac('sha256', apiSecret)
+                .update(passphrase)
+                .digest('hex');
+              
+              // Show headers (without sensitive info)
+              console.log("Request headers:", {
+                'ACCESS-TIMESTAMP': timestamp,
+                'ACCESS-SIGN': 'SIGNATURE GENERATED',
+                'ACCESS-KEY': 'API KEY PRESENT',
+                'ACCESS-PASSPHRASE': 'PASSPHRASE PRESENT'
+              });
               
               // Make the request to Bitget API
               console.log("Making request to Bitget API...");
               const response = await axios({
                 method: 'POST',
-                url: 'https://api.bitget.com/api/spot/v1/trade/orders',
+                url: 'https://api.bitget.com' + endpoint,
                 headers: {
                   'ACCESS-KEY': apiKey,
                   'ACCESS-SIGN': signature,
@@ -90,11 +111,11 @@ jobs:
               
               console.log("Bitget API response:", JSON.stringify(response.data, null, 2));
               
-              if (response.data.code === '00000') {
+              if (response.data && response.data.code === '00000') {
                 console.log("Order placed successfully!");
                 return;
               } else {
-                throw new Error(`Bitget error: ${response.data.msg || 'Unknown error'}`);
+                throw new Error(`Bitget error: ${response.data ? response.data.msg : 'Unknown error'}`);
               }
             } catch (error) {
               console.error("Error placing order:", error.message);
