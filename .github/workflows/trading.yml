@@ -1,0 +1,112 @@
+name: TradingView-Bitget Bridge
+
+on:
+  repository_dispatch:
+    types: [trading-signal]
+
+jobs:
+  place-order:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Process Trading Signal
+        env:
+          BITGET_API_KEY: ${{ secrets.BITGET_API_KEY }}
+          BITGET_API_SECRET: ${{ secrets.BITGET_API_SECRET }}
+          BITGET_PASSPHRASE: ${{ secrets.BITGET_PASSPHRASE }}
+          SIGNAL_DATA: ${{ toJson(github.event.client_payload) }}
+        run: |
+          echo "Received trading signal"
+          echo "Symbol: ${{ github.event.client_payload.symbol }}"
+          echo "Action: ${{ github.event.client_payload.action }}"
+          echo "Quantity: ${{ github.event.client_payload.quantity }}"
+          
+          # Install dependencies
+          npm install axios crypto-js
+          
+          # Create and run the trading script
+          cat > trade.js << 'EOF'
+          const axios = require('axios');
+          const crypto = require('crypto');
+          
+          async function placeOrder() {
+            try {
+              const apiKey = process.env.BITGET_API_KEY;
+              const apiSecret = process.env.BITGET_API_SECRET;
+              const passphrase = process.env.BITGET_PASSPHRASE;
+              const signal = JSON.parse(process.env.SIGNAL_DATA);
+              
+              console.log("Processing signal:", signal);
+              
+              // Format symbol
+              let symbol = signal.symbol.replace('/', '').toUpperCase();
+              if (symbol.endsWith('USD') && !symbol.endsWith('USDT')) {
+                symbol = symbol.replace('USD', 'USDT');
+              }
+              
+              // Create order parameters
+              const payload = {
+                symbol: symbol,
+                side: signal.action.toLowerCase(),
+                orderType: signal.orderType.toLowerCase(),
+                force: 'normal',
+                size: signal.quantity.toString()
+              };
+              
+              // Add price for limit orders
+              if (payload.orderType === 'limit' && signal.price) {
+                payload.price = signal.price.toString();
+              }
+              
+              console.log("Order payload:", payload);
+              
+              // Create the signature
+              const timestamp = Date.now().toString();
+              const requestPath = '/api/v2/spot/trade/orders';
+              const method = 'POST';
+              
+              // Create the pre-hash string
+              const preHash = timestamp + method + requestPath + JSON.stringify(payload);
+              
+              // Create the signature
+              const signature = crypto.createHmac('sha256', apiSecret)
+                .update(preHash)
+                .digest('hex');
+              
+              // Make the request to Bitget API
+              console.log("Making request to Bitget API...");
+              const response = await axios({
+                method: 'POST',
+                url: 'https://api.bitget.com/api/v2/spot/trade/orders',
+                headers: {
+                  'ACCESS-KEY': apiKey,
+                  'ACCESS-SIGN': signature,
+                  'ACCESS-TIMESTAMP': timestamp,
+                  'ACCESS-PASSPHRASE': passphrase,
+                  'Content-Type': 'application/json'
+                },
+                data: payload,
+                timeout: 10000
+              });
+              
+              console.log("Bitget API response:", JSON.stringify(response.data, null, 2));
+              
+              if (response.data.code === '00000') {
+                console.log("Order placed successfully!");
+                return;
+              } else {
+                throw new Error(`Bitget error: ${response.data.msg || 'Unknown error'}`);
+              }
+            } catch (error) {
+              console.error("Error placing order:", error.message);
+              if (error.response) {
+                console.error("Error response data:", JSON.stringify(error.response.data, null, 2));
+              }
+              process.exit(1);
+            }
+          }
+          
+          // Execute the function
+          placeOrder();
+          EOF
+          
+          node trade.js
