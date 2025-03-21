@@ -76,7 +76,7 @@ jobs:
               console.log("Making request to Bitget API...");
               const response = await axios({
                 method: 'POST',
-                url: 'https://api.bitget.com/api/v2/spot/trade/orders',
+                url: 'https://api.bitget.com/api/mix/v1/order/placeOrder',
                 headers: {
                   'ACCESS-KEY': apiKey,
                   'ACCESS-SIGN': signature,
