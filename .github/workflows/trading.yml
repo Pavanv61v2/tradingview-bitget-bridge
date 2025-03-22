@@ -92,9 +92,23 @@ jobs:
                   // Get the appropriate decimal scale for this coin
                   const scale = coinScales[baseCoin] || coinScales['DEFAULT'];
                   
-                  // Format the size with the appropriate number of decimal places
-                  orderSize = parseFloat(position.available).toFixed(scale);
-                  console.log(`Selling entire position: ${orderSize} ${position.coin} (formatted to ${scale} decimal places)`);
+                  // Get the available amount
+                  const availableAmount = parseFloat(position.available);
+                  
+                  // Handle based on position size
+                  if (availableAmount >= 0.1) {
+                    // For larger positions: Round down slightly to ensure order goes through
+                    const multiplier = Math.pow(10, scale);
+                    const roundedDown = Math.floor(availableAmount * multiplier) / multiplier;
+                    orderSize = roundedDown.toFixed(scale);
+                    console.log(`Selling larger position (rounded down): ${orderSize} ${position.coin} (original: ${position.available})`);
+                  } else {
+                    // For small "dust-like" positions: Sell 99.5% to ensure order success
+                    // This helps with tiny positions where precision matters more
+                    const safeAmount = availableAmount * 0.995;
+                    orderSize = safeAmount.toFixed(scale);
+                    console.log(`Selling small position (99.5%): ${orderSize} ${position.coin} (original: ${position.available})`);
+                  }
                 } else {
                   throw new Error(`No position found for ${symbol} or position is empty`);
                 }
