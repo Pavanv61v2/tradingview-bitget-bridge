@@ -25,5 +25,21 @@
     "orderSize": "3.00",
     "orderId": "1287380394224742403",
     "status": "success"
+  },
+  {
+    "timestamp": "2025-03-22T16:41:54.503Z",
+    "symbol": "SOLUSDT",
+    "action": "sell",
+    "originalAmount": 0.023346,
+    "orderSize": "0.0232",
+    "orderId": "1287382027419611136",
+    "status": "success"
+  },
+  {
+    "timestamp": "2025-03-22T16:42:12.741Z",
+    "symbol": "UNKNOWN",
+    "action": "UNKNOWN",
+    "status": "failed",
+    "error": "All 3 attempts failed: Request failed with status code 400"
   }
 ]
