@@ -48,5 +48,14 @@
     "action": "sell",
     "status": "failed",
     "error": "All 3 attempts failed: Request failed with status code 400"
+  },
+  {
+    "timestamp": "2025-03-22T18:45:09.475Z",
+    "symbol": "SOLUSDT",
+    "action": "buy",
+    "originalAmount": 15,
+    "orderSize": "15.00",
+    "orderId": "1287413044192833538",
+    "status": "success"
   }
 ]
