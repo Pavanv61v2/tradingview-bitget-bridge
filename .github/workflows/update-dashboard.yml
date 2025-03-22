@@ -1,0 +1,44 @@
+name: Update Dashboard
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 */1 * * *'
+  push:
+    paths:
+      - 'trade_history.json'
+
+jobs:
+  update-dashboard:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v3
+      
+      - name: Check if trade history exists
+        id: check_file
+        run: |
+          if [ -f "trade_history.json" ]; then
+            echo "file_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "file_exists=false" >> $GITHUB_OUTPUT
+            echo "[]" > trade_history.json
+          fi
+      
+      - name: Setup Git
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+      
+      - name: Clone gh-pages branch
+        run: |
+          git clone --branch gh-pages https://${{ github.token }}@github.com/${{ github.repository }}.git gh-pages-clone
+      
+      - name: Copy trade history to gh-pages
+        run: |
+          cp trade_history.json gh-pages-clone/
+          cd gh-pages-clone
+          git add trade_history.json
+          git commit -m "Update trade history [skip ci]" || echo "No changes to commit"
+          git push || echo "Nothing to push"
