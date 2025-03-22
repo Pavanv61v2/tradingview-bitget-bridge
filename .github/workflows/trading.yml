@@ -402,29 +402,17 @@ jobs:
       - name: Checkout repository for updating trade history
         if: success()
         uses: actions/checkout@v3
-        with:
-          ref: ${{ github.ref }}
-          token: ${{ github.token }}
-          path: repo-checkout
-
+        
       - name: Copy and commit trade history
         if: success()
         run: |
-          # Move the trade_history.json file if it exists
-          if [ -f "trade_history.json" ]; then
-            cp trade_history.json repo-checkout/
-            cd repo-checkout
-            
-            # Configure git
-            git config user.name "GitHub Action"
-            git config user.email "action@github.com"
-            
-            # Add and commit the file
-            git add trade_history.json
-            git commit -m "Update trade history from latest trade" || echo "No changes to commit"
-            
-            # Push changes back to repository using the token
-            git push https://${{ github.token }}@github.com/${{ github.repository }}.git HEAD:${{ github.ref_name }} || echo "Nothing to push"
-          else
-            echo "No trade_history.json file found to commit"
-          fi
+          # Configure git
+          git config user.name "GitHub Action"
+          git config user.email "action@github.com"
+          
+          # Add and commit the file
+          git add trade_history.json
+          git commit -m "Update trade history from latest trade" || echo "No changes to commit"
+          
+          # Push changes back to repository using the token
+          git push
