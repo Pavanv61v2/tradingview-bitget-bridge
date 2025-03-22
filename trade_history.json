@@ -25,5 +25,14 @@
     "orderSize": "0.002",
     "orderId": "sample-123458",
     "status": "success"
+  },
+  {
+    "timestamp": "2025-03-22T14:56:25.436Z",
+    "symbol": "SOLUSDT",
+    "action": "buy",
+    "originalAmount": 3,
+    "orderSize": "3.00",
+    "orderId": "test-1742655385436",
+    "status": "success"
   }
 ]
