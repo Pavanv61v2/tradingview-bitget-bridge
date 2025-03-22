@@ -13,18 +13,21 @@ permissions:
 jobs:
   deploy-dashboard:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-        
+      
       - name: Setup Pages
         uses: actions/configure-pages@v3
-        
-      - name: Create dashboard directory
+      
+      - name: Create build directory
         run: |
           mkdir -p _site
-          
+      
       - name: Prepare dashboard files
         run: |
           # Copy dashboard HTML
@@ -39,7 +42,9 @@ jobs:
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
-        
+        with:
+          path: "_site"
+      
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v1
