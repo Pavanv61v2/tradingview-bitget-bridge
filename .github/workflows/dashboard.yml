@@ -13,20 +13,48 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
       
-      - name: Create dashboard files
+      - name: Setup Pages
+        id: pages
+        uses: actions/configure-pages@v3
+      
+      - name: Create dashboard directory
         run: |
-          # Create index.html in the root
-          echo '<!DOCTYPE html><html><head><title>Trading Dashboard</title></head><body><h1>Trading Dashboard</h1><p>Dashboard initialization. This will be updated with real content soon.</p></body></html>' > index.html
+          mkdir -p _site
+          
+          # Create basic index.html
+          cat > _site/index.html << 'EOF'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Bot Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        h1 { color: #333; }
+    </style>
+</head>
+<body>
+    <h1>Trading Dashboard</h1>
+    <p>Dashboard initialization. This will be updated with real content soon.</p>
+</body>
+</html>
+EOF
           
           # Create empty trade history if it doesn't exist
-          if [ ! -f "trade_history.json" ]; then
-            echo "[]" > trade_history.json
-          fi
+          echo "[]" > _site/trade_history.json
+          
+          # List files for debugging
+          echo "Contents of _site directory:"
+          ls -la _site
       
-      - name: Deploy to gh-pages
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
         with:
-          personal_token: ${{ secrets.DASHBOARD_PAT }}
-          publish_dir: ./
-          destination_dir: ./
-          exclude_assets: '.github,**/.git**'
+          path: '_site'
+      
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
