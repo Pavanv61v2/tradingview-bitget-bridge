@@ -1,9 +1,9 @@
 name: Update Dashboard
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:  # Manual trigger
   schedule:
-    - cron: '*/5 * * * *'
+    - cron: '*/5 * * * *'  # Every 5 minutes
   push:
     paths:
       - 'trade_history.json'
@@ -12,43 +12,41 @@ jobs:
   update-dashboard:
     runs-on: ubuntu-latest
     
+    # Add permissions to ensure the workflow can push to gh-pages
+    permissions:
+      contents: write
+    
     steps:
-      # First, check if the trading workflow updated the trade history
-      - name: Checkout main branch (for trading logs)
+      - name: Checkout main branch
         uses: actions/checkout@v3
         with:
           path: main-repo
       
-      # Then check out the gh-pages branch
       - name: Checkout gh-pages branch
         uses: actions/checkout@v3
         with:
           ref: gh-pages
           path: gh-pages-repo
       
-      # If main branch has a trade_history.json, use it to update gh-pages
-      - name: Update trade history if new trades exist
+      - name: Copy trade history to gh-pages
         run: |
           if [ -f "main-repo/trade_history.json" ]; then
             echo "Found trade history in main branch"
             
-            # Check if the files are different (meaning new trades exist)
-            if ! cmp -s "main-repo/trade_history.json" "gh-pages-repo/trade_history.json"; then
-              echo "Trade history has been updated, copying to gh-pages"
-              cp "main-repo/trade_history.json" "gh-pages-repo/trade_history.json"
-              
-              # Setup git in gh-pages directory
-              cd gh-pages-repo
-              git config user.name "GitHub Action"
-              git config user.email "action@github.com"
-              
-              # Commit and push changes
-              git add trade_history.json
-              git commit -m "Update trade history [skip ci]"
-              git push origin gh-pages
-            else
-              echo "No changes to trade history detected"
-            fi
+            # Always copy the file to ensure it's up to date
+            cp main-repo/trade_history.json gh-pages-repo/
+            
+            # Setup git in gh-pages directory
+            cd gh-pages-repo
+            git config user.name "GitHub Action"
+            git config user.email "action@github.com"
+            
+            # Add, commit, and push
+            git add trade_history.json
+            git commit -m "Update trade history [skip ci]" || echo "No changes to commit"
+            git push || echo "Failed to push changes"
+            
+            echo "Completed updating trade history on gh-pages"
           else
             echo "No trade_history.json found in main branch"
           fi
