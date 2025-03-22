@@ -13,62 +13,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
       
-      - name: Set up Git
+      - name: Create dashboard files
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-      
-      - name: Prepare dashboard directory
-        run: |
-          # Create temp directory
-          mkdir -p temp_dashboard
+          # Create index.html in the root
+          echo '<!DOCTYPE html><html><head><title>Trading Dashboard</title></head><body><h1>Trading Dashboard</h1><p>Dashboard initialization. This will be updated with real content soon.</p></body></html>' > index.html
           
-          # Copy dashboard HTML file
-          cp .github/dashboard/index.html temp_dashboard/ || echo "Dashboard HTML not found"
-          
-          # Copy or create trade history
-          if [ -f "trade_history.json" ]; then
-            cp trade_history.json temp_dashboard/
-          else
-            echo "[]" > temp_dashboard/trade_history.json
+          # Create empty trade history if it doesn't exist
+          if [ ! -f "trade_history.json" ]; then
+            echo "[]" > trade_history.json
           fi
-          
-          # List files for debugging
-          echo "Contents of current directory:"
-          ls -la
-          
-          echo "Contents of .github directory (if exists):"
-          ls -la .github || echo ".github directory not found"
-          
-          echo "Contents of temp_dashboard directory:"
-          ls -la temp_dashboard
       
-      - name: Deploy to gh-pages branch
-        run: |
-          # Save the workspace path
-          WORKSPACE_PATH=$(pwd)
-          
-          # Clone repository to a new directory
-          cd ..
-          git clone https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git gh-pages
-          cd gh-pages
-          
-          # Create or switch to gh-pages branch
-          git checkout gh-pages || git checkout --orphan gh-pages
-          
-          # Clear existing files (except .git directory)
-          find . -maxdepth 1 ! -path "./.git" ! -path "." -exec rm -rf {} \;
-          
-          # Copy dashboard files - using absolute path
-          cp -r $WORKSPACE_PATH/temp_dashboard/* . || echo "No files to copy"
-          
-          # If copy failed, create a minimal index.html
-          if [ ! -f "index.html" ]; then
-            echo "Creating default index.html"
-            echo '<!DOCTYPE html><html><head><title>Trading Dashboard</title></head><body><h1>Trading Dashboard</h1><p>Dashboard initialization. Real content will be updated by the workflow.</p></body></html>' > index.html
-          fi
-          
-          # Add, commit, and push changes
-          git add .
-          git commit -m "Update dashboard" || echo "No changes to commit"
-          git push origin gh-pages || (git push --set-upstream origin gh-pages && echo "First push to gh-pages branch")
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          personal_token: ${{ secrets.DASHBOARD_PAT }}
+          publish_dir: ./
+          destination_dir: ./
+          exclude_assets: '.github,**/.git**'
