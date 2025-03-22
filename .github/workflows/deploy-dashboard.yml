@@ -22,15 +22,23 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
       
+      # Explicitly add the missing dependency
+      - name: Setup Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: dummy-artifact
+          path: README.md
+          retention-days: 1
+          if-no-files-found: ignore
+      
       - name: Setup GitHub Pages
         uses: actions/configure-pages@v3
         
-      - name: Create dashboard directory
+      - name: Create site directory
         run: mkdir -p _site
           
       - name: Copy index.html to site directory
-        run: |
-          cp index.html _site/index.html
+        run: cp index.html _site/index.html
       
       - name: Create sample trade history
         run: |
@@ -64,10 +72,18 @@ jobs:
             }
           ]' > _site/trade_history.json
       
-      - name: Upload pages artifact
-        uses: actions/upload-pages-artifact@v2
+      # Use a direct zip and upload approach
+      - name: Archive site contents
+        run: |
+          cd _site
+          zip -r ../artifact.zip .
+      
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
         with:
-          path: _site
+          name: github-pages
+          path: artifact.zip
+          retention-days: 1
       
       - name: Deploy to GitHub Pages
         id: deployment
