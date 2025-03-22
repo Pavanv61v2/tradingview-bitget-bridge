@@ -13,32 +13,42 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - name: Checkout main branch
+      # First, check if the trading workflow updated the trade history
+      - name: Checkout main branch (for trading logs)
         uses: actions/checkout@v3
+        with:
+          path: main-repo
       
-      - name: Check if trade history exists
-        id: check_file
+      # Then check out the gh-pages branch
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v3
+        with:
+          ref: gh-pages
+          path: gh-pages-repo
+      
+      # If main branch has a trade_history.json, use it to update gh-pages
+      - name: Update trade history if new trades exist
         run: |
-          if [ -f "trade_history.json" ]; then
-            echo "file_exists=true" >> $GITHUB_OUTPUT
+          if [ -f "main-repo/trade_history.json" ]; then
+            echo "Found trade history in main branch"
+            
+            # Check if the files are different (meaning new trades exist)
+            if ! cmp -s "main-repo/trade_history.json" "gh-pages-repo/trade_history.json"; then
+              echo "Trade history has been updated, copying to gh-pages"
+              cp "main-repo/trade_history.json" "gh-pages-repo/trade_history.json"
+              
+              # Setup git in gh-pages directory
+              cd gh-pages-repo
+              git config user.name "GitHub Action"
+              git config user.email "action@github.com"
+              
+              # Commit and push changes
+              git add trade_history.json
+              git commit -m "Update trade history [skip ci]"
+              git push origin gh-pages
+            else
+              echo "No changes to trade history detected"
+            fi
           else
-            echo "file_exists=false" >> $GITHUB_OUTPUT
-            echo "[]" > trade_history.json
+            echo "No trade_history.json found in main branch"
           fi
-      
-      - name: Setup Git
-        run: |
-          git config --global user.name "GitHub Action"
-          git config --global user.email "action@github.com"
-      
-      - name: Clone gh-pages branch
-        run: |
-          git clone --branch gh-pages https://${{ github.token }}@github.com/${{ github.repository }}.git gh-pages-clone
-      
-      - name: Copy trade history to gh-pages
-        run: |
-          cp trade_history.json gh-pages-clone/
-          cd gh-pages-clone
-          git add trade_history.json
-          git commit -m "Update trade history [skip ci]" || echo "No changes to commit"
-          git push || echo "Nothing to push"
