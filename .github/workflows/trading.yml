@@ -48,7 +48,7 @@ jobs:
                 symbol: symbol,
                 side: signal.action.toLowerCase(),
                 orderType: signal.orderType.toLowerCase(),
-                force: 'normal',
+                force: 'gtc',
                 size: signal.quantity.toString()
               };
               
