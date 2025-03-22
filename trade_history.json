@@ -75,5 +75,32 @@
     "orderSize": "15.00",
     "orderId": "1287424376392740864",
     "status": "success"
+  },
+  {
+    "timestamp": "2025-03-22T20:05:10.580Z",
+    "symbol": "SOLUSDT",
+    "action": "sell",
+    "originalAmount": 0.1152152,
+    "orderSize": "0.1152",
+    "orderId": "1287433181478350848",
+    "status": "success"
+  },
+  {
+    "timestamp": "2025-03-22T20:15:10.722Z",
+    "symbol": "SOLUSDT",
+    "action": "buy",
+    "originalAmount": 15,
+    "orderSize": "15.00",
+    "orderId": "1287435698601816066",
+    "status": "success"
+  },
+  {
+    "timestamp": "2025-03-22T20:20:11.855Z",
+    "symbol": "SOLUSDT",
+    "action": "sell",
+    "originalAmount": 0.1153997,
+    "orderSize": "0.1153",
+    "orderId": "1287436961485778944",
+    "status": "success"
   }
 ]
