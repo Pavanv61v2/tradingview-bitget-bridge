@@ -43,12 +43,12 @@ jobs:
                 symbol = symbol.replace('USD', 'USDT');
               }
               
-              // Create payload according to Bitget API
+              // Create payload according to NEW Bitget API v2
               const payload = {
                 symbol: symbol,
                 side: signal.action.toLowerCase(),
                 orderType: signal.orderType.toLowerCase(),
-                force: 'gtc',
+                force: 'gtc', // Changed from 'normal' to 'gtc' per docs
                 size: signal.quantity.toString()
               };
               
@@ -59,10 +59,10 @@ jobs:
               
               console.log("Order payload:", payload);
               
-              // Create the signature according to Bitget documentation
-              const timestamp = Date.now().toString();
-              const requestPath = '/api/spot/v1/trade/orders';
+              // Use the updated API endpoint (v2)
+              const requestPath = '/api/v2/spot/trade/place-order';
               const method = 'POST';
+              const timestamp = Date.now().toString();
               
               // Convert payload to string
               const body = JSON.stringify(payload);
@@ -74,7 +74,7 @@ jobs:
               // Generate signature using HMAC SHA256 and BASE64 encoding
               const signature = crypto.createHmac('sha256', apiSecret)
                 .update(preHash)
-                .digest('base64');  // NOTE: Using base64 encoding as per Bitget docs
+                .digest('base64');
               
               console.log("Generated signature (partial):", signature.substring(0, 10) + "...");
               
