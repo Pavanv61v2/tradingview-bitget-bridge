@@ -18,7 +18,7 @@ jobs:
           echo "Received trading signal"
           echo "Symbol: ${{ github.event.client_payload.symbol }}"
           echo "Action: ${{ github.event.client_payload.action }}"
-          echo "Quantity: ${{ github.event.client_payload.quantity }}"
+          echo "Order size: ${{ github.event.client_payload.order_size }}"
           
           # Install dependencies
           npm install axios crypto-js
@@ -38,28 +38,58 @@ jobs:
               console.log("Processing signal:", signal);
               
               // Format symbol
-              let symbol = signal.symbol.replace('/', '').toUpperCase();
+              let symbol = signal.symbol || signal.ticker;
+              symbol = symbol.replace('/', '').toUpperCase();
               if (symbol.endsWith('USD') && !symbol.endsWith('USDT')) {
                 symbol = symbol.replace('USD', 'USDT');
               }
               
-              // Create payload according to NEW Bitget API v2
+              // Determine if this is a buy or sell order
+              const isBuy = signal.action.toLowerCase() === 'buy';
+              
+              let orderSize;
+              
+              if (isBuy) {
+                // BUY ORDER: Use the order_size directly as USDT amount
+                // For market buy, size is the amount of USDT to spend
+                
+                // Get the specified order size (in USDT)
+                let investmentAmount = 100; // Default amount in USDT
+                
+                if (signal.order_size && !isNaN(parseFloat(signal.order_size))) {
+                  investmentAmount = parseFloat(signal.order_size);
+                }
+                
+                orderSize = investmentAmount.toString();
+                console.log(`Buy order: Using ${orderSize} USDT to buy ${symbol}`);
+                
+              } else {
+                // SELL ORDER: Get current position and sell 100% of it
+                // For market sell, size is the amount of base currency (e.g., BTC) to sell
+                
+                // Get current position for the symbol
+                const position = await getAccountAssets(symbol);
+                
+                if (position && position.available && parseFloat(position.available) > 0) {
+                  orderSize = position.available;
+                  console.log(`Selling entire position: ${orderSize} ${position.coin}`);
+                } else {
+                  throw new Error(`No position found for ${symbol} or position is empty`);
+                }
+              }
+              
+              // Create payload according to Bitget API v2
               const payload = {
                 symbol: symbol,
-                side: signal.action.toLowerCase(),
-                orderType: signal.orderType.toLowerCase(),
-                force: 'gtc', // Changed from 'normal' to 'gtc' per docs
-                size: signal.quantity.toString()
+                side: isBuy ? 'buy' : 'sell',
+                orderType: 'market',
+                force: 'gtc',
+                size: orderSize.toString()
               };
-              
-              // Add price for limit orders
-              if (payload.orderType === 'limit' && signal.price) {
-                payload.price = signal.price.toString();
-              }
               
               console.log("Order payload:", payload);
               
-              // Use the updated API endpoint (v2)
+              // Use the API endpoint
               const requestPath = '/api/v2/spot/trade/place-order';
               const method = 'POST';
               const timestamp = Date.now().toString();
@@ -108,6 +138,44 @@ jobs:
                 console.error("Error response data:", JSON.stringify(error.response.data, null, 2));
               }
               process.exit(1);
+            }
+          }
+          
+          // Helper function to get account assets
+          async function getAccountAssets(symbol) {
+            const timestamp = Date.now().toString();
+            const requestPath = '/api/v2/spot/account/assets';
+            const method = 'GET';
+            
+            // Signature content: timestamp + method + requestPath
+            const preHash = timestamp + method.toUpperCase() + requestPath;
+            
+            // Generate signature
+            const signature = crypto.createHmac('sha256', process.env.BITGET_API_SECRET)
+              .update(preHash)
+              .digest('base64');
+            
+            const response = await axios({
+              method: method,
+              url: 'https://api.bitget.com' + requestPath,
+              headers: {
+                'ACCESS-KEY': process.env.BITGET_API_KEY,
+                'ACCESS-SIGN': signature,
+                'ACCESS-TIMESTAMP': timestamp,
+                'ACCESS-PASSPHRASE': process.env.BITGET_PASSPHRASE,
+                'Content-Type': 'application/json'
+              },
+              timeout: 10000
+            });
+            
+            if (response.data && response.data.code === '00000') {
+              // Find the asset for the specific coin (e.g., BTC for BTCUSDT)
+              const baseCoin = symbol.replace('USDT', '');
+              const asset = response.data.data.find(a => a.coin === baseCoin);
+              console.log(`Account assets for ${baseCoin}:`, asset);
+              return asset;
+            } else {
+              throw new Error(`Failed to get account assets: ${response.data ? response.data.msg : 'Unknown error'}`);
             }
           }
           
