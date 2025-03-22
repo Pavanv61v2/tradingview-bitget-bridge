@@ -1,38 +1,50 @@
 name: TradingView-Bitget Bridge
-
-on:
+'on':
   repository_dispatch:
-    types: [trading-signal]
-
+    types:
+      - trading-signal
 jobs:
   place-order:
     runs-on: ubuntu-latest
     steps:
       - name: Process Trading Signal
         env:
-          BITGET_API_KEY: ${{ secrets.BITGET_API_KEY }}
-          BITGET_API_SECRET: ${{ secrets.BITGET_API_SECRET }}
-          BITGET_PASSPHRASE: ${{ secrets.BITGET_PASSPHRASE }}
-          SIGNAL_DATA: ${{ toJson(github.event.client_payload) }}
+          BITGET_API_KEY: '${{ secrets.BITGET_API_KEY }}'
+          BITGET_API_SECRET: '${{ secrets.BITGET_API_SECRET }}'
+          BITGET_PASSPHRASE: '${{ secrets.BITGET_PASSPHRASE }}'
+          SIGNAL_DATA: '${{ toJson(github.event.client_payload) }}'
           NOTIFICATIONS_ENABLED: 'true'
-          NOTIFICATION_EMAIL: ${{ secrets.NOTIFICATION_EMAIL }}
-        run: |
+          NOTIFICATION_EMAIL: '${{ secrets.NOTIFICATION_EMAIL }}'
+        run: >
           echo "Received trading signal"
+
           echo "Symbol: ${{ github.event.client_payload.symbol }}"
+
           echo "Action: ${{ github.event.client_payload.action }}"
+
           echo "Order size: ${{ github.event.client_payload.order_size }}"
-          
+
+
           # Install dependencies
+
           npm install axios crypto-js nodemailer
-          
+
+
           # Create and run the trading script
+
           cat > trade.js << 'EOF'
+
           const axios = require('axios');
+
           const crypto = require('crypto');
+
           const nodemailer = require('nodemailer');
+
           const fs = require('fs');
-          
+
+
           // Common scale (decimal places) for cryptocurrencies
+
           const coinScales = {
             'BTC': 6,
             'ETH': 5,
@@ -45,14 +57,21 @@ jobs:
             // Default scale for others
             'DEFAULT': 4
           };
-          
+
+
           // Trade log file
+
           const TRADE_LOG_FILE = 'trade_history.json';
-          
+
+
           // Notification settings
-          const NOTIFICATIONS_ENABLED = process.env.NOTIFICATIONS_ENABLED === 'true';
+
+          const NOTIFICATIONS_ENABLED = process.env.NOTIFICATIONS_ENABLED ===
+          'true';
+
           const NOTIFICATION_EMAIL = process.env.NOTIFICATION_EMAIL;
-          
+
+
           async function placeOrder() {
             try {
               const apiKey = process.env.BITGET_API_KEY;
@@ -279,8 +298,10 @@ jobs:
               process.exit(1);
             }
           }
-          
+
+
           // Helper function to get account assets
+
           async function getAccountAssets(symbol) {
             const timestamp = Date.now().toString();
             const requestPath = '/api/v2/spot/account/assets';
@@ -317,8 +338,10 @@ jobs:
               throw new Error(`Failed to get account assets: ${response.data ? response.data.msg : 'Unknown error'}`);
             }
           }
-          
+
+
           // Helper function to log trades
+
           async function logTrade(tradeInfo) {
             try {
               // Check if the log file exists
@@ -339,8 +362,10 @@ jobs:
               console.error("Error logging trade:", error.message);
             }
           }
-          
+
+
           // Helper function to send email notifications
+
           async function sendNotification(subject, body) {
             if (!NOTIFICATIONS_ENABLED || !NOTIFICATION_EMAIL) {
               console.log("Notifications disabled or email not configured");
@@ -364,9 +389,31 @@ jobs:
               console.error("Error sending notification:", error.message);
             }
           }
-          
+
+
           // Execute the function
+
           placeOrder();
+
           EOF
-          
+
+
           node trade.js
+      - name: Commit updated trade history
+        if: success()
+        run: |
+          # Configure git
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+
+          # Check if trade_history.json was created/updated
+          if [ -f "trade_history.json" ]; then
+            # Add and commit the file
+            git add trade_history.json
+            git commit -m "Update trade history from latest trade" || echo "No changes to commit"
+            
+            # Push changes back to repository
+            git push || echo "Nothing to push"
+          else
+            echo "No trade_history.json file found to commit"
+          fi
