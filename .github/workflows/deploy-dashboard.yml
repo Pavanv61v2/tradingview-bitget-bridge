@@ -8,13 +8,19 @@ jobs:
     runs-on: ubuntu-latest
     
     permissions:
-      contents: write  # This is important for allowing the action to push
+      contents: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          persist-credentials: false  # This is important
+          persist-credentials: false
+      
+      # Ensure we have the dashboard HTML
+      - name: Copy dashboard HTML
+        run: |
+          # If your dashboard HTML is in a different file or location, adjust this line
+          cp dashboard/index.html index.html || echo "Dashboard HTML already at root"
       
       - name: Create sample trade history
         run: |
@@ -53,4 +59,4 @@ jobs:
         with:
           branch: gh-pages
           folder: .
-          clean: false  # Don't remove existing files
+          clean: true  # Changed to true to remove old files
