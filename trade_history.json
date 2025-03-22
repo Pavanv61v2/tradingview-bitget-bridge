@@ -1,29 +1,9 @@
 [
   {
-    "timestamp": "2025-03-20T12:00:00.000Z",
-    "symbol": "BTCUSDT",
-    "action": "buy",
-    "originalAmount": 100,
-    "orderSize": "100.00",
-    "orderId": "12345678",
-    "status": "success"
-  },
-  {
-    "timestamp": "2025-03-20T13:30:00.000Z",
-    "symbol": "BTCUSDT",
-    "action": "sell",
-    "originalAmount": 0.002,
-    "orderSize": "0.002",
-    "orderId": "12345679",
-    "status": "success"
-  },
-  {
-    "timestamp": "2025-03-21T09:15:00.000Z",
-    "symbol": "SOLUSDT",
-    "action": "buy",
-    "originalAmount": 200,
-    "orderSize": "200.00",
-    "orderId": "12345680",
-    "status": "success"
+    "timestamp": "2025-03-22T14:30:43.886Z",
+    "symbol": "UNKNOWN",
+    "action": "UNKNOWN",
+    "status": "failed",
+    "error": "Cannot read properties of null (reading 'symbol')"
   }
 ]
