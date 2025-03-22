@@ -1,0 +1,9 @@
+[
+  {
+    "timestamp": "2025-03-22T14:30:43.886Z",
+    "symbol": "UNKNOWN",
+    "action": "UNKNOWN",
+    "status": "failed",
+    "error": "Cannot read properties of null (reading 'symbol')"
+  }
+]
