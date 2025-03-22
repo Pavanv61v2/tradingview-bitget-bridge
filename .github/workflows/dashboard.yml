@@ -5,6 +5,11 @@ on:
   schedule:
     - cron: '0 */6 * * *'  # Run every 6 hours
 
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
 jobs:
   deploy-dashboard:
     runs-on: ubuntu-latest
@@ -13,30 +18,28 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
         
-      - name: Set up Git user
-        run: |
-          git config --global user.name "GitHub Action"
-          git config --global user.email "action@github.com"
-      
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+        
       - name: Create dashboard directory
         run: |
-          mkdir -p dashboard
+          mkdir -p _site
           
-      - name: Copy trade history to dashboard folder
+      - name: Prepare dashboard files
         run: |
+          # Copy dashboard HTML
+          cp .github/dashboard/index.html _site/index.html
+          
+          # Copy or create trade history
           if [ -f "trade_history.json" ]; then
-            cp trade_history.json dashboard/
+            cp trade_history.json _site/
           else
-            echo "[]" > dashboard/trade_history.json
+            echo "[]" > _site/trade_history.json
           fi
       
-      - name: Copy dashboard HTML file
-        run: |
-          cp .github/dashboard/index.html dashboard/
-      
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v2
+        
       - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@4.1.4
-        with:
-          branch: gh-pages
-          folder: dashboard
-          clean: true
+        id: deployment
+        uses: actions/deploy-pages@v2
