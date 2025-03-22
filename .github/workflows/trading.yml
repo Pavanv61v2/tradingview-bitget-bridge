@@ -43,13 +43,13 @@ jobs:
                 symbol = symbol.replace('USD', 'USDT');
               }
               
-              // According to latest Bitget API documentation
+              // Create payload according to Bitget API
               const payload = {
                 symbol: symbol,
                 side: signal.action.toLowerCase(),
                 orderType: signal.orderType.toLowerCase(),
                 force: 'normal',
-                size: signal.quantity.toString() // Bitget uses 'size' not 'quantity'
+                size: signal.quantity.toString()
               };
               
               // Add price for limit orders
@@ -59,31 +59,30 @@ jobs:
               
               console.log("Order payload:", payload);
               
-              // Create the signature according to Bitget's requirements
-              // https://www.bitget.com/api-doc/common/verification
+              // Create the signature according to Bitget documentation
               const timestamp = Date.now().toString();
-              const endpoint = '/api/spot/v1/trade/orders';
+              const requestPath = '/api/spot/v1/trade/orders';
               const method = 'POST';
               
-              // Bitget requires stringified JSON payload
-              const jsonPayload = JSON.stringify(payload);
+              // Convert payload to string
+              const body = JSON.stringify(payload);
               
-              // Signature format: timestamp + method + requestPath + body
-              const preHashString = timestamp + method + endpoint + jsonPayload;
-              console.log("Pre-hash string:", preHashString);
+              // Signature content: timestamp + method + requestPath + body
+              const preHash = timestamp + method.toUpperCase() + requestPath + body;
+              console.log("Pre-hash string:", preHash);
               
-              // Create the signature using HMAC SHA256
+              // Generate signature using HMAC SHA256 and BASE64 encoding
               const signature = crypto.createHmac('sha256', apiSecret)
-                .update(preHashString)
-                .digest('hex');
+                .update(preHash)
+                .digest('base64');  // NOTE: Using base64 encoding as per Bitget docs
               
               console.log("Generated signature (partial):", signature.substring(0, 10) + "...");
               
-              // Make the request to Bitget API
+              // Make the request
               console.log("Making request to Bitget API...");
               const response = await axios({
                 method: method,
-                url: 'https://api.bitget.com' + endpoint,
+                url: 'https://api.bitget.com' + requestPath,
                 headers: {
                   'ACCESS-KEY': apiKey,
                   'ACCESS-SIGN': signature,
