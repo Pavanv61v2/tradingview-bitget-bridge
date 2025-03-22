@@ -7,19 +7,14 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     
+    permissions:
+      contents: write  # This is important for allowing the action to push
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      
-      - name: Setup Git
-        run: |
-          git config --global user.name "GitHub Action"
-          git config --global user.email "action@github.com"
-      
-      - name: Create gh-pages branch if it doesn't exist
-        run: |
-          git checkout -b gh-pages || git checkout gh-pages
-          git pull origin gh-pages --rebase || echo "No gh-pages branch yet"
+        with:
+          persist-credentials: false  # This is important
       
       - name: Create sample trade history
         run: |
@@ -54,13 +49,8 @@ jobs:
           ]' > trade_history.json
       
       - name: Deploy to GitHub Pages
-        run: |
-          # Make sure index.html exists on this branch
-          cp index.html index.html || echo "index.html already exists"
-          
-          # Add all changes
-          git add .
-          git commit -m "Update dashboard" || echo "No changes to commit"
-          
-          # Push to gh-pages branch
-          git push origin gh-pages --force
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: .
+          clean: false  # Don't remove existing files
