@@ -41,5 +41,12 @@
     "action": "UNKNOWN",
     "status": "failed",
     "error": "All 3 attempts failed: Request failed with status code 400"
+  },
+  {
+    "timestamp": "2025-03-22T16:52:34.085Z",
+    "symbol": "SOLUSDT",
+    "action": "sell",
+    "status": "failed",
+    "error": "All 3 attempts failed: Request failed with status code 400"
   }
 ]
