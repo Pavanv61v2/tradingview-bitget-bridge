@@ -28,6 +28,20 @@ jobs:
           const axios = require('axios');
           const crypto = require('crypto');
           
+          // Common scale (decimal places) for cryptocurrencies
+          const coinScales = {
+            'BTC': 6,
+            'ETH': 5,
+            'SOL': 4,
+            'XRP': 2,
+            'ADA': 2,
+            'DOT': 3,
+            'DOGE': 2,
+            'SHIB': 0,
+            // Default scale for others
+            'DEFAULT': 4
+          };
+          
           async function placeOrder() {
             try {
               const apiKey = process.env.BITGET_API_KEY;
@@ -43,6 +57,9 @@ jobs:
               if (symbol.endsWith('USD') && !symbol.endsWith('USDT')) {
                 symbol = symbol.replace('USD', 'USDT');
               }
+              
+              // Extract base coin name
+              const baseCoin = symbol.replace('USDT', '');
               
               // Determine if this is a buy or sell order
               const isBuy = signal.action.toLowerCase() === 'buy';
@@ -60,7 +77,8 @@ jobs:
                   investmentAmount = parseFloat(signal.order_size);
                 }
                 
-                orderSize = investmentAmount.toString();
+                // For USDT, we use 2 decimal places
+                orderSize = investmentAmount.toFixed(2);
                 console.log(`Buy order: Using ${orderSize} USDT to buy ${symbol}`);
                 
               } else {
@@ -71,8 +89,12 @@ jobs:
                 const position = await getAccountAssets(symbol);
                 
                 if (position && position.available && parseFloat(position.available) > 0) {
-                  orderSize = position.available;
-                  console.log(`Selling entire position: ${orderSize} ${position.coin}`);
+                  // Get the appropriate decimal scale for this coin
+                  const scale = coinScales[baseCoin] || coinScales['DEFAULT'];
+                  
+                  // Format the size with the appropriate number of decimal places
+                  orderSize = parseFloat(position.available).toFixed(scale);
+                  console.log(`Selling entire position: ${orderSize} ${position.coin} (formatted to ${scale} decimal places)`);
                 } else {
                   throw new Error(`No position found for ${symbol} or position is empty`);
                 }
@@ -84,7 +106,7 @@ jobs:
                 side: isBuy ? 'buy' : 'sell',
                 orderType: 'market',
                 force: 'gtc',
-                size: orderSize.toString()
+                size: orderSize
               };
               
               console.log("Order payload:", payload);
