@@ -1,16 +1,29 @@
 [
   {
-    "timestamp": "2025-03-22T14:30:43.886Z",
-    "symbol": "UNKNOWN",
-    "action": "UNKNOWN",
-    "status": "failed",
-    "error": "Cannot read properties of null (reading 'symbol')"
+    "timestamp": "2025-03-23T14:00:00.000Z",
+    "symbol": "BTCUSDT",
+    "action": "buy",
+    "originalAmount": 100,
+    "orderSize": "100.00",
+    "orderId": "sample-123456",
+    "status": "success"
   },
   {
-    "timestamp": "2025-03-22T14:35:19.120Z",
-    "symbol": "UNKNOWN",
-    "action": "UNKNOWN",
-    "status": "failed",
-    "error": "Cannot read properties of null (reading 'symbol')"
+    "timestamp": "2025-03-23T16:30:00.000Z",
+    "symbol": "ETHUSDT",
+    "action": "buy",
+    "originalAmount": 150,
+    "orderSize": "150.00",
+    "orderId": "sample-123457",
+    "status": "success"
+  },
+  {
+    "timestamp": "2025-03-23T18:15:00.000Z",
+    "symbol": "BTCUSDT",
+    "action": "sell",
+    "originalAmount": 0.002,
+    "orderSize": "0.002",
+    "orderId": "sample-123458",
+    "status": "success"
   }
 ]
