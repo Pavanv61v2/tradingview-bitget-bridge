@@ -5,5 +5,12 @@
     "action": "UNKNOWN",
     "status": "failed",
     "error": "Cannot read properties of null (reading 'symbol')"
+  },
+  {
+    "timestamp": "2025-03-22T14:35:19.120Z",
+    "symbol": "UNKNOWN",
+    "action": "UNKNOWN",
+    "status": "failed",
+    "error": "Cannot read properties of null (reading 'symbol')"
   }
 ]
