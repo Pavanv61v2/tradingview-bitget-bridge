@@ -7,38 +7,19 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     
-    # Add permission for GitHub Pages
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
-    
-    # Deploy to the github-pages environment
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
       
-      # Explicitly add the missing dependency
-      - name: Setup Upload Artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: dummy-artifact
-          path: README.md
-          retention-days: 1
-          if-no-files-found: ignore
+      - name: Setup Git
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
       
-      - name: Setup GitHub Pages
-        uses: actions/configure-pages@v3
-        
-      - name: Create site directory
-        run: mkdir -p _site
-          
-      - name: Copy index.html to site directory
-        run: cp index.html _site/index.html
+      - name: Create gh-pages branch if it doesn't exist
+        run: |
+          git checkout -b gh-pages || git checkout gh-pages
+          git pull origin gh-pages --rebase || echo "No gh-pages branch yet"
       
       - name: Create sample trade history
         run: |
@@ -70,21 +51,16 @@ jobs:
               "orderId": "12345680",
               "status": "success"
             }
-          ]' > _site/trade_history.json
-      
-      # Use a direct zip and upload approach
-      - name: Archive site contents
-        run: |
-          cd _site
-          zip -r ../artifact.zip .
-      
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: github-pages
-          path: artifact.zip
-          retention-days: 1
+          ]' > trade_history.json
       
       - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v1
+        run: |
+          # Make sure index.html exists on this branch
+          cp index.html index.html || echo "index.html already exists"
+          
+          # Add all changes
+          git add .
+          git commit -m "Update dashboard" || echo "No changes to commit"
+          
+          # Push to gh-pages branch
+          git push origin gh-pages --force
