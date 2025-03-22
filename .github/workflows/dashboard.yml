@@ -1,0 +1,60 @@
+name: Deploy Dashboard
+
+on:
+  workflow_dispatch:  # Manual trigger
+  schedule:
+    - cron: '0 */6 * * *'  # Run every 6 hours
+
+jobs:
+  deploy-dashboard:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  # Full git history
+          
+      - name: Set up Git user
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+      
+      - name: Create dashboard directory if it doesn't exist
+        run: |
+          mkdir -p dashboard
+          
+      - name: Copy trade history to dashboard folder
+        run: |
+          if [ -f "trade_history.json" ]; then
+            cp trade_history.json dashboard/
+          else
+            echo "[]" > dashboard/trade_history.json
+          fi
+      
+      - name: Deploy dashboard
+        run: |
+          # Copy dashboard HTML file
+          cp .github/dashboard/index.html dashboard/
+          
+          # Create gh-pages branch if it doesn't exist
+          if ! git ls-remote --heads origin gh-pages; then
+            git checkout --orphan gh-pages
+            git rm -rf .
+            echo "# Trade Dashboard" > README.md
+            git add README.md
+            git commit -m "Initial gh-pages branch"
+            git push origin gh-pages
+          fi
+          
+          # Switch to gh-pages branch
+          git fetch
+          git checkout gh-pages
+          
+          # Update dashboard files
+          cp -r dashboard/* .
+          
+          # Commit and push changes
+          git add .
+          git commit -m "Update dashboard [skip ci]" || echo "No changes to commit"
+          git push origin gh-pages || echo "No changes to push"
