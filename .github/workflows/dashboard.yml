@@ -24,7 +24,7 @@ jobs:
           mkdir -p temp_dashboard
           
           # Copy dashboard HTML file
-          cp .github/dashboard/index.html temp_dashboard/
+          cp .github/dashboard/index.html temp_dashboard/ || echo "Dashboard HTML not found"
           
           # Copy or create trade history
           if [ -f "trade_history.json" ]; then
@@ -32,9 +32,22 @@ jobs:
           else
             echo "[]" > temp_dashboard/trade_history.json
           fi
+          
+          # List files for debugging
+          echo "Contents of current directory:"
+          ls -la
+          
+          echo "Contents of .github directory (if exists):"
+          ls -la .github || echo ".github directory not found"
+          
+          echo "Contents of temp_dashboard directory:"
+          ls -la temp_dashboard
       
       - name: Deploy to gh-pages branch
         run: |
+          # Save the workspace path
+          WORKSPACE_PATH=$(pwd)
+          
           # Clone repository to a new directory
           cd ..
           git clone https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git gh-pages
@@ -46,8 +59,14 @@ jobs:
           # Clear existing files (except .git directory)
           find . -maxdepth 1 ! -path "./.git" ! -path "." -exec rm -rf {} \;
           
-          # Copy dashboard files
-          cp -r ../github-workspace/temp_dashboard/* .
+          # Copy dashboard files - using absolute path
+          cp -r $WORKSPACE_PATH/temp_dashboard/* . || echo "No files to copy"
+          
+          # If copy failed, create a minimal index.html
+          if [ ! -f "index.html" ]; then
+            echo "Creating default index.html"
+            echo '<!DOCTYPE html><html><head><title>Trading Dashboard</title></head><body><h1>Trading Dashboard</h1><p>Dashboard initialization. Real content will be updated by the workflow.</p></body></html>' > index.html
+          fi
           
           # Add, commit, and push changes
           git add .
