@@ -3,7 +3,7 @@ name: TradingView-Bitget Bridge
 on:
   repository_dispatch:
     types: [trading-signal]
-  workflow_dispatch:  # Added for manual testing
+  workflow_dispatch:  # Keep for manual testing if needed
 
 jobs:
   place-order:
@@ -22,9 +22,9 @@ jobs:
           NOTIFICATION_EMAIL: ${{ secrets.NOTIFICATION_EMAIL }}
         run: |
           echo "Received trading signal"
-          echo "Symbol: ${{ github.event.client_payload.symbol || 'BTCUSDT' }}"
-          echo "Action: ${{ github.event.client_payload.action || 'buy' }}"
-          echo "Order size: ${{ github.event.client_payload.order_size || '100' }}"
+          echo "Symbol: ${{ github.event.client_payload.symbol || 'N/A' }}"
+          echo "Action: ${{ github.event.client_payload.action || 'N/A' }}"
+          echo "Order size: ${{ github.event.client_payload.order_size || 'N/A' }}"
           
           # Install dependencies
           npm install axios crypto-js nodemailer
@@ -63,27 +63,26 @@ jobs:
               const apiSecret = process.env.BITGET_API_SECRET;
               const passphrase = process.env.BITGET_PASSPHRASE;
               
-              // Parse signal data or use defaults for testing
+              // Parse signal data
               let signal;
               try {
-                signal = process.env.SIGNAL_DATA ? JSON.parse(process.env.SIGNAL_DATA) : {
-                  symbol: 'BTCUSDT',
-                  action: 'buy',
-                  order_size: '100'
-                };
+                signal = process.env.SIGNAL_DATA ? JSON.parse(process.env.SIGNAL_DATA) : null;
+                if (!signal) {
+                  throw new Error("No signal data provided");
+                }
               } catch(e) {
-                console.log("Error parsing signal data, using defaults:", e.message);
-                signal = {
-                  symbol: 'BTCUSDT',
-                  action: 'buy',
-                  order_size: '100'
-                };
+                console.error("Error parsing signal data:", e.message);
+                throw e;
               }
               
               console.log("Processing signal:", signal);
               
               // Format symbol
-              let symbol = signal.symbol || signal.ticker || 'BTCUSDT';
+              let symbol = signal.symbol || signal.ticker;
+              if (!symbol) {
+                throw new Error("No symbol provided in signal");
+              }
+              
               symbol = symbol.replace('/', '').toUpperCase();
               if (symbol.endsWith('USD') && !symbol.endsWith('USDT')) {
                 symbol = symbol.replace('USD', 'USDT');
@@ -93,13 +92,20 @@ jobs:
               const baseCoin = symbol.replace('USDT', '');
               
               // Determine if this is a buy or sell order
-              const isBuy = signal.action ? signal.action.toLowerCase() === 'buy' : true;
+              if (!signal.action) {
+                throw new Error("No action (buy/sell) provided in signal");
+              }
+              
+              const isBuy = signal.action.toLowerCase() === 'buy';
               
               let orderSize;
               let originalAmount;
               
               if (isBuy) {
                 // BUY ORDER: Use the order_size directly as USDT amount
+                // For market buy, size is the amount of USDT to spend
+                
+                // Get the specified order size (in USDT)
                 let investmentAmount = 100; // Default amount in USDT
                 
                 if (signal.order_size && !isNaN(parseFloat(signal.order_size))) {
@@ -107,29 +113,146 @@ jobs:
                 }
                 
                 originalAmount = investmentAmount;
+                
+                // For USDT, we use 2 decimal places
                 orderSize = investmentAmount.toFixed(2);
                 console.log(`Buy order: Using ${orderSize} USDT to buy ${symbol}`);
                 
               } else {
-                // For testing, just use a fixed sell amount
-                orderSize = "0.001";
-                originalAmount = 0.001;
-                console.log(`Sell order: Selling ${orderSize} ${baseCoin}`);
+                // SELL ORDER: Get current position and sell 100% of it
+                // For market sell, size is the amount of base currency (e.g., BTC) to sell
+                
+                // Get current position for the symbol
+                const position = await getAccountAssets(symbol);
+                
+                if (position && position.available && parseFloat(position.available) > 0) {
+                  // Get the appropriate decimal scale for this coin
+                  const scale = coinScales[baseCoin] || coinScales['DEFAULT'];
+                  
+                  // Get the available amount
+                  const availableAmount = parseFloat(position.available);
+                  originalAmount = availableAmount;
+                  
+                  // Handle based on position size
+                  if (availableAmount >= 0.1) {
+                    // For larger positions: Round down slightly to ensure order goes through
+                    const multiplier = Math.pow(10, scale);
+                    const roundedDown = Math.floor(availableAmount * multiplier) / multiplier;
+                    orderSize = roundedDown.toFixed(scale);
+                    console.log(`Selling larger position (rounded down): ${orderSize} ${position.coin} (original: ${position.available})`);
+                  } else {
+                    // For small "dust-like" positions: Sell 99.5% to ensure order success
+                    // This helps with tiny positions where precision matters more
+                    const safeAmount = availableAmount * 0.995;
+                    orderSize = safeAmount.toFixed(scale);
+                    console.log(`Selling small position (99.5%): ${orderSize} ${position.coin} (original: ${position.available})`);
+                  }
+                } else {
+                  const errorMsg = `No position found for ${symbol} or position is empty`;
+                  console.error(errorMsg);
+                  await sendNotification(
+                    `Error: Nothing to Sell - ${symbol}`,
+                    `Attempted to sell ${symbol} but no position was found or it was empty.`
+                  );
+                  throw new Error(errorMsg);
+                }
               }
               
-              // For testing/demo, we'll create a mock response
-              const mockResponse = {
-                data: {
-                  code: '00000',
-                  data: {
-                    orderId: 'test-' + Date.now()
-                  },
-                  msg: 'success'
-                }
+              // Create payload according to Bitget API v2
+              const payload = {
+                symbol: symbol,
+                side: isBuy ? 'buy' : 'sell',
+                orderType: 'market',
+                force: 'gtc',
+                size: orderSize
               };
               
-              console.log("Mock order placed successfully!");
-              console.log("Mock API response:", JSON.stringify(mockResponse.data, null, 2));
+              // Add take profit and stop loss if provided
+              if (isBuy && signal.takeProfit && !isNaN(parseFloat(signal.takeProfit))) {
+                payload.presetTakeProfitPrice = parseFloat(signal.takeProfit).toString();
+              }
+              
+              if (isBuy && signal.stopLoss && !isNaN(parseFloat(signal.stopLoss))) {
+                payload.presetStopLossPrice = parseFloat(signal.stopLoss).toString();
+              }
+              
+              console.log("Order payload:", payload);
+              
+              // Use the API endpoint
+              const requestPath = '/api/v2/spot/trade/place-order';
+              const method = 'POST';
+              const timestamp = Date.now().toString();
+              
+              // Convert payload to string
+              const body = JSON.stringify(payload);
+              
+              // Signature content: timestamp + method + requestPath + body
+              const preHash = timestamp + method.toUpperCase() + requestPath + body;
+              
+              // Generate signature using HMAC SHA256 and BASE64 encoding
+              const signature = crypto.createHmac('sha256', apiSecret)
+                .update(preHash)
+                .digest('base64');
+              
+              console.log("Making request to Bitget API...");
+              
+              // Retry configuration
+              const maxRetries = 3;
+              let attempts = 0;
+              let success = false;
+              let lastError = null;
+              let response = null;
+              
+              while (attempts < maxRetries && !success) {
+                attempts++;
+                try {
+                  response = await axios({
+                    method: method,
+                    url: 'https://api.bitget.com' + requestPath,
+                    headers: {
+                      'ACCESS-KEY': apiKey,
+                      'ACCESS-SIGN': signature,
+                      'ACCESS-TIMESTAMP': timestamp,
+                      'ACCESS-PASSPHRASE': passphrase,
+                      'Content-Type': 'application/json'
+                    },
+                    data: payload,
+                    timeout: 10000
+                  });
+                  
+                  if (response.data && response.data.code === '00000') {
+                    success = true;
+                  } else {
+                    throw new Error(`Bitget error: ${response.data ? response.data.msg : 'Unknown error'}`);
+                  }
+                } catch (error) {
+                  lastError = error;
+                  console.error(`Attempt ${attempts}/${maxRetries} failed:`, error.message);
+                  if (error.response) {
+                    console.error("Error response data:", JSON.stringify(error.response.data, null, 2));
+                  }
+                  
+                  // Wait before retrying (exponential backoff)
+                  if (attempts < maxRetries) {
+                    const delay = Math.pow(2, attempts) * 1000;
+                    console.log(`Retrying in ${delay/1000} seconds...`);
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                  }
+                }
+              }
+              
+              if (!success) {
+                const errorMsg = `All ${maxRetries} attempts failed: ${lastError.message}`;
+                console.error(errorMsg);
+                await sendNotification(
+                  `Error: Order Failed - ${symbol}`,
+                  `Failed to place ${isBuy ? 'buy' : 'sell'} order for ${symbol} after ${maxRetries} attempts.\n\nError: ${lastError.message}`
+                );
+                throw new Error(errorMsg);
+              }
+              
+              console.log("Order placed successfully!");
+              console.log("Bitget API response:", JSON.stringify(response.data, null, 2));
               
               // Log the trade
               const tradeInfo = {
@@ -138,14 +261,26 @@ jobs:
                 action: isBuy ? 'buy' : 'sell',
                 originalAmount: originalAmount,
                 orderSize: orderSize,
-                orderId: mockResponse.data.data.orderId,
+                orderId: response.data.data.orderId,
                 status: 'success'
               };
               
               await logTrade(tradeInfo);
-              console.log("Trade information logged successfully");
               
-              return mockResponse.data;
+              // Send notification
+              if (isBuy) {
+                await sendNotification(
+                  `Buy Order Executed - ${symbol}`,
+                  `Successfully bought ${symbol} with ${orderSize} USDT\n\nOrder ID: ${response.data.data.orderId}`
+                );
+              } else {
+                await sendNotification(
+                  `Sell Order Executed - ${symbol}`,
+                  `Successfully sold ${orderSize} ${baseCoin}\n\nOrder ID: ${response.data.data.orderId}`
+                );
+              }
+              
+              return response.data;
               
             } catch (error) {
               console.error("Error placing order:", error.message);
@@ -159,31 +294,58 @@ jobs:
               };
               
               await logTrade(tradeInfo);
-              console.log("Error logged to trade history");
               
               return { error: error.message };
+            }
+          }
+          
+          // Helper function to get account assets
+          async function getAccountAssets(symbol) {
+            const timestamp = Date.now().toString();
+            const requestPath = '/api/v2/spot/account/assets';
+            const method = 'GET';
+            
+            // Signature content: timestamp + method + requestPath
+            const preHash = timestamp + method.toUpperCase() + requestPath;
+            
+            // Generate signature
+            const signature = crypto.createHmac('sha256', process.env.BITGET_API_SECRET)
+              .update(preHash)
+              .digest('base64');
+            
+            const response = await axios({
+              method: method,
+              url: 'https://api.bitget.com' + requestPath,
+              headers: {
+                'ACCESS-KEY': process.env.BITGET_API_KEY,
+                'ACCESS-SIGN': signature,
+                'ACCESS-TIMESTAMP': timestamp,
+                'ACCESS-PASSPHRASE': process.env.BITGET_PASSPHRASE,
+                'Content-Type': 'application/json'
+              },
+              timeout: 10000
+            });
+            
+            if (response.data && response.data.code === '00000') {
+              // Find the asset for the specific coin (e.g., BTC for BTCUSDT)
+              const baseCoin = symbol.replace('USDT', '');
+              const asset = response.data.data.find(a => a.coin === baseCoin);
+              console.log(`Account assets for ${baseCoin}:`, asset);
+              return asset;
+            } else {
+              throw new Error(`Failed to get account assets: ${response.data ? response.data.msg : 'Unknown error'}`);
             }
           }
           
           // Helper function to log trades
           async function logTrade(tradeInfo) {
             try {
-              console.log("Attempting to log trade to", TRADE_LOG_FILE);
               // Check if the log file exists
               let trades = [];
               if (fs.existsSync(TRADE_LOG_FILE)) {
                 // Read existing logs
                 const data = fs.readFileSync(TRADE_LOG_FILE, 'utf8');
-                console.log("Existing trade history found");
-                try {
-                  trades = JSON.parse(data);
-                  console.log(`Parsed ${trades.length} existing trades`);
-                } catch (e) {
-                  console.error("Error parsing trade history JSON:", e.message);
-                  trades = [];
-                }
-              } else {
-                console.log("No existing trade history found, creating new file");
+                trades = JSON.parse(data);
               }
               
               // Add the new trade
@@ -191,27 +353,39 @@ jobs:
               
               // Write back to file
               fs.writeFileSync(TRADE_LOG_FILE, JSON.stringify(trades, null, 2));
-              console.log(`Trade logged successfully! Total trades: ${trades.length}`);
-              
-              // List directory contents for debugging
-              console.log("Files in current directory:");
-              fs.readdirSync('./').forEach(file => {
-                console.log(" - " + file);
-              });
+              console.log("Trade logged successfully");
             } catch (error) {
               console.error("Error logging trade:", error.message);
             }
           }
           
+          // Helper function to send email notifications
+          async function sendNotification(subject, body) {
+            if (!NOTIFICATIONS_ENABLED || !NOTIFICATION_EMAIL) {
+              console.log("Notifications disabled or email not configured");
+              return;
+            }
+            
+            try {
+              // Using GitHub Actions to create a notification issue instead of email
+              // This is a workaround since we can't easily send emails from GitHub Actions
+              
+              // Print the notification to the log
+              console.log("==== NOTIFICATION ====");
+              console.log("Subject:", subject);
+              console.log("Body:", body);
+              console.log("======================");
+              
+              // In a real-world scenario, you would use nodemailer to send an email here
+            } catch (error) {
+              console.error("Error sending notification:", error.message);
+            }
+          }
+          
           // Execute the function
-          placeOrder().then(() => {
-            console.log("Order process completed");
-          }).catch(err => {
-            console.error("Unhandled error:", err);
-          });
+          placeOrder();
           EOF
           
-          # Run the trading script
           node trade.js
           
           # Debug: List files after script execution
@@ -224,11 +398,8 @@ jobs:
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
           
-          # Debug: Check if trade_history.json exists
+          # Check if trade_history.json exists
           if [ -f "trade_history.json" ]; then
-            echo "trade_history.json found, contents:"
-            cat trade_history.json
-            
             # Add the file and commit
             git add trade_history.json
             git commit -m "Update trade history [skip ci]" || echo "No changes to commit"
@@ -236,10 +407,5 @@ jobs:
             # Push changes to the repository
             git push || echo "Failed to push changes"
           else
-            echo "trade_history.json not found, creating sample file"
-            echo '[{"timestamp":"2025-03-23T14:00:00.000Z","symbol":"BTCUSDT","action":"buy","originalAmount":100,"orderSize":"100.00","orderId":"sample-order","status":"success"}]' > trade_history.json
-            
-            git add trade_history.json
-            git commit -m "Create sample trade history [skip ci]"
-            git push
+            echo "trade_history.json not found"
           fi
