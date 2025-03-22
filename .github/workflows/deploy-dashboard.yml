@@ -1,82 +1,90 @@
 name: Deploy Dashboard
-
-on:
-  workflow_dispatch:  # Manual trigger
-
+'on':
+  workflow_dispatch: null
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      
       - name: Setup GitHub Pages
         id: pages
         uses: actions/configure-pages@v3
-        
       - name: Create dashboard directory
         run: mkdir -p _site
-          
       - name: Create index.html
-        run: |
+        run: >
           cat > _site/index.html << 'EOF'
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trading Bot Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <style>
-        body {
+
+          <!DOCTYPE html>
+
+          <html lang="en">
+
+          <head>
+
+          <meta charset="UTF-8">
+
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+          <title>Trading Bot Dashboard</title>
+
+          <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+          <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+          <style>
+
+          body {
             background-color: #f8f9fa;
-        }
-        .card {
+          }
+
+          .card {
             margin-bottom: 20px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        .card-header {
+          }
+            .card-header {
             font-weight: bold;
-        }
-        .buy-bg {
+            }
+            .buy-bg {
             background-color: rgba(40, 167, 69, 0.1);
-        }
-        .sell-bg {
+            }
+            .sell-bg {
             background-color: rgba(220, 53, 69, 0.1);
-        }
-        .buy-text {
+            }
+            .buy-text {
             color: #28a745;
-        }
-        .sell-text {
+            }
+            .sell-text {
             color: #dc3545;
-        }
-        .stats-card {
+            }
+            .stats-card {
             transition: all 0.3s;
-        }
-        .stats-card:hover {
+            }
+            .stats-card:hover {
             transform: translateY(-5px);
-        }
-        .table td, .table th {
+            }
+            .table td, .table th {
             vertical-align: middle;
-        }
-        .failed {
+            }
+            .failed {
             background-color: rgba(220, 53, 69, 0.1);
-        }
-    </style>
-</head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
+            }
+            </style>
+            </head>
+            <body>
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container">
             <a class="navbar-brand" href="#">
                 <i class="bi bi-robot"></i> TradingView-Bitget Bridge
             </a>
-        </div>
-    </nav>
+            </div>
+            </nav>
 
-    <div class="container mt-4">
-        <div class="row">
+            <div class="container mt-4">
+            <div class="row">
             <div class="col-md-3">
                 <div class="card stats-card text-center">
                     <div class="card-body">
@@ -109,9 +117,9 @@ jobs:
                     </div>
                 </div>
             </div>
-        </div>
-        
-        <div class="row mt-4">
+            </div>
+
+            <div class="row mt-4">
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
@@ -141,9 +149,9 @@ jobs:
                     </div>
                 </div>
             </div>
-        </div>
-        
-        <div class="row mt-4">
+            </div>
+
+            <div class="row mt-4">
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-header">
@@ -164,18 +172,18 @@ jobs:
                     </div>
                 </div>
             </div>
-        </div>
-        
-        <footer class="mt-5 mb-3 text-center text-muted">
+            </div>
+
+            <footer class="mt-5 mb-3 text-center text-muted">
             <p>Last updated: <span id="last-updated">Never</span></p>
-        </footer>
-    </div>
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        // Function to load and display trade data
-        async function loadTradeData() {
+            </footer>
+            </div>
+
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <script>
+             // Function to load and display trade data
+             async function loadTradeData() {
             try {
                 const response = await fetch('trade_history.json');
                 if (!response.ok) {
@@ -192,10 +200,10 @@ jobs:
                 console.error('Error loading trade data:', error);
                 alert('Error loading trade data. See console for details.');
             }
-        }
-        
-        // Function to display trades in the table
-        function displayTrades(trades) {
+             }
+
+                // Function to display trades in the table
+            function displayTrades(trades) {
             const tableBody = document.getElementById('trades-table-body');
             tableBody.innerHTML = '';
             
@@ -243,10 +251,10 @@ jobs:
                 
                 tableBody.appendChild(row);
             });
-        }
-        
-        // Function to update statistics
-        function updateStats(trades) {
+             }
+
+            // Function to update statistics
+            function updateStats(trades) {
             const totalTrades = trades.length;
             const successfulTrades = trades.filter(t => t.status === 'success').length;
             const failedTrades = trades.filter(t => t.status === 'failed').length;
@@ -256,16 +264,16 @@ jobs:
             document.getElementById('successful-trades').textContent = successfulTrades;
             document.getElementById('failed-trades').textContent = failedTrades;
             document.getElementById('success-rate').textContent = `${successRate}%`;
-        }
-        
-        // Function to update charts
-        function updateCharts(trades) {
+            }
+
+            // Function to update charts
+            function updateCharts(trades) {
             updateSymbolChart(trades);
             updateActionChart(trades);
-        }
-        
-        // Function to update symbol distribution chart
-        function updateSymbolChart(trades) {
+            }
+
+            // Function to update symbol distribution chart
+            function updateSymbolChart(trades) {
             const symbolCounts = {};
             
             trades.forEach(trade => {
@@ -310,10 +318,10 @@ jobs:
                     }
                 }
             });
-        }
-        
-        // Function to update buy/sell ratio chart
-        function updateActionChart(trades) {
+            }
+
+            // Function to update buy/sell ratio chart
+            function updateActionChart(trades) {
             const buyTrades = trades.filter(t => t.action === 'buy').length;
             const sellTrades = trades.filter(t => t.action === 'sell').length;
             
@@ -348,21 +356,20 @@ jobs:
                     }
                 }
             });
-        }
-        
-        // Load data when page loads
-        document.addEventListener('DOMContentLoaded', loadTradeData);
-        
-        // Refresh button handler
-        document.getElementById('refresh-btn').addEventListener('click', loadTradeData);
-        
-        // Auto-refresh every 5 minutes
-        setInterval(loadTradeData, 5 * 60 * 1000);
-    </script>
-</body>
-</html>
-EOF
-      
+            }
+
+            // Load data when page loads
+            document.addEventListener('DOMContentLoaded', loadTradeData);
+
+            // Refresh button handler
+            document.getElementById('refresh-btn').addEventListener('click', loadTradeData);
+
+            // Auto-refresh every 5 minutes
+            setInterval(loadTradeData, 5 * 60 * 1000);
+            </script>
+            </body>
+            </html>
+            EOF
       - name: Create sample trade history
         run: |
           echo '[
@@ -394,12 +401,10 @@ EOF
               "status": "success"
             }
           ]' > _site/trade_history.json
-      
       - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v1
         with:
-          path: "_site"
-      
+          path: _site
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v1
