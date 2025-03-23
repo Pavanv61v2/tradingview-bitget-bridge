@@ -89,7 +89,7 @@
             </div>
         </div>
         
-        <!-- New row for additional metrics -->
+        <!-- Performance metrics row -->
         <div class="row mt-3">
             <div class="col-md-3">
                 <div class="card stats-card text-center">
@@ -180,6 +180,20 @@
             </div>
         </div>
         
+        <!-- New Timeline Chart Section -->
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        Trade Activity Timeline
+                    </div>
+                    <div class="card-body">
+                        <canvas id="timelineChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <footer class="mt-5 mb-3 text-center text-muted">
             <p>Last updated: <span id="last-updated">Never</span></p>
         </footer>
@@ -200,6 +214,7 @@
                 displayTrades(trades);
                 updateStats(trades);
                 updateCharts(trades);
+                updateTimelineChart(trades); // Added timeline chart update
                 
                 document.getElementById('last-updated').textContent = new Date().toLocaleString();
             } catch (error) {
@@ -418,6 +433,126 @@
                         title: {
                             display: true,
                             text: 'Buy vs Sell Orders'
+                        }
+                    }
+                }
+            });
+        }
+        
+        // New function to update timeline chart
+        function updateTimelineChart(trades) {
+            // Sort trades by timestamp
+            const sortedTrades = [...trades].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+            
+            // Prepare data for chart
+            const labels = sortedTrades.map(trade => {
+                const date = new Date(trade.timestamp);
+                return date.toLocaleString(undefined, { 
+                    month: 'short', 
+                    day: 'numeric', 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+            });
+            
+            // Create datasets for buys and sells
+            const buyData = sortedTrades.map(trade => 
+                trade.action && trade.action.toLowerCase() === 'buy' ? 
+                    parseFloat(trade.orderSize || 0) : null
+            );
+            
+            const sellData = sortedTrades.map(trade => 
+                trade.action && trade.action.toLowerCase() === 'sell' ? 
+                    1 : null  // Just showing occurrence for sells
+            );
+            
+            const ctx = document.getElementById('timelineChart').getContext('2d');
+            
+            // Safely destroy previous chart if it exists
+            if (window.timelineChart && typeof window.timelineChart.destroy === 'function') {
+                window.timelineChart.destroy();
+            } else if (window.timelineChart) {
+                window.timelineChart = null;
+            }
+            
+            window.timelineChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Buy Orders (USDT)',
+                            data: buyData,
+                            borderColor: 'rgba(40, 167, 69, 1)',
+                            backgroundColor: 'rgba(40, 167, 69, 0.2)',
+                            pointBackgroundColor: 'rgba(40, 167, 69, 1)',
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            fill: false
+                        },
+                        {
+                            label: 'Sell Orders',
+                            data: sellData,
+                            borderColor: 'rgba(220, 53, 69, 1)',
+                            backgroundColor: 'rgba(220, 53, 69, 0.2)',
+                            pointBackgroundColor: 'rgba(220, 53, 69, 1)',
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            fill: false,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Time'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Buy Amount (USDT)'
+                            }
+                        },
+                        y1: {
+                            position: 'right',
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Sell Occurrences'
+                            },
+                            grid: {
+                                drawOnChartArea: false
+                            },
+                            max: 2 // Adjusting scale for sell occurrences
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Trading Activity Over Time'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const index = context.dataIndex;
+                                    const trade = sortedTrades[index];
+                                    const datasetLabel = context.dataset.label;
+                                    
+                                    if (trade.action && trade.action.toLowerCase() === 'buy') {
+                                        return `${datasetLabel}: ${trade.orderSize} USDT`;
+                                    } else if (trade.action && trade.action.toLowerCase() === 'sell') {
+                                        const symbol = trade.symbol ? trade.symbol.replace('USDT', '') : '';
+                                        return `${datasetLabel}: ${trade.orderSize} ${symbol}`;
+                                    }
+                                    return datasetLabel;
+                                }
+                            }
                         }
                     }
                 }
