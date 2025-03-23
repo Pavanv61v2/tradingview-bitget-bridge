@@ -47,35 +47,62 @@ jobs:
           const fs = require('fs');
 
 
-          // Common scale (decimal places) for cryptocurrencies
-
-          const coinScales = {
+          // Initial fallback scales in case API call fails
+          const fallbackCoinScales = {
             'BTC': 6,
             'ETH': 5,
-            'SOL': 4,
-            'XRP': 2,
+            'SOL': 2,
+            'XRP': 1,
             'ADA': 2,
-            'DOT': 3,
-            'DOGE': 2,
+            'DOT': 2,
+            'DOGE': 1,
             'SHIB': 0,
             'SUI': 2,
             // Default scale for others
             'DEFAULT': 2
           };
 
+          // Dynamic coin scales to be populated from API
+          let dynamicCoinScales = { ...fallbackCoinScales };
 
           // Trade log file
-
           const TRADE_LOG_FILE = 'trade_history.json';
 
-
           // Notification settings
-
-          const NOTIFICATIONS_ENABLED = process.env.NOTIFICATIONS_ENABLED ===
-          'true';
-
+          const NOTIFICATIONS_ENABLED = process.env.NOTIFICATIONS_ENABLED === 'true';
           const NOTIFICATION_EMAIL = process.env.NOTIFICATION_EMAIL;
 
+          // Function to fetch precision scale for a specific symbol
+          async function getSymbolPrecision(symbol) {
+            try {
+              console.log(`Fetching precision info for ${symbol}...`);
+              const response = await axios({
+                method: 'GET',
+                url: `https://api.bitget.com/api/v2/spot/public/symbols?symbol=${symbol}`,
+                timeout: 5000
+              });
+              
+              if (response.data && response.data.code === '00000' && 
+                  response.data.data && response.data.data.length > 0) {
+                const symbolInfo = response.data.data[0];
+                
+                // Extract the base coin and precision
+                const baseCoin = symbolInfo.baseCoin;
+                const quantityPrecision = parseInt(symbolInfo.quantityPrecision);
+                
+                console.log(`Precision for ${symbol}: ${quantityPrecision} decimal places`);
+                console.log(`Min trade amount: ${symbolInfo.minTradeAmount} ${baseCoin}`);
+                
+                return quantityPrecision;
+              } else {
+                console.warn(`Could not get precision for ${symbol}, using fallback`);
+                return null;
+              }
+            } catch (error) {
+              console.error(`Error fetching precision for ${symbol}:`, error.message);
+              return null;
+            }
+          }
 
           async function placeOrder() {
             try {
@@ -118,6 +145,16 @@ jobs:
               
               const isBuy = signal.action.toLowerCase() === 'buy';
               
+              // Only fetch precision for the specific symbol being traded
+              if (!isBuy) {
+                // For sell orders, we need the precision
+                const precision = await getSymbolPrecision(symbol);
+                if (precision !== null) {
+                  // Update the scale in the dictionary
+                  dynamicCoinScales[baseCoin] = precision;
+                }
+              }
+              
               let orderSize;
               let originalAmount;
               
@@ -145,34 +182,42 @@ jobs:
                 // Get current position for the symbol
                 const position = await getAccountAssets(symbol);
                 
-                  // For SELL orders in the placeOrder function:
-                  if (position && position.available && parseFloat(position.available) > 0) {
-                    // Get the appropriate decimal scale for this coin
-                    const scale = coinScales[baseCoin] || coinScales['DEFAULT'];
-                    
-                    // Get the available amount
-                    const availableAmount = parseFloat(position.available);
-                    originalAmount = availableAmount;
-                    
-                    // For BTC and very small amounts, use even more conservative scaling
-                    if (baseCoin === 'BTC' && availableAmount < 0.001) {
-                      // For tiny BTC amounts, use 98% to account for any potential rounding or fee issues
-                      const safeAmount = availableAmount * 0.98;
-                      orderSize = safeAmount.toFixed(scale);
-                      console.log(`Selling tiny BTC position (98%): ${orderSize} ${position.coin} (original: ${position.available})`);
-                    } else if (availableAmount >= 0.1) {
-                      // For larger positions: Round down slightly to ensure order goes through
-                      const multiplier = Math.pow(10, scale);
-                      const roundedDown = Math.floor(availableAmount * multiplier) / multiplier;
-                      orderSize = roundedDown.toFixed(scale);
-                      console.log(`Selling larger position (rounded down): ${orderSize} ${position.coin} (original: ${position.available})`);
-                    } else {
-                      // For small "dust-like" positions: Sell 99% to ensure order success
-                      const safeAmount = availableAmount * 0.99;
-                      orderSize = safeAmount.toFixed(scale);
-                      console.log(`Selling small position (99%): ${orderSize} ${position.coin} (original: ${position.available})`);
-                    }
+                // For SELL orders in the placeOrder function:
+                if (position && position.available && parseFloat(position.available) > 0) {
+                  // Get the appropriate decimal scale for this coin
+                  const scale = dynamicCoinScales[baseCoin] || dynamicCoinScales['DEFAULT'];
+                  console.log(`Using scale ${scale} for ${baseCoin}`);
+                  
+                  // Get the available amount
+                  const availableAmount = parseFloat(position.available);
+                  originalAmount = availableAmount;
+                  
+                  // For BTC and very small amounts, use even more conservative scaling
+                  if ((baseCoin === 'BTC' || availableAmount < 0.01) && availableAmount < 0.1) {
+                    // For tiny amounts, use 95% to account for any potential rounding or fee issues
+                    const safeAmount = availableAmount * 0.95;
+                    orderSize = safeAmount.toFixed(scale);
+                    console.log(`Selling tiny position (95%): ${orderSize} ${position.coin} (original: ${position.available})`);
+                  } else if (availableAmount >= 0.1) {
+                    // For larger positions: Round down slightly to ensure order goes through
+                    const multiplier = Math.pow(10, scale);
+                    const roundedDown = Math.floor(availableAmount * multiplier) / multiplier;
+                    // Add extra safety margin for larger values
+                    const safeAmount = roundedDown * 0.995;
+                    orderSize = safeAmount.toFixed(scale);
+                    console.log(`Selling larger position (rounded down): ${orderSize} ${position.coin} (original: ${position.available})`);
                   } else {
+                    // For small "dust-like" positions: Sell 98% to ensure order success
+                    const safeAmount = availableAmount * 0.98;
+                    orderSize = safeAmount.toFixed(scale);
+                    console.log(`Selling small position (98%): ${orderSize} ${position.coin} (original: ${position.available})`);
+                  }
+                  
+                  // Validate final order size
+                  if (parseFloat(orderSize) <= 0) {
+                    throw new Error(`Calculated order size (${orderSize}) is too small to execute.`);
+                  }
+                } else {
                   const errorMsg = `No position found for ${symbol} or position is empty`;
                   console.error(errorMsg);
                   await sendNotification(
@@ -182,6 +227,9 @@ jobs:
                   throw new Error(errorMsg);
                 }
               }
+              
+              // Validate the order against minimum size requirements
+              await validateOrderSize(symbol, baseCoin, orderSize, isBuy);
               
               // Create payload according to Bitget API v2
               const payload = {
@@ -248,7 +296,17 @@ jobs:
                   if (response.data && response.data.code === '00000') {
                     success = true;
                   } else {
-                    throw new Error(`Bitget error: ${response.data ? response.data.msg : 'Unknown error'}`);
+                    const errorCode = response.data ? response.data.code : 'unknown';
+                    const errorMsg = response.data ? response.data.msg : 'Unknown error';
+                    
+                    // Special handling for common errors
+                    if (errorCode === '43012') {
+                      throw new Error(`Insufficient balance: The available balance of ${baseCoin} may have changed since checked`);
+                    } else if (errorCode === '40808' && errorMsg.includes('checkBDScale')) {
+                      throw new Error(`Precision error: ${errorMsg}. Update the coinScales dictionary for ${baseCoin}`);
+                    } else {
+                      throw new Error(`Bitget error: ${errorMsg} (code: ${errorCode})`);
+                    }
                   }
                 } catch (error) {
                   lastError = error;
@@ -427,9 +485,41 @@ jobs:
             }
           }
 
+          // Function to validate order size against known minimums
+          async function validateOrderSize(symbol, baseCoin, orderSize, isBuy) {
+            try {
+              // Common minimums based on Bitget requirements
+              const minimumSizes = {
+                'BTC': 0.000100,
+                'ETH': 0.00100,
+                'SOL': 0.0100,
+                'SUI': 1.00,
+                'DEFAULT': 0.0100
+              };
+              
+              const sizeValue = parseFloat(orderSize);
+              
+              if (isBuy) {
+                // For buy orders (USDT), minimum is typically 5-10 USDT
+                if (sizeValue < 5) {
+                  console.warn(`Buy order size ${sizeValue} USDT is less than recommended minimum of 5 USDT`);
+                }
+              } else {
+                // For sell orders (base currency)
+                const minimumSize = minimumSizes[baseCoin] || minimumSizes['DEFAULT'];
+                if (sizeValue < minimumSize) {
+                  console.warn(`Sell order size ${sizeValue} ${baseCoin} may be below minimum required by Bitget (${minimumSize})`);
+                }
+              }
+              
+              return true;
+            } catch (error) {
+              console.error("Error validating order size:", error.message);
+              return true; // Proceed anyway
+            }
+          }
 
           // Helper function to get account assets
-
           async function getAccountAssets(symbol) {
             const timestamp = Date.now().toString();
             const requestPath = '/api/v2/spot/account/assets';
@@ -467,9 +557,7 @@ jobs:
             }
           }
 
-
           // Helper function to log trades
-
           async function logTrade(tradeInfo) {
             try {
               // Check if the log file exists
@@ -496,9 +584,7 @@ jobs:
             }
           }
 
-
           // Helper function to send email notifications
-
           async function sendNotification(subject, body) {
             if (!NOTIFICATIONS_ENABLED || !NOTIFICATION_EMAIL) {
               console.log("Notifications disabled or email not configured");
@@ -519,9 +605,7 @@ jobs:
             }
           }
 
-
           // Execute the function
-
           placeOrder().then(() => {
             console.log("Order process completed");
           }).catch(err => {
