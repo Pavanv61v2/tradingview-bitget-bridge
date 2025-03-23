@@ -102,5 +102,18 @@
     "orderSize": "0.1153",
     "orderId": "1287436961485778944",
     "status": "success"
+  },
+  {
+    "timestamp": "2025-03-23T08:01:42.965Z",
+    "symbol": "SOLUSDT",
+    "action": "buy",
+    "originalAmount": 3,
+    "orderSize": "3.00",
+    "price": 131.21,
+    "filledBaseVolume": 0.0228,
+    "filledQuoteVolume": 2.991588,
+    "usdtEquivalent": 2.991588,
+    "orderId": "1287613495307759616",
+    "status": "success"
   }
 ]
