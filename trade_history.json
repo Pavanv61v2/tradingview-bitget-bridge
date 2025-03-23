@@ -142,5 +142,15 @@
     "usdtEquivalent": 5.647460000000001,
     "orderId": "1287652245698080768",
     "status": "success"
+  },
+  {
+    "timestamp": "2025-03-23T11:06:45.815Z",
+    "symbol": "BNBUSDT",
+    "action": "sell",
+    "orderSize": null,
+    "originalAmount": null,
+    "price": null,
+    "status": "failed",
+    "error": "All 3 attempts failed: Request failed with status code 400"
   }
 ]
