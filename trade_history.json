@@ -37,5 +37,18 @@
     "usdtEquivalent": 2.95051225,
     "orderId": "1287620006255882248",
     "status": "success"
+  },
+  {
+    "timestamp": "2025-03-23T08:27:58.647Z",
+    "symbol": "SUIUSDT",
+    "action": "buy",
+    "originalAmount": 3,
+    "orderSize": "3.00",
+    "price": 2.264,
+    "filledBaseVolume": 1.32,
+    "filledQuoteVolume": 2.98848,
+    "usdtEquivalent": 2.98848,
+    "orderId": "1287620103840559108",
+    "status": "success"
   }
 ]
