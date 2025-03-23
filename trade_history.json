@@ -50,5 +50,12 @@
     "usdtEquivalent": 2.98848,
     "orderId": "1287620103840559108",
     "status": "success"
+  },
+  {
+    "timestamp": "2025-03-23T08:43:17.041Z",
+    "symbol": "SUIUSD",
+    "action": "sell",
+    "status": "failed",
+    "error": "All 3 attempts failed: Request failed with status code 400"
   }
 ]
