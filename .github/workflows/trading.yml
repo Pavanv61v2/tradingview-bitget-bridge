@@ -435,26 +435,17 @@ jobs:
             } catch (error) {
               console.error("Error placing order:", error.message);
               
-              // Get the symbol and action from the signal if possible
-              let symbol = 'UNKNOWN';
-              let action = 'UNKNOWN';
+              // We already have symbol and orderSize from above in the function
+              // No need to try to extract them again from the signal
               
-              try {
-                // Try to extract the correct symbol and action from the original signal
-                const signal = process.env.SIGNAL_DATA ? JSON.parse(process.env.SIGNAL_DATA) : null;
-                if (signal) {
-                  symbol = signal.symbol || signal.ticker || 'UNKNOWN';
-                  action = signal.action || 'UNKNOWN';
-                }
-              } catch (parseError) {
-                console.error("Error parsing signal data during error handling:", parseError.message);
-              }
-              
-              // Log the failed trade with the actual symbol and action
+              // Log the failed trade with all available information
               const tradeInfo = {
                 timestamp: new Date().toISOString(),
-                symbol: symbol,
-                action: action,
+                symbol: symbol,  // Use the already formatted symbol
+                action: isBuy ? 'buy' : 'sell',  // We already determined this
+                orderSize: orderSize,  // The amount we tried to trade
+                originalAmount: originalAmount,  // The original amount
+                price: null,  // We don't know the execution price
                 status: 'failed',
                 error: error.message
               };
