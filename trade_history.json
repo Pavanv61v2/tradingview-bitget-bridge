@@ -129,5 +129,18 @@
     "usdtEquivalent": 2.98032,
     "orderId": "1287650445712519168",
     "status": "success"
+  },
+  {
+    "timestamp": "2025-03-23T10:35:42.039Z",
+    "symbol": "BNBUSDT",
+    "action": "sell",
+    "originalAmount": 0.0095904,
+    "orderSize": "0.0091",
+    "price": 620.6,
+    "filledBaseVolume": 0.0091,
+    "filledQuoteVolume": 5.64746,
+    "usdtEquivalent": 5.647460000000001,
+    "orderId": "1287652245698080768",
+    "status": "success"
   }
 ]
