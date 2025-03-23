@@ -77,5 +77,31 @@
     "usdtEquivalent": 2.9748350000000006,
     "orderId": "1287624253865291776",
     "status": "success"
+  },
+  {
+    "timestamp": "2025-03-23T08:57:55.948Z",
+    "symbol": "SUIUSDT",
+    "action": "sell",
+    "originalAmount": 1.31868,
+    "orderSize": "1.31",
+    "price": 2.2629,
+    "filledBaseVolume": 1.31,
+    "filledQuoteVolume": 2.964399,
+    "usdtEquivalent": 2.9643990000000002,
+    "orderId": "1287627642695151632",
+    "status": "success"
+  },
+  {
+    "timestamp": "2025-03-23T08:58:31.108Z",
+    "symbol": "BTCUSDT",
+    "action": "sell",
+    "originalAmount": 0.000034965,
+    "orderSize": "0.000034",
+    "price": 84327.15,
+    "filledBaseVolume": 0.000034,
+    "filledQuoteVolume": 2.8671231,
+    "usdtEquivalent": 2.8671230999999997,
+    "orderId": "1287627790124937216",
+    "status": "success"
   }
 ]
