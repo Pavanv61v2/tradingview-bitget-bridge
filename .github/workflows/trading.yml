@@ -47,8 +47,8 @@ jobs:
           const fs = require('fs');
 
 
-          // Initial fallback scales in case API call fails
-          const fallbackCoinScales = {
+          // Initial fallback scales in case API call fails const
+          fallbackCoinScales = {
             'BTC': 6,
             'ETH': 5,
             'SOL': 2,
@@ -62,18 +62,17 @@ jobs:
             'DEFAULT': 2
           };
 
-          // Dynamic coin scales to be populated from API
-          let dynamicCoinScales = { ...fallbackCoinScales };
+          // Dynamic coin scales to be populated from API let dynamicCoinScales
+          = { ...fallbackCoinScales };
 
-          // Trade log file
-          const TRADE_LOG_FILE = 'trade_history.json';
+          // Trade log file const TRADE_LOG_FILE = 'trade_history.json';
 
-          // Notification settings
-          const NOTIFICATIONS_ENABLED = process.env.NOTIFICATIONS_ENABLED === 'true';
-          const NOTIFICATION_EMAIL = process.env.NOTIFICATION_EMAIL;
+          // Notification settings const NOTIFICATIONS_ENABLED =
+          process.env.NOTIFICATIONS_ENABLED === 'true'; const NOTIFICATION_EMAIL
+          = process.env.NOTIFICATION_EMAIL;
 
-          // Function to fetch precision scale for a specific symbol
-          async function getSymbolPrecision(symbol) {
+          // Function to fetch precision scale for a specific symbol async
+          function getSymbolPrecision(symbol) {
             try {
               console.log(`Fetching precision info for ${symbol}...`);
               const response = await axios({
@@ -485,8 +484,8 @@ jobs:
             }
           }
 
-          // Function to validate order size against known minimums
-          async function validateOrderSize(symbol, baseCoin, orderSize, isBuy) {
+          // Function to validate order size against known minimums async
+          function validateOrderSize(symbol, baseCoin, orderSize, isBuy) {
             try {
               // Common minimums based on Bitget requirements
               const minimumSizes = {
@@ -519,8 +518,8 @@ jobs:
             }
           }
 
-          // Helper function to get account assets
-          async function getAccountAssets(symbol) {
+          // Helper function to get account assets async function
+          getAccountAssets(symbol) {
             const timestamp = Date.now().toString();
             const requestPath = '/api/v2/spot/account/assets';
             const method = 'GET';
@@ -557,8 +556,7 @@ jobs:
             }
           }
 
-          // Helper function to log trades
-          async function logTrade(tradeInfo) {
+          // Helper function to log trades async function logTrade(tradeInfo) {
             try {
               // Check if the log file exists
               let trades = [];
@@ -584,8 +582,8 @@ jobs:
             }
           }
 
-          // Helper function to send email notifications
-          async function sendNotification(subject, body) {
+          // Helper function to send email notifications async function
+          sendNotification(subject, body) {
             if (!NOTIFICATIONS_ENABLED || !NOTIFICATION_EMAIL) {
               console.log("Notifications disabled or email not configured");
               return;
@@ -605,8 +603,7 @@ jobs:
             }
           }
 
-          // Execute the function
-          placeOrder().then(() => {
+          // Execute the function placeOrder().then(() => {
             console.log("Order process completed");
           }).catch(err => {
             console.error("Unhandled error:", err);
