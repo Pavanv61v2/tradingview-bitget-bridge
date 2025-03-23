@@ -1,54 +1,42 @@
 name: TradingView-Bitget Bridge
-'on':
+
+on:
   repository_dispatch:
-    types:
-      - trading-signal
-  workflow_dispatch: null
+    types: [trading-signal]
+  workflow_dispatch:  # Added for manual testing
+
 jobs:
   place-order:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+
       - name: Process Trading Signal
         env:
-          BITGET_API_KEY: '${{ secrets.BITGET_API_KEY }}'
-          BITGET_API_SECRET: '${{ secrets.BITGET_API_SECRET }}'
-          BITGET_PASSPHRASE: '${{ secrets.BITGET_PASSPHRASE }}'
-          SIGNAL_DATA: '${{ toJson(github.event.client_payload) }}'
+          BITGET_API_KEY: ${{ secrets.BITGET_API_KEY }}
+          BITGET_API_SECRET: ${{ secrets.BITGET_API_SECRET }}
+          BITGET_PASSPHRASE: ${{ secrets.BITGET_PASSPHRASE }}
+          SIGNAL_DATA: ${{ toJson(github.event.client_payload) }}
           NOTIFICATIONS_ENABLED: 'true'
-          NOTIFICATION_EMAIL: '${{ secrets.NOTIFICATION_EMAIL }}'
-        run: >
+          NOTIFICATION_EMAIL: ${{ secrets.NOTIFICATION_EMAIL }}
+        run: |
           echo "Received trading signal"
-
           echo "Symbol: ${{ github.event.client_payload.symbol || 'N/A' }}"
-
           echo "Action: ${{ github.event.client_payload.action || 'N/A' }}"
-
-          echo "Order size: ${{ github.event.client_payload.order_size || 'N/A'
-          }}"
-
-
+          echo "Order size: ${{ github.event.client_payload.order_size || 'N/A' }}"
+          
           # Install dependencies
-
           npm install axios crypto-js nodemailer
-
-
+          
           # Create and run the trading script
-
           cat > trade.js << 'EOF'
-
           const axios = require('axios');
-
           const crypto = require('crypto');
-
           const nodemailer = require('nodemailer');
-
           const fs = require('fs');
-
-
+          
           // Common scale (decimal places) for cryptocurrencies
-
           const coinScales = {
             'BTC': 6,
             'ETH': 5,
@@ -61,21 +49,14 @@ jobs:
             // Default scale for others
             'DEFAULT': 4
           };
-
-
+          
           // Trade log file
-
           const TRADE_LOG_FILE = 'trade_history.json';
-
-
+          
           // Notification settings
-
-          const NOTIFICATIONS_ENABLED = process.env.NOTIFICATIONS_ENABLED ===
-          'true';
-
+          const NOTIFICATIONS_ENABLED = process.env.NOTIFICATIONS_ENABLED === 'true';
           const NOTIFICATION_EMAIL = process.env.NOTIFICATION_EMAIL;
-
-
+          
           async function placeOrder() {
             try {
               const apiKey = process.env.BITGET_API_KEY;
@@ -273,6 +254,85 @@ jobs:
               console.log("Order placed successfully!");
               console.log("Bitget API response:", JSON.stringify(response.data, null, 2));
               
+              // Get the orderId from the response
+              const orderId = response.data.data.orderId;
+              
+              // Wait a moment for the order to process
+              console.log("Waiting 2 seconds for order to be processed...");
+              await new Promise(resolve => setTimeout(resolve, 2000));
+              
+              // Fetch order details to get the fill price
+              let fillDetails = {
+                price: null,
+                priceAvg: null,
+                baseVolume: null,
+                quoteVolume: null,
+                status: "processing"
+              };
+              
+              try {
+                // Create the request for order details
+                const detailsTimestamp = Date.now().toString();
+                const requestPath = `/api/v2/spot/trade/orderInfo?orderId=${orderId}`;
+                
+                // Generate signature for the GET request
+                const preHash = detailsTimestamp + 'GET' + requestPath;
+                const signature = crypto.createHmac('sha256', apiSecret)
+                  .update(preHash)
+                  .digest('base64');
+                
+                console.log("Fetching order details for orderId:", orderId);
+                
+                const orderDetailsResponse = await axios({
+                  method: 'GET',
+                  url: 'https://api.bitget.com' + requestPath,
+                  headers: {
+                    'ACCESS-KEY': apiKey,
+                    'ACCESS-SIGN': signature,
+                    'ACCESS-TIMESTAMP': detailsTimestamp,
+                    'ACCESS-PASSPHRASE': passphrase,
+                    'Content-Type': 'application/json'
+                  },
+                  timeout: 10000
+                });
+                
+                if (orderDetailsResponse.data && orderDetailsResponse.data.code === '00000' && 
+                    orderDetailsResponse.data.data && orderDetailsResponse.data.data.length > 0) {
+                  
+                  const orderData = orderDetailsResponse.data.data[0];
+                  
+                  // Extract important price information
+                  fillDetails = {
+                    price: orderData.price || '0',
+                    priceAvg: orderData.priceAvg || '0',
+                    baseVolume: orderData.baseVolume || '0',
+                    quoteVolume: orderData.quoteVolume || '0',
+                    status: orderData.status
+                  };
+                  
+                  console.log("Order details fetched successfully:", fillDetails);
+                } else {
+                  console.warn("Order details response empty or unexpected format:", orderDetailsResponse.data);
+                }
+              } catch (error) {
+                console.error("Error fetching order details:", error.message);
+                if (error.response) {
+                  console.error("Error response data:", JSON.stringify(error.response.data, null, 2));
+                }
+              }
+              
+              // Calculate USDT equivalent based on actual executed values
+              let usdtEquivalent = 0;
+              if (isBuy) {
+                // For buy orders, we use the quote volume (USDT amount)
+                usdtEquivalent = parseFloat(fillDetails.quoteVolume || 0);
+              } else {
+                // For sell orders, we convert base volume to USDT using average price
+                const baseAmount = parseFloat(fillDetails.baseVolume || 0);
+                const avgPrice = parseFloat(fillDetails.priceAvg || 0);
+                usdtEquivalent = baseAmount * avgPrice;
+              }
+              
               // Log the trade
               const tradeInfo = {
                 timestamp: new Date().toISOString(),
@@ -280,7 +340,14 @@ jobs:
                 action: isBuy ? 'buy' : 'sell',
                 originalAmount: originalAmount,
                 orderSize: orderSize,
-                orderId: response.data.data.orderId,
+                // Use the average execution price
+                price: parseFloat(fillDetails.priceAvg) || null,
+                // Store actual filled volumes
+                filledBaseVolume: parseFloat(fillDetails.baseVolume) || null,
+                filledQuoteVolume: parseFloat(fillDetails.quoteVolume) || null,
+                // Store USDT equivalent for easy calculations
+                usdtEquivalent: usdtEquivalent,
+                orderId: orderId,
                 status: 'success'
               };
               
@@ -290,55 +357,52 @@ jobs:
               if (isBuy) {
                 await sendNotification(
                   `Buy Order Executed - ${symbol}`,
-                  `Successfully bought ${symbol} with ${orderSize} USDT\n\nOrder ID: ${response.data.data.orderId}`
+                  `Successfully bought ${fillDetails.baseVolume} ${baseCoin} with ${fillDetails.quoteVolume} USDT\nAvg Price: ${fillDetails.priceAvg} USDT\nOrder ID: ${orderId}`
                 );
               } else {
                 await sendNotification(
                   `Sell Order Executed - ${symbol}`,
-                  `Successfully sold ${orderSize} ${baseCoin}\n\nOrder ID: ${response.data.data.orderId}`
+                  `Successfully sold ${fillDetails.baseVolume} ${baseCoin} for ${usdtEquivalent.toFixed(2)} USDT\nAvg Price: ${fillDetails.priceAvg} USDT\nOrder ID: ${orderId}`
                 );
               }
               
               return response.data;
               
-            } 
-            // In the catch block of the placeOrder function:
-            catch (error) {
-            console.error("Error placing order:", error.message);
-
-            // Get the symbol and action from the signal if possible
-            let symbol = 'UNKNOWN';
-            let action = 'UNKNOWN';
-
-            try {
-            // Try to extract the correct symbol and action from the original signal
-            const signal = process.env.SIGNAL_DATA ? JSON.parse(process.env.SIGNAL_DATA) : null;
-            if (signal) {
-            symbol = signal.symbol || signal.ticker || 'UNKNOWN';
-            action = signal.action || 'UNKNOWN';
+            } catch (error) {
+              console.error("Error placing order:", error.message);
+              
+              // Get the symbol and action from the signal if possible
+              let symbol = 'UNKNOWN';
+              let action = 'UNKNOWN';
+              
+              try {
+                // Try to extract the correct symbol and action from the original signal
+                const signal = process.env.SIGNAL_DATA ? JSON.parse(process.env.SIGNAL_DATA) : null;
+                if (signal) {
+                  symbol = signal.symbol || signal.ticker || 'UNKNOWN';
+                  action = signal.action || 'UNKNOWN';
+                }
+              } catch (parseError) {
+                console.error("Error parsing signal data during error handling:", parseError.message);
               }
-            } catch (parseError) {
-            console.error("Error parsing signal data during error handling:", parseError.message);
-            }
-
-            // Log the failed trade with the actual symbol and action
-            const tradeInfo = {
-            timestamp: new Date().toISOString(),
-            symbol: symbol,
-            action: action,
-            status: 'failed',
-            error: error.message
-            };
-
-            await logTrade(tradeInfo);
-
-            return { error: error.message };
+              
+              // Log the failed trade with the actual symbol and action
+              const tradeInfo = {
+                timestamp: new Date().toISOString(),
+                symbol: symbol,
+                action: action,
+                status: 'failed',
+                error: error.message
+              };
+              
+              await logTrade(tradeInfo);
+              console.log("Error logged to trade history");
+              
+              return { error: error.message };
             }
           }
-
-
+          
           // Helper function to get account assets
-
           async function getAccountAssets(symbol) {
             const timestamp = Date.now().toString();
             const requestPath = '/api/v2/spot/account/assets';
@@ -375,10 +439,8 @@ jobs:
               throw new Error(`Failed to get account assets: ${response.data ? response.data.msg : 'Unknown error'}`);
             }
           }
-
-
+          
           // Helper function to log trades
-
           async function logTrade(tradeInfo) {
             try {
               // Check if the log file exists
@@ -386,7 +448,12 @@ jobs:
               if (fs.existsSync(TRADE_LOG_FILE)) {
                 // Read existing logs
                 const data = fs.readFileSync(TRADE_LOG_FILE, 'utf8');
-                trades = JSON.parse(data);
+                try {
+                  trades = JSON.parse(data);
+                } catch (e) {
+                  console.error("Error parsing trade history JSON:", e.message);
+                  trades = [];
+                }
               }
               
               // Add the new trade
@@ -394,15 +461,13 @@ jobs:
               
               // Write back to file
               fs.writeFileSync(TRADE_LOG_FILE, JSON.stringify(trades, null, 2));
-              console.log("Trade logged successfully");
+              console.log("Trade logged successfully!");
             } catch (error) {
               console.error("Error logging trade:", error.message);
             }
           }
-
-
+          
           // Helper function to send email notifications
-
           async function sendNotification(subject, body) {
             if (!NOTIFICATIONS_ENABLED || !NOTIFICATION_EMAIL) {
               console.log("Notifications disabled or email not configured");
@@ -418,35 +483,31 @@ jobs:
               console.log("Subject:", subject);
               console.log("Body:", body);
               console.log("======================");
-              
-              // In a real-world scenario, you would use nodemailer to send an email here
             } catch (error) {
               console.error("Error sending notification:", error.message);
             }
           }
-
-
+          
           // Execute the function
-
-          placeOrder();
-
+          placeOrder().then(() => {
+            console.log("Order process completed");
+          }).catch(err => {
+            console.error("Unhandled error:", err);
+          });
           EOF
-
-
+          
           node trade.js
-
-
+          
           # Debug: List files after script execution
-
           echo "Files in directory after script execution:"
-
           ls -la
+
       - name: Commit updated trade history
         run: |
           # Configure git
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
-
+          
           # Check if trade_history.json exists
           if [ -f "trade_history.json" ]; then
             # Add the file and commit
