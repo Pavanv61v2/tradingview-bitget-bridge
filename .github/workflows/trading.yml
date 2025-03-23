@@ -1,42 +1,54 @@
 name: TradingView-Bitget Bridge
-
-on:
+'on':
   repository_dispatch:
-    types: [trading-signal]
-  workflow_dispatch:  # Added for manual testing
-
+    types:
+      - trading-signal
+  workflow_dispatch: null
 jobs:
   place-order:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-
       - name: Process Trading Signal
         env:
-          BITGET_API_KEY: ${{ secrets.BITGET_API_KEY }}
-          BITGET_API_SECRET: ${{ secrets.BITGET_API_SECRET }}
-          BITGET_PASSPHRASE: ${{ secrets.BITGET_PASSPHRASE }}
-          SIGNAL_DATA: ${{ toJson(github.event.client_payload) }}
+          BITGET_API_KEY: '${{ secrets.BITGET_API_KEY }}'
+          BITGET_API_SECRET: '${{ secrets.BITGET_API_SECRET }}'
+          BITGET_PASSPHRASE: '${{ secrets.BITGET_PASSPHRASE }}'
+          SIGNAL_DATA: '${{ toJson(github.event.client_payload) }}'
           NOTIFICATIONS_ENABLED: 'true'
-          NOTIFICATION_EMAIL: ${{ secrets.NOTIFICATION_EMAIL }}
-        run: |
+          NOTIFICATION_EMAIL: '${{ secrets.NOTIFICATION_EMAIL }}'
+        run: >
           echo "Received trading signal"
+
           echo "Symbol: ${{ github.event.client_payload.symbol || 'N/A' }}"
+
           echo "Action: ${{ github.event.client_payload.action || 'N/A' }}"
-          echo "Order size: ${{ github.event.client_payload.order_size || 'N/A' }}"
-          
+
+          echo "Order size: ${{ github.event.client_payload.order_size || 'N/A'
+          }}"
+
+
           # Install dependencies
+
           npm install axios crypto-js nodemailer
-          
+
+
           # Create and run the trading script
+
           cat > trade.js << 'EOF'
+
           const axios = require('axios');
+
           const crypto = require('crypto');
+
           const nodemailer = require('nodemailer');
+
           const fs = require('fs');
-          
+
+
           // Common scale (decimal places) for cryptocurrencies
+
           const coinScales = {
             'BTC': 6,
             'ETH': 5,
@@ -46,17 +58,25 @@ jobs:
             'DOT': 3,
             'DOGE': 2,
             'SHIB': 0,
+            'SUI': 2,
             // Default scale for others
-            'DEFAULT': 4
+            'DEFAULT': 2
           };
-          
+
+
           // Trade log file
+
           const TRADE_LOG_FILE = 'trade_history.json';
-          
+
+
           // Notification settings
-          const NOTIFICATIONS_ENABLED = process.env.NOTIFICATIONS_ENABLED === 'true';
+
+          const NOTIFICATIONS_ENABLED = process.env.NOTIFICATIONS_ENABLED ===
+          'true';
+
           const NOTIFICATION_EMAIL = process.env.NOTIFICATION_EMAIL;
-          
+
+
           async function placeOrder() {
             try {
               const apiKey = process.env.BITGET_API_KEY;
@@ -125,29 +145,34 @@ jobs:
                 // Get current position for the symbol
                 const position = await getAccountAssets(symbol);
                 
-                if (position && position.available && parseFloat(position.available) > 0) {
-                  // Get the appropriate decimal scale for this coin
-                  const scale = coinScales[baseCoin] || coinScales['DEFAULT'];
-                  
-                  // Get the available amount
-                  const availableAmount = parseFloat(position.available);
-                  originalAmount = availableAmount;
-                  
-                  // Handle based on position size
-                  if (availableAmount >= 0.1) {
-                    // For larger positions: Round down slightly to ensure order goes through
-                    const multiplier = Math.pow(10, scale);
-                    const roundedDown = Math.floor(availableAmount * multiplier) / multiplier;
-                    orderSize = roundedDown.toFixed(scale);
-                    console.log(`Selling larger position (rounded down): ${orderSize} ${position.coin} (original: ${position.available})`);
+                  // For SELL orders in the placeOrder function:
+                  if (position && position.available && parseFloat(position.available) > 0) {
+                    // Get the appropriate decimal scale for this coin
+                    const scale = coinScales[baseCoin] || coinScales['DEFAULT'];
+                    
+                    // Get the available amount
+                    const availableAmount = parseFloat(position.available);
+                    originalAmount = availableAmount;
+                    
+                    // For BTC and very small amounts, use even more conservative scaling
+                    if (baseCoin === 'BTC' && availableAmount < 0.001) {
+                      // For tiny BTC amounts, use 98% to account for any potential rounding or fee issues
+                      const safeAmount = availableAmount * 0.98;
+                      orderSize = safeAmount.toFixed(scale);
+                      console.log(`Selling tiny BTC position (98%): ${orderSize} ${position.coin} (original: ${position.available})`);
+                    } else if (availableAmount >= 0.1) {
+                      // For larger positions: Round down slightly to ensure order goes through
+                      const multiplier = Math.pow(10, scale);
+                      const roundedDown = Math.floor(availableAmount * multiplier) / multiplier;
+                      orderSize = roundedDown.toFixed(scale);
+                      console.log(`Selling larger position (rounded down): ${orderSize} ${position.coin} (original: ${position.available})`);
+                    } else {
+                      // For small "dust-like" positions: Sell 99% to ensure order success
+                      const safeAmount = availableAmount * 0.99;
+                      orderSize = safeAmount.toFixed(scale);
+                      console.log(`Selling small position (99%): ${orderSize} ${position.coin} (original: ${position.available})`);
+                    }
                   } else {
-                    // For small "dust-like" positions: Sell 99.5% to ensure order success
-                    // This helps with tiny positions where precision matters more
-                    const safeAmount = availableAmount * 0.995;
-                    orderSize = safeAmount.toFixed(scale);
-                    console.log(`Selling small position (99.5%): ${orderSize} ${position.coin} (original: ${position.available})`);
-                  }
-                } else {
                   const errorMsg = `No position found for ${symbol} or position is empty`;
                   console.error(errorMsg);
                   await sendNotification(
@@ -401,8 +426,10 @@ jobs:
               return { error: error.message };
             }
           }
-          
+
+
           // Helper function to get account assets
+
           async function getAccountAssets(symbol) {
             const timestamp = Date.now().toString();
             const requestPath = '/api/v2/spot/account/assets';
@@ -439,8 +466,10 @@ jobs:
               throw new Error(`Failed to get account assets: ${response.data ? response.data.msg : 'Unknown error'}`);
             }
           }
-          
+
+
           // Helper function to log trades
+
           async function logTrade(tradeInfo) {
             try {
               // Check if the log file exists
@@ -466,8 +495,10 @@ jobs:
               console.error("Error logging trade:", error.message);
             }
           }
-          
+
+
           // Helper function to send email notifications
+
           async function sendNotification(subject, body) {
             if (!NOTIFICATIONS_ENABLED || !NOTIFICATION_EMAIL) {
               console.log("Notifications disabled or email not configured");
@@ -487,27 +518,33 @@ jobs:
               console.error("Error sending notification:", error.message);
             }
           }
-          
+
+
           // Execute the function
+
           placeOrder().then(() => {
             console.log("Order process completed");
           }).catch(err => {
             console.error("Unhandled error:", err);
           });
-          EOF
-          
-          node trade.js
-          
-          # Debug: List files after script execution
-          echo "Files in directory after script execution:"
-          ls -la
 
+          EOF
+
+
+          node trade.js
+
+
+          # Debug: List files after script execution
+
+          echo "Files in directory after script execution:"
+
+          ls -la
       - name: Commit updated trade history
         run: |
           # Configure git
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
-          
+
           # Check if trade_history.json exists
           if [ -f "trade_history.json" ]; then
             # Add the file and commit
