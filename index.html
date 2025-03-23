@@ -255,90 +255,92 @@
              }
              
              // Function to update symbol distribution chart
-             function updateSymbolChart(trades) {
-                 const symbolCounts = {};
-                 
-                 trades.forEach(trade => {
-                     if (trade.symbol) {
-                         symbolCounts[trade.symbol] = (symbolCounts[trade.symbol] || 0) + 1;
-                     }
-                 });
-                 
-                 const labels = Object.keys(symbolCounts);
-                 const data = Object.values(symbolCounts);
-                 
-                 // Generate random colors
-                 const backgroundColors = labels.map(() => 
-                     `rgba(${Math.floor(Math.random() * 200)}, ${Math.floor(Math.random() * 200)}, ${Math.floor(Math.random() * 200)}, 0.6)`
-                 );
-                 
-                 const ctx = document.getElementById('symbolChart').getContext('2d');
-                 
-                 if (window.symbolChart) {
-                     window.symbolChart.destroy();
-                 }
-                 
-                 window.symbolChart = new Chart(ctx, {
-                     type: 'pie',
-                     data: {
-                         labels: labels,
-                         datasets: [{
-                             data: data,
-                             backgroundColor: backgroundColors
-                         }]
-                     },
-                     options: {
-                         responsive: true,
-                         plugins: {
-                             legend: {
-                                 position: 'right',
-                             },
-                             title: {
-                                 display: true,
-                                 text: 'Trade Distribution by Symbol'
-                             }
-                         }
-                     }
-                 });
-             }
-             
-             // Function to update buy/sell ratio chart
-             function updateActionChart(trades) {
-                 const buyTrades = trades.filter(t => t.action === 'buy').length;
-                 const sellTrades = trades.filter(t => t.action === 'sell').length;
-                 
-                 const ctx = document.getElementById('actionChart').getContext('2d');
-                 
-                 if (window.actionChart) {
-                     window.actionChart.destroy();
-                 }
-                 
-                 window.actionChart = new Chart(ctx, {
-                     type: 'doughnut',
-                     data: {
-                         labels: ['Buy', 'Sell'],
-                         datasets: [{
-                             data: [buyTrades, sellTrades],
-                             backgroundColor: [
-                                 'rgba(40, 167, 69, 0.6)',
-                                 'rgba(220, 53, 69, 0.6)'
-                             ]
-                         }]
-                     },
-                     options: {
-                         responsive: true,
-                         plugins: {
-                             legend: {
-                                 position: 'bottom',
-                             },
-                             title: {
-                                 display: true,
-                                 text: 'Buy vs Sell Orders'
-                             }
-                         }
-                     }
-                 });
-             }
+         function updateSymbolChart(trades) {
+         const symbolCounts = {};
+         
+         trades.forEach(trade => {
+         if (trade.symbol) {
+            symbolCounts[trade.symbol] = (symbolCounts[trade.symbol] || 0) + 1;
+         }
+         });
+         
+         const labels = Object.keys(symbolCounts);
+         const data = Object.values(symbolCounts);
+         
+         // Generate random colors
+         const backgroundColors = labels.map(() => 
+         `rgba(${Math.floor(Math.random() * 200)}, ${Math.floor(Math.random() * 200)}, ${Math.floor(Math.random() * 200)}, 0.6)`
+         );
+         
+         const ctx = document.getElementById('symbolChart').getContext('2d');
+         
+         // Safely destroy previous chart if it exists
+         if (window.symbolChart && typeof window.symbolChart.destroy === 'function') {
+         window.symbolChart.destroy();
+         }
+         
+         window.symbolChart = new Chart(ctx, {
+         type: 'pie',
+         data: {
+            labels: labels,
+            datasets: [{
+                data: data,
+                backgroundColor: backgroundColors
+            }]
+         },
+         options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'right',
+                },
+                title: {
+                    display: true,
+                    text: 'Trade Distribution by Symbol'
+                }
+            }
+         }
+         });
+         }
+         
+         // Function to update buy/sell ratio chart
+         function updateActionChart(trades) {
+         const buyTrades = trades.filter(t => t.action.toLowerCase() === 'buy').length;
+         const sellTrades = trades.filter(t => t.action.toLowerCase() === 'sell').length;
+         
+         const ctx = document.getElementById('actionChart').getContext('2d');
+         
+         // Safely destroy previous chart if it exists
+         if (window.actionChart && typeof window.actionChart.destroy === 'function') {
+         window.actionChart.destroy();
+         }
+         
+         window.actionChart = new Chart(ctx, {
+         type: 'doughnut',
+         data: {
+            labels: ['Buy', 'Sell'],
+            datasets: [{
+                data: [buyTrades, sellTrades],
+                backgroundColor: [
+                    'rgba(40, 167, 69, 0.6)',
+                    'rgba(220, 53, 69, 0.6)'
+                ]
+            }]
+         },
+         options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                },
+                title: {
+                    display: true,
+                    text: 'Buy vs Sell Orders'
+                }
+            }
+         }
+         });
+         }
              
              // Load data when page loads
              document.addEventListener('DOMContentLoaded', loadTradeData);
