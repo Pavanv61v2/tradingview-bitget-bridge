@@ -57,5 +57,12 @@
     "action": "sell",
     "status": "failed",
     "error": "All 3 attempts failed: Request failed with status code 400"
+  },
+  {
+    "timestamp": "2025-03-23T08:43:59.474Z",
+    "symbol": "BTCUSD",
+    "action": "sell",
+    "status": "failed",
+    "error": "All 3 attempts failed: Request failed with status code 400"
   }
 ]
