@@ -118,8 +118,8 @@
             <div class="col-md-3">
                 <div class="card stats-card text-center">
                     <div class="card-body">
-                        <h5 class="card-title">Most Traded</h5>
-                        <h2 id="most-traded">N/A</h2>
+                        <h5 class="card-title">Profit/Loss</h5>
+                        <h2 id="profit-loss">0 USDT</h2>
                     </div>
                 </div>
             </div>
@@ -143,6 +143,7 @@
                                         <th>Symbol</th>
                                         <th>Action</th>
                                         <th>Amount</th>
+                                        <th>Price</th>
                                         <th>Order ID</th>
                                         <th>Status</th>
                                     </tr>
@@ -180,7 +181,7 @@
             </div>
         </div>
         
-        <!-- New Timeline Chart Section -->
+        <!-- Timeline Chart Section -->
         <div class="row mt-4">
             <div class="col-md-12">
                 <div class="card">
@@ -242,17 +243,38 @@
                 }
                 
                 const timestamp = new Date(trade.timestamp).toLocaleString();
+                
+                // Prepare amount and price text
                 let amountText = '';
+                let priceText = '';
                 
                 if (trade.action === 'buy') {
-                    if (trade.orderSize) {
-                        amountText = `${trade.orderSize} USDT`;
+                    // Use filled amounts if available, otherwise use original order size
+                    const amount = trade.filledBaseVolume || trade.orderSize;
+                    const symbol = trade.symbol ? trade.symbol.replace('USDT', '') : '';
+                    amountText = `${amount} ${symbol}`;
+                    
+                    if (trade.usdtEquivalent) {
+                        amountText += ` (${trade.usdtEquivalent} USDT)`;
+                    } else if (trade.filledQuoteVolume) {
+                        amountText += ` (${trade.filledQuoteVolume} USDT)`;
                     }
                 } else if (trade.action === 'sell') {
-                    if (trade.orderSize) {
-                        const symbol = trade.symbol.replace('USDT', '');
-                        amountText = `${trade.orderSize} ${symbol}`;
+                    // Use filled amounts if available, otherwise use original order size
+                    const amount = trade.filledBaseVolume || trade.orderSize;
+                    const symbol = trade.symbol ? trade.symbol.replace('USDT', '') : '';
+                    amountText = `${amount} ${symbol}`;
+                    
+                    if (trade.usdtEquivalent) {
+                        amountText += ` (${trade.usdtEquivalent} USDT)`;
                     }
+                }
+                
+                // Price text
+                if (trade.price) {
+                    priceText = `${trade.price} USDT`;
+                } else {
+                    priceText = 'N/A';
                 }
                 
                 row.innerHTML = `
@@ -262,6 +284,7 @@
                         ${trade.action === 'buy' ? 'BUY' : 'SELL'}
                     </td>
                     <td>${amountText}</td>
+                    <td>${priceText}</td>
                     <td>${trade.orderId || 'N/A'}</td>
                     <td>
                         ${trade.status === 'success' 
@@ -294,7 +317,7 @@
             let avgTradeSize = 0;
             if (successfulBuyTrades.length > 0) {
                 const totalBuySize = successfulBuyTrades.reduce((sum, trade) => {
-                    const size = parseFloat(trade.orderSize) || 0;
+                    const size = parseFloat(trade.filledQuoteVolume || trade.usdtEquivalent || trade.orderSize || 0);
                     return sum + size;
                 }, 0);
                 avgTradeSize = (totalBuySize / successfulBuyTrades.length).toFixed(2);
@@ -304,7 +327,9 @@
             // Largest buy
             let largestBuy = 0;
             if (successfulBuyTrades.length > 0) {
-                largestBuy = Math.max(...successfulBuyTrades.map(t => parseFloat(t.orderSize) || 0)).toFixed(2);
+                largestBuy = Math.max(...successfulBuyTrades.map(t => 
+                    parseFloat(t.filledQuoteVolume || t.usdtEquivalent || t.orderSize || 0)
+                )).toFixed(2);
             }
             document.getElementById('largest-buy').textContent = `${largestBuy} USDT`;
             
@@ -313,12 +338,12 @@
             let largestSellCoin = '';
             if (successfulSellTrades.length > 0) {
                 const largestSellTrade = successfulSellTrades.reduce((max, trade) => {
-                    const size = parseFloat(trade.orderSize) || 0;
-                    return size > parseFloat(max.orderSize || 0) ? trade : max;
-                }, { orderSize: '0' });
+                    const size = parseFloat(trade.usdtEquivalent || 0);
+                    return size > parseFloat(max.usdtEquivalent || 0) ? trade : max;
+                }, { usdtEquivalent: '0' });
                 
-                largestSell = parseFloat(largestSellTrade.orderSize).toFixed(5);
-                largestSellCoin = largestSellTrade.symbol ? largestSellTrade.symbol.replace('USDT', '') : '';
+                largestSell = parseFloat(largestSellTrade.usdtEquivalent || 0).toFixed(2);
+                largestSellCoin = 'USDT';
             }
             document.getElementById('largest-sell').textContent = largestSell + (largestSellCoin ? ` ${largestSellCoin}` : '');
             
@@ -339,6 +364,37 @@
                 }
             }
             document.getElementById('most-traded').textContent = mostTraded;
+            
+            // Calculate profit/loss 
+            let totalProfitLoss = 0;
+            let profitLossPercentage = 0;
+
+            // Track total USDT spent on buys and received from sells
+            const totalBuyUsdt = trades
+                .filter(t => t.status === 'success' && t.action === 'buy')
+                .reduce((sum, trade) => sum + (parseFloat(trade.filledQuoteVolume || trade.usdtEquivalent || trade.orderSize || 0)), 0);
+
+            const totalSellUsdt = trades
+                .filter(t => t.status === 'success' && t.action === 'sell')
+                .reduce((sum, trade) => sum + (parseFloat(trade.usdtEquivalent || 0)), 0);
+
+            // Calculate profit/loss
+            totalProfitLoss = totalSellUsdt - totalBuyUsdt;
+
+            // Calculate percentage
+            if (totalBuyUsdt > 0) {
+                profitLossPercentage = (totalProfitLoss / totalBuyUsdt * 100).toFixed(2);
+            }
+
+            // Update UI elements
+            const profitLossElement = document.getElementById('profit-loss');
+            profitLossElement.textContent = `${totalProfitLoss.toFixed(2)} USDT`;
+            profitLossElement.className = totalProfitLoss >= 0 ? 'buy-text' : 'sell-text';
+
+            // Add percentage if meaningful
+            if (totalBuyUsdt > 0) {
+                profitLossElement.textContent += ` (${profitLossPercentage}%)`;
+            }
         }
         
         // Function to update charts
@@ -439,7 +495,7 @@
             });
         }
         
-        // New function to update timeline chart
+        // Function to update timeline chart
         function updateTimelineChart(trades) {
             // Sort trades by timestamp
             const sortedTrades = [...trades].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
@@ -455,15 +511,15 @@
                 });
             });
             
-            // Create datasets for buys and sells
+            // Create datasets for buys and sells with USDT values where available
             const buyData = sortedTrades.map(trade => 
                 trade.action && trade.action.toLowerCase() === 'buy' ? 
-                    parseFloat(trade.orderSize || 0) : null
+                    parseFloat(trade.filledQuoteVolume || trade.usdtEquivalent || trade.orderSize || 0) : null
             );
             
             const sellData = sortedTrades.map(trade => 
                 trade.action && trade.action.toLowerCase() === 'sell' ? 
-                    1 : null  // Just showing occurrence for sells
+                    parseFloat(trade.usdtEquivalent || 0) : null
             );
             
             const ctx = document.getElementById('timelineChart').getContext('2d');
@@ -491,15 +547,14 @@
                             fill: false
                         },
                         {
-                            label: 'Sell Orders',
+                            label: 'Sell Orders (USDT)',
                             data: sellData,
                             borderColor: 'rgba(220, 53, 69, 1)',
                             backgroundColor: 'rgba(220, 53, 69, 0.2)',
                             pointBackgroundColor: 'rgba(220, 53, 69, 1)',
                             pointRadius: 4,
                             pointHoverRadius: 6,
-                            fill: false,
-                            yAxisID: 'y1'
+                            fill: false
                         }
                     ]
                 },
@@ -516,20 +571,8 @@
                             beginAtZero: true,
                             title: {
                                 display: true,
-                                text: 'Buy Amount (USDT)'
+                                text: 'Amount (USDT)'
                             }
-                        },
-                        y1: {
-                            position: 'right',
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Sell Occurrences'
-                            },
-                            grid: {
-                                drawOnChartArea: false
-                            },
-                            max: 2 // Adjusting scale for sell occurrences
                         }
                     },
                     plugins: {
@@ -545,10 +588,17 @@
                                     const datasetLabel = context.dataset.label;
                                     
                                     if (trade.action && trade.action.toLowerCase() === 'buy') {
-                                        return `${datasetLabel}: ${trade.orderSize} USDT`;
-                                    } else if (trade.action && trade.action.toLowerCase() === 'sell') {
+                                        const amount = trade.filledBaseVolume || trade.orderSize;
+                                        const usdtValue = trade.filledQuoteVolume || trade.usdtEquivalent;
+                                        const price = trade.price || 'N/A';
                                         const symbol = trade.symbol ? trade.symbol.replace('USDT', '') : '';
-                                        return `${datasetLabel}: ${trade.orderSize} ${symbol}`;
+                                        return `${datasetLabel}: ${amount} ${symbol} @ ${price} USDT (${usdtValue} USDT)`;
+                                    } else if (trade.action && trade.action.toLowerCase() === 'sell') {
+                                        const amount = trade.filledBaseVolume || trade.orderSize;
+                                        const usdtValue = trade.usdtEquivalent || 0;
+                                        const price = trade.price || 'N/A';
+                                        const symbol = trade.symbol ? trade.symbol.replace('USDT', '') : '';
+                                        return `${datasetLabel}: ${amount} ${symbol} @ ${price} USDT (${usdtValue} USDT)`;
                                     }
                                     return datasetLabel;
                                 }
