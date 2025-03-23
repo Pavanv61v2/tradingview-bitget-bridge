@@ -24,5 +24,18 @@
     "usdtEquivalent": 2.992044,
     "orderId": "1287616478208684045",
     "status": "success"
+  },
+  {
+    "timestamp": "2025-03-23T08:27:35.316Z",
+    "symbol": "BTCUSDT",
+    "action": "buy",
+    "originalAmount": 3,
+    "orderSize": "3.00",
+    "price": 84300.35,
+    "filledBaseVolume": 0.000035,
+    "filledQuoteVolume": 2.95051225,
+    "usdtEquivalent": 2.95051225,
+    "orderId": "1287620006255882248",
+    "status": "success"
   }
 ]
