@@ -50,5 +50,32 @@
     "usdtEquivalent": 2.98848,
     "orderId": "1287620103840559108",
     "status": "success"
+  },
+  {
+    "timestamp": "2025-03-23T08:43:17.041Z",
+    "symbol": "SUIUSD",
+    "action": "sell",
+    "status": "failed",
+    "error": "All 3 attempts failed: Request failed with status code 400"
+  },
+  {
+    "timestamp": "2025-03-23T08:43:59.474Z",
+    "symbol": "BTCUSD",
+    "action": "sell",
+    "status": "failed",
+    "error": "All 3 attempts failed: Request failed with status code 400"
+  },
+  {
+    "timestamp": "2025-03-23T08:44:27.910Z",
+    "symbol": "SOLUSDT",
+    "action": "sell",
+    "originalAmount": 0.0228541,
+    "orderSize": "0.0227",
+    "price": 131.05,
+    "filledBaseVolume": 0.0227,
+    "filledQuoteVolume": 2.974835,
+    "usdtEquivalent": 2.9748350000000006,
+    "orderId": "1287624253865291776",
+    "status": "success"
   }
 ]
