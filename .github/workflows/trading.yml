@@ -435,17 +435,63 @@ jobs:
             } catch (error) {
               console.error("Error placing order:", error.message);
               
-              // We already have symbol and orderSize from above in the function
-              // No need to try to extract them again from the signal
+              // Define default values in case the error happened early in the function
+              let errorSymbol = 'UNKNOWN';
+              let errorAction = 'UNKNOWN';
+              let errorOrderSize = null;
+              let errorOriginalAmount = null;
+              
+              try {
+                // Use the variables if they were already defined in the function
+                if (typeof symbol !== 'undefined') {
+                  errorSymbol = symbol;
+                }
+                
+                if (typeof isBuy !== 'undefined') {
+                  errorAction = isBuy ? 'buy' : 'sell';
+                }
+                
+                if (typeof orderSize !== 'undefined') {
+                  errorOrderSize = orderSize;
+                }
+                
+                if (typeof originalAmount !== 'undefined') {
+                  errorOriginalAmount = originalAmount;
+                }
+                
+                // If we don't have the values from the function,
+                // try to extract them from the signal
+                if (errorSymbol === 'UNKNOWN' || errorAction === 'UNKNOWN') {
+                  const signal = process.env.SIGNAL_DATA ? JSON.parse(process.env.SIGNAL_DATA) : null;
+                  if (signal) {
+                    if (errorSymbol === 'UNKNOWN') {
+                      let signalSymbol = signal.symbol || signal.ticker || 'UNKNOWN';
+                      if (signalSymbol !== 'UNKNOWN') {
+                        signalSymbol = signalSymbol.replace('/', '').toUpperCase();
+                        if (signalSymbol.endsWith('USD') && !signalSymbol.endsWith('USDT')) {
+                          signalSymbol = signalSymbol.replace('USD', 'USDT');
+                        }
+                        errorSymbol = signalSymbol;
+                      }
+                    }
+                    
+                    if (errorAction === 'UNKNOWN') {
+                      errorAction = signal.action || 'UNKNOWN';
+                    }
+                  }
+                }
+              } catch (parseError) {
+                console.error("Error during error handling:", parseError.message);
+              }
               
               // Log the failed trade with all available information
               const tradeInfo = {
                 timestamp: new Date().toISOString(),
-                symbol: symbol,  // Use the already formatted symbol
-                action: isBuy ? 'buy' : 'sell',  // We already determined this
-                orderSize: orderSize,  // The amount we tried to trade
-                originalAmount: originalAmount,  // The original amount
-                price: null,  // We don't know the execution price
+                symbol: errorSymbol,
+                action: errorAction,
+                orderSize: errorOrderSize,
+                originalAmount: errorOriginalAmount,
+                price: null,
                 status: 'failed',
                 error: error.message
               };
