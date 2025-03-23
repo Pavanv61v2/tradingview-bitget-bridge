@@ -1,119 +1,15 @@
 [
   {
-    "timestamp": "2025-03-22T14:56:25.436Z",
-    "symbol": "SOLUSDT",
-    "action": "buy",
-    "originalAmount": 3,
-    "orderSize": "3.00",
-    "orderId": "test-1742655385436",
-    "status": "success"
-  },
-  {
-    "timestamp": "2025-03-22T16:08:39.905Z",
+    "timestamp": "2025-03-23T08:06:44.098Z",
     "symbol": "SOLUSDT",
     "action": "sell",
-    "originalAmount": 0.0463691,
-    "orderSize": "0.0461",
-    "orderId": "1287373661473435648",
-    "status": "success"
-  },
-  {
-    "timestamp": "2025-03-22T16:35:25.134Z",
-    "symbol": "SOLUSDT",
-    "action": "buy",
-    "originalAmount": 3,
-    "orderSize": "3.00",
-    "orderId": "1287380394224742403",
-    "status": "success"
-  },
-  {
-    "timestamp": "2025-03-22T16:41:54.503Z",
-    "symbol": "SOLUSDT",
-    "action": "sell",
-    "originalAmount": 0.023346,
-    "orderSize": "0.0232",
-    "orderId": "1287382027419611136",
-    "status": "success"
-  },
-  {
-    "timestamp": "2025-03-22T16:42:12.741Z",
-    "symbol": "UNKNOWN",
-    "action": "UNKNOWN",
-    "status": "failed",
-    "error": "All 3 attempts failed: Request failed with status code 400"
-  },
-  {
-    "timestamp": "2025-03-22T16:52:34.085Z",
-    "symbol": "SOLUSDT",
-    "action": "sell",
-    "status": "failed",
-    "error": "All 3 attempts failed: Request failed with status code 400"
-  },
-  {
-    "timestamp": "2025-03-22T18:45:09.475Z",
-    "symbol": "SOLUSDT",
-    "action": "buy",
-    "originalAmount": 15,
-    "orderSize": "15.00",
-    "orderId": "1287413044192833538",
-    "status": "success"
-  },
-  {
-    "timestamp": "2025-03-22T19:25:12.860Z",
-    "symbol": "SOLUSDT",
-    "action": "sell",
-    "originalAmount": 0.1155305,
-    "orderSize": "0.1155",
-    "orderId": "1287423124678209539",
-    "status": "success"
-  },
-  {
-    "timestamp": "2025-03-22T19:30:11.281Z",
-    "symbol": "SOLUSDT",
-    "action": "buy",
-    "originalAmount": 15,
-    "orderSize": "15.00",
-    "orderId": "1287424376392740864",
-    "status": "success"
-  },
-  {
-    "timestamp": "2025-03-22T20:05:10.580Z",
-    "symbol": "SOLUSDT",
-    "action": "sell",
-    "originalAmount": 0.1152152,
-    "orderSize": "0.1152",
-    "orderId": "1287433181478350848",
-    "status": "success"
-  },
-  {
-    "timestamp": "2025-03-22T20:15:10.722Z",
-    "symbol": "SOLUSDT",
-    "action": "buy",
-    "originalAmount": 15,
-    "orderSize": "15.00",
-    "orderId": "1287435698601816066",
-    "status": "success"
-  },
-  {
-    "timestamp": "2025-03-22T20:20:11.855Z",
-    "symbol": "SOLUSDT",
-    "action": "sell",
-    "originalAmount": 0.1153997,
-    "orderSize": "0.1153",
-    "orderId": "1287436961485778944",
-    "status": "success"
-  },
-  {
-    "timestamp": "2025-03-23T08:01:42.965Z",
-    "symbol": "SOLUSDT",
-    "action": "buy",
-    "originalAmount": 3,
-    "orderSize": "3.00",
-    "price": 131.21,
+    "originalAmount": 0.0228769,
+    "orderSize": "0.0228",
+    "price": 131.19,
     "filledBaseVolume": 0.0228,
-    "filledQuoteVolume": 2.991588,
-    "usdtEquivalent": 2.991588,
-    "orderId": "1287613495307759616",
+    "filledQuoteVolume": 2.991132,
+    "usdtEquivalent": 2.991132,
+    "orderId": "1287614758338523137",
     "status": "success"
   }
 ]
