@@ -435,7 +435,7 @@ jobs:
             } catch (error) {
               console.error("Error placing order:", error.message);
               
-              // Define default values in case the error happened early in the function
+            // Define default values in case the error happened early in the function
               let errorSymbol = 'UNKNOWN';
               let errorAction = 'UNKNOWN';
               let errorOrderSize = null;
@@ -478,6 +478,19 @@ jobs:
                     if (errorAction === 'UNKNOWN') {
                       errorAction = signal.action || 'UNKNOWN';
                     }
+                    
+                    // Add these new lines to capture order size and price from signal
+                    if (errorOrderSize === null && signal.order_size) {
+                      errorOrderSize = signal.order_size;
+                    }
+                    
+                    // If this is a buy order, and we have the order_size, that's the USDT amount
+                    if (errorAction.toLowerCase() === 'buy' && errorOrderSize !== null) {
+                      errorOriginalAmount = errorOrderSize;
+                    }
+                    
+                    // Capture price if available
+                    const errorPrice = signal.price || null;
                   }
                 }
               } catch (parseError) {
@@ -491,9 +504,10 @@ jobs:
                 action: errorAction,
                 orderSize: errorOrderSize,
                 originalAmount: errorOriginalAmount,
-                price: null,
+                price: errorPrice || null,
                 status: 'failed',
-                error: error.message
+                error: error.message,
+                errorDetails: error.response && error.response.data ? JSON.stringify(error.response.data) : null
               };
               
               await logTrade(tradeInfo);
