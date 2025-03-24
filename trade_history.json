@@ -162,5 +162,15 @@
     "price": null,
     "status": "failed",
     "error": "All 3 attempts failed: Request failed with status code 400"
+  },
+  {
+    "timestamp": "2025-03-24T02:44:08.200Z",
+    "symbol": "BNBUSDT",
+    "action": "sell",
+    "orderSize": null,
+    "originalAmount": null,
+    "price": null,
+    "status": "failed",
+    "error": "All 3 attempts failed: Request failed with status code 400"
   }
 ]
