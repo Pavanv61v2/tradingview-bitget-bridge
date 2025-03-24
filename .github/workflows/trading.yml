@@ -18,37 +18,23 @@ jobs:
           SIGNAL_DATA: '${{ toJson(github.event.client_payload) }}'
           NOTIFICATIONS_ENABLED: 'true'
           NOTIFICATION_EMAIL: '${{ secrets.NOTIFICATION_EMAIL }}'
-        run: >
+        run: |
           echo "Received trading signal"
-
           echo "Symbol: ${{ github.event.client_payload.symbol || 'N/A' }}"
-
           echo "Action: ${{ github.event.client_payload.action || 'N/A' }}"
-
-          echo "Order size: ${{ github.event.client_payload.order_size || 'N/A'
-          }}"
-
-
+          echo "Order size: ${{ github.event.client_payload.order_size || 'N/A' }}"
+          
           # Install dependencies
-
           npm install axios crypto-js nodemailer
-
-
+          
           # Create and run the trading script
-
           cat > trade.js << 'EOF'
-
           const axios = require('axios');
-
           const crypto = require('crypto');
-
           const nodemailer = require('nodemailer');
-
           const fs = require('fs');
-
-
+          
           // Common scale (decimal places) for cryptocurrencies
-
           const coinScales = {
             'BTC': 6,
             'ETH': 5,
@@ -62,23 +48,15 @@ jobs:
             // Default scale for others
             'DEFAULT': 2
           };
-
-
+          
           // Trade log file
-
           const TRADE_LOG_FILE = 'trade_history.json';
-
-
+          
           // Notification settings
-
-          const NOTIFICATIONS_ENABLED = process.env.NOTIFICATIONS_ENABLED ===
-          'true';
-
+          const NOTIFICATIONS_ENABLED = process.env.NOTIFICATIONS_ENABLED === 'true';
           const NOTIFICATION_EMAIL = process.env.NOTIFICATION_EMAIL;
-
-
+          
           // Function to fetch precision scale for a specific symbol
-
           async function getSymbolPrecision(symbol) {
             try {
               console.log(`Fetching precision info for ${symbol}...`);
@@ -109,8 +87,7 @@ jobs:
               return null;
             }
           }
-
-
+          
           async function placeOrder() {
             try {
               const apiKey = process.env.BITGET_API_KEY;
@@ -455,98 +432,96 @@ jobs:
               
               return response.data;
               
-            } } catch (error) {
-                console.error("Error placing order:", error.message);
-                
-                // Define default values in case the error happened early in the function
-                let errorSymbol = 'UNKNOWN';
-                let errorAction = 'UNKNOWN';
-                let errorOrderSize = null;
-                let errorOriginalAmount = null;
-                
-                try {
-                  // Use the variables if they were already defined in the function
-                  if (typeof symbol !== 'undefined') {
-                    errorSymbol = symbol;
-                  }
-                  
-                  if (typeof isBuy !== 'undefined') {
-                    errorAction = isBuy ? 'buy' : 'sell';
-                  }
-                  
-                  if (typeof orderSize !== 'undefined') {
-                    errorOrderSize = orderSize;
-                  }
-                  
-                  if (typeof originalAmount !== 'undefined') {
-                    errorOriginalAmount = originalAmount;
-                  }
-                  
-                  // If we don't have the values from the function,
-                  // try to extract them from the signal
-                  if (errorSymbol === 'UNKNOWN' || errorAction === 'UNKNOWN') {
-                    const signal = process.env.SIGNAL_DATA ? JSON.parse(process.env.SIGNAL_DATA) : null;
-                    if (signal) {
-                      if (errorSymbol === 'UNKNOWN') {
-                        let signalSymbol = signal.symbol || signal.ticker || 'UNKNOWN';
-                        if (signalSymbol !== 'UNKNOWN') {
-                          signalSymbol = signalSymbol.replace('/', '').toUpperCase();
-                          if (signalSymbol.endsWith('USD') && !signalSymbol.endsWith('USDT')) {
-                            signalSymbol = signalSymbol.replace('USD', 'USDT');
-                          }
-                          errorSymbol = signalSymbol;
-                        }
-                      }
-                      
-                      if (errorAction === 'UNKNOWN') {
-                        errorAction = signal.action || 'UNKNOWN';
-                      }
-                    }
-                  }
-                } catch (parseError) {
-                  console.error("Error during error handling:", parseError.message);
+            } catch (error) {
+              console.error("Error placing order:", error.message);
+              
+              // Define default values in case the error happened early in the function
+              let errorSymbol = 'UNKNOWN';
+              let errorAction = 'UNKNOWN';
+              let errorOrderSize = null;
+              let errorOriginalAmount = null;
+              
+              try {
+                // Use the variables if they were already defined in the function
+                if (typeof symbol !== 'undefined') {
+                  errorSymbol = symbol;
                 }
                 
-                // Log the failed trade with all available information
-                const tradeInfo = {
-                  timestamp: new Date().toISOString(),
-                  symbol: errorSymbol,
-                  action: errorAction,
-                  orderSize: errorOrderSize,
-                  originalAmount: errorOriginalAmount,
-                  price: null,
-                  status: 'failed',
-                  error: error.message
-                };
+                if (typeof isBuy !== 'undefined') {
+                  errorAction = isBuy ? 'buy' : 'sell';
+                }
                 
-                // Try to get price and additional info from the original signal
-                try {
-                  const signalData = process.env.SIGNAL_DATA ? JSON.parse(process.env.SIGNAL_DATA) : null;
-                  if (signalData) {
-                    // Add price from signal if available
-                    if (signalData.price) {
-                      tradeInfo.price = signalData.price;
+                if (typeof orderSize !== 'undefined') {
+                  errorOrderSize = orderSize;
+                }
+                
+                if (typeof originalAmount !== 'undefined') {
+                  errorOriginalAmount = originalAmount;
+                }
+                
+                // If we don't have the values from the function,
+                // try to extract them from the signal
+                if (errorSymbol === 'UNKNOWN' || errorAction === 'UNKNOWN') {
+                  const signal = process.env.SIGNAL_DATA ? JSON.parse(process.env.SIGNAL_DATA) : null;
+                  if (signal) {
+                    if (errorSymbol === 'UNKNOWN') {
+                      let signalSymbol = signal.symbol || signal.ticker || 'UNKNOWN';
+                      if (signalSymbol !== 'UNKNOWN') {
+                        signalSymbol = signalSymbol.replace('/', '').toUpperCase();
+                        if (signalSymbol.endsWith('USD') && !signalSymbol.endsWith('USDT')) {
+                          signalSymbol = signalSymbol.replace('USD', 'USDT');
+                        }
+                        errorSymbol = signalSymbol;
+                      }
                     }
                     
-                    // If order size is still null, try to get it from signal
-                    if (tradeInfo.orderSize === null && signalData.order_size) {
-                      tradeInfo.orderSize = signalData.order_size;
+                    if (errorAction === 'UNKNOWN') {
+                      errorAction = signal.action || 'UNKNOWN';
                     }
                   }
-                } catch (e) {
-                  console.error("Error extracting signal data for failed trade:", e.message);
                 }
-                
-                await logTrade(tradeInfo);
-                console.log("Error logged to trade history");
-                
-                return { error: error.message };
+              } catch (parseError) {
+                console.error("Error during error handling:", parseError.message);
               }
+              
+              // Log the failed trade with all available information
+              const tradeInfo = {
+                timestamp: new Date().toISOString(),
+                symbol: errorSymbol,
+                action: errorAction,
+                orderSize: errorOrderSize,
+                originalAmount: errorOriginalAmount,
+                price: null,
+                status: 'failed',
+                error: error.message
+              };
+              
+              // Additional code to extract price from signal
+              try {
+                const signalData = process.env.SIGNAL_DATA ? JSON.parse(process.env.SIGNAL_DATA) : null;
+                if (signalData) {
+                  // Get price from signal if available
+                  if (signalData.price) {
+                    tradeInfo.price = signalData.price;
+                  }
+                  
+                  // If orderSize is still null, try to get it from signal
+                  if (tradeInfo.orderSize === null && signalData.order_size) {
+                    tradeInfo.orderSize = signalData.order_size;
+                  }
+                }
+              } catch (e) {
+                console.error("Error extracting signal data for failed trade:", e.message);
+              }
+              
+              await logTrade(tradeInfo);
+              console.log("Error logged to trade history");
+              
+              return { error: error.message };
+            }
           }
-
-
+          
           // Helper function to get account assets
-
           async function getAccountAssets(symbol) {
             const timestamp = Date.now().toString();
             const requestPath = '/api/v2/spot/account/assets';
@@ -583,10 +558,8 @@ jobs:
               throw new Error(`Failed to get account assets: ${response.data ? response.data.msg : 'Unknown error'}`);
             }
           }
-
-
+          
           // Helper function to log trades
-
           async function logTrade(tradeInfo) {
             try {
               // Check if the log file exists
@@ -612,10 +585,8 @@ jobs:
               console.error("Error logging trade:", error.message);
             }
           }
-
-
+          
           // Helper function to send email notifications
-
           async function sendNotification(subject, body) {
             if (!NOTIFICATIONS_ENABLED || !NOTIFICATION_EMAIL) {
               console.log("Notifications disabled or email not configured");
@@ -635,33 +606,26 @@ jobs:
               console.error("Error sending notification:", error.message);
             }
           }
-
-
+          
           // Execute the function
-
           placeOrder().then(() => {
             console.log("Order process completed");
           }).catch(err => {
             console.error("Unhandled error:", err);
           });
-
           EOF
-
-
+          
           node trade.js
-
-
+          
           # Debug: List files after script execution
-
           echo "Files in directory after script execution:"
-
           ls -la
       - name: Commit updated trade history
         run: |
           # Configure git
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
-
+          
           # Check if trade_history.json exists
           if [ -f "trade_history.json" ]; then
             # Add the file and commit
