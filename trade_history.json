@@ -172,5 +172,18 @@
     "price": null,
     "status": "failed",
     "error": "All 3 attempts failed: Request failed with status code 400"
+  },
+  {
+    "timestamp": "2025-03-24T08:00:25.875Z",
+    "symbol": "ETHUSDT",
+    "action": "buy",
+    "originalAmount": 50,
+    "orderSize": "50.00",
+    "price": 2070.83,
+    "filledBaseVolume": 0.0241,
+    "filledQuoteVolume": 49.907003,
+    "usdtEquivalent": 49.907003,
+    "orderId": "1287975559897378816",
+    "status": "success"
   }
 ]
