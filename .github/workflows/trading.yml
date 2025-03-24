@@ -496,24 +496,6 @@ jobs:
                 error: error.message
               };
               
-              // Additional code to extract price from signal
-              try {
-                const signalData = process.env.SIGNAL_DATA ? JSON.parse(process.env.SIGNAL_DATA) : null;
-                if (signalData) {
-                  // Get price from signal if available
-                  if (signalData.price) {
-                    tradeInfo.price = signalData.price;
-                  }
-                  
-                  // If orderSize is still null, try to get it from signal
-                  if (tradeInfo.orderSize === null && signalData.order_size) {
-                    tradeInfo.orderSize = signalData.order_size;
-                  }
-                }
-              } catch (e) {
-                console.error("Error extracting signal data for failed trade:", e.message);
-              }
-              
               await logTrade(tradeInfo);
               console.log("Error logged to trade history");
               
