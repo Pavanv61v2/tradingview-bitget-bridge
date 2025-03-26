@@ -185,5 +185,18 @@
     "usdtEquivalent": 49.907003,
     "orderId": "1287975559897378816",
     "status": "success"
+  },
+  {
+    "timestamp": "2025-03-26T16:00:35.833Z",
+    "symbol": "ETHUSDT",
+    "action": "sell",
+    "originalAmount": 0.0240759,
+    "orderSize": "0.0236",
+    "price": 2010.2,
+    "filledBaseVolume": 0.0236,
+    "filledQuoteVolume": 47.44072,
+    "usdtEquivalent": 47.44072,
+    "orderId": "1288821173304520707",
+    "status": "success"
   }
 ]
