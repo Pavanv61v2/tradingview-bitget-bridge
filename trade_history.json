@@ -251,5 +251,25 @@
     "price": null,
     "status": "failed",
     "error": "All 3 attempts failed: Request failed with status code 400"
+  },
+  {
+    "timestamp": "2025-04-12T14:44:39.681Z",
+    "symbol": "SOLUSDT",
+    "action": "buy",
+    "orderSize": null,
+    "originalAmount": null,
+    "price": null,
+    "status": "failed",
+    "error": "usdtAsset is not defined"
+  },
+  {
+    "timestamp": "2025-04-12T14:45:19.806Z",
+    "symbol": "SOLUSDT",
+    "action": "buy",
+    "orderSize": null,
+    "originalAmount": null,
+    "price": null,
+    "status": "failed",
+    "error": "usdtAsset is not defined"
   }
 ]
