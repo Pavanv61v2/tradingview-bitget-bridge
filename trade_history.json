@@ -211,5 +211,15 @@
     "usdtEquivalent": 1.994304,
     "orderId": "1294947193942274069",
     "status": "success"
+  },
+  {
+    "timestamp": "2025-04-12T13:59:14.969Z",
+    "symbol": "SOLUSDT",
+    "action": "buy",
+    "orderSize": null,
+    "originalAmount": null,
+    "price": null,
+    "status": "failed",
+    "error": "All 3 attempts failed: Request failed with status code 400"
   }
 ]
