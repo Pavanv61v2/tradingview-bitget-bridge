@@ -145,17 +145,16 @@ jobs:
               if (isBuy) {
                 // BUY ORDER: Use the order_size directly as USDT amount
                 // For market buy, size is the amount of USDT to spend
+
+                const usdtAsset = await getAccountAssets('USDTUSDT');
                 
                 // Get the specified order size (in USDT)
                 let investmentAmount = 100; // Default amount in USDT
                 
                 if (signal.order_size && !isNaN(parseFloat(signal.order_size))) {
-                  const usdtAsset = await getAccountAssets('USDTUSDT');
-                  
-                  if (usdtAsset && usdtAsset.available && parseFloat(usdtAsset.available) > 0) {
-                  const usdtBalance = parseFloat(usdtAsset.available);
-                  investmentAmount = (usdtBalance * parseFloat(signal.order_size)/ 100);
-                  console.log(`Using ${percentageValue}% of available USDT (${usdtBalance}): ${investmentAmount} USDT`);
+                  if (parseFloat(usdtAsset.available) > 0) {
+                  investmentAmount = ((parseFloat(usdtAsset.available) * parseFloat(signal.order_size))/ 100);
+                  console.log(`Using ${parseFloat(signal.order_size)}% of available USDT (${parseFloat(usdtAsset.available)}): ${investmentAmount} USDT`);
                   }else{
                   console.warn("Could not retrieve USDT balance or balance is zero, using default value");
                   }
