@@ -152,11 +152,10 @@ jobs:
                 let investmentAmount = 100; // Default amount in USDT
                 
                 if (signal.order_size && !isNaN(parseFloat(signal.order_size))) {
-                  if (parseFloat(usdtAsset.available) > 0) {
+                  if (usdtAsset && usdtAsset.available && parseFloat(usdtAsset.available) > 0) {
                   investmentAmount = ((parseFloat(usdtAsset.available) * parseFloat(signal.order_size))/ 100);
-                  console.log(`Using ${parseFloat(signal.order_size)}% of available USDT (${parseFloat(usdtAsset.available)}): ${investmentAmount} USDT`);
                   }else{
-                  console.warn("Could not retrieve USDT balance or balance is zero, using default value");
+                  console.log("Could not retrieve USDT balance or balance is zero, using default value");
                   }
                 }
                 
