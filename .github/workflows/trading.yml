@@ -152,7 +152,8 @@ jobs:
                 let investmentAmount = 100; // Default amount in USDT
                 
                 if (signal.order_size && !isNaN(parseFloat(signal.order_size))) {
-                  investmentAmount = parseFloat(signal.order_size)
+                  
+                  investmentAmount = (parseFloat(usdtAsset.available)*parseFloat(signal.order_size))/100
                 }
                 
                 originalAmount = investmentAmount;
