@@ -146,7 +146,7 @@ jobs:
                 // BUY ORDER: Use the order_size directly as USDT amount
                 // For market buy, size is the amount of USDT to spend
 
-                //const usdtAsset = await getAccountAssets('USDTUSDT');
+                const usdtAsset = await getAccountAssets('USDTUSDT');
                 
                 // Get the specified order size (in USDT)
                 let investmentAmount = 100; // Default amount in USDT
