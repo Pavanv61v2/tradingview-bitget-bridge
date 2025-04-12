@@ -150,7 +150,15 @@ jobs:
                 let investmentAmount = 100; // Default amount in USDT
                 
                 if (signal.order_size && !isNaN(parseFloat(signal.order_size))) {
-                  investmentAmount = parseFloat(signal.order_size);
+                  const usdtAsset = await getAccountAssets('USDTUSDT');
+                  
+                  if (usdtAsset && usdtAsset.available && parseFloat(usdtAsset.available) > 0) {
+                  const usdtBalance = parseFloat(usdtAsset.available);
+                  investmentAmount = (usdtBalance * parseFloat(signal.order_size)/ 100);
+                  console.log(`Using ${percentageValue}% of available USDT (${usdtBalance}): ${investmentAmount} USDT`);
+                  }else{
+                  console.warn("Could not retrieve USDT balance or balance is zero, using default value");
+                  }
                 }
                 
                 originalAmount = investmentAmount;
