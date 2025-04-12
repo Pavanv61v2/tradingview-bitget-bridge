@@ -88,57 +88,6 @@ jobs:
             }
           }
           
-          // Function to get USDT balance
-          async function getUsdtBalance() {
-            try {
-              const timestamp = Date.now().toString();
-              // Use the coin parameter to directly query USDT balance only
-              const requestPath = '/api/v2/spot/account/assets?coin=USDT';
-              const method = 'GET';
-              
-              // Signature content: timestamp + method + requestPath
-              const preHash = timestamp + method.toUpperCase() + requestPath;
-              
-              // Generate signature
-              const signature = crypto.createHmac('sha256', process.env.BITGET_API_SECRET)
-                .update(preHash)
-                .digest('base64');
-              
-              const response = await axios({
-                method: method,
-                url: 'https://api.bitget.com' + requestPath,
-                headers: {
-                  'ACCESS-KEY': process.env.BITGET_API_KEY,
-                  'ACCESS-SIGN': signature,
-                  'ACCESS-TIMESTAMP': timestamp,
-                  'ACCESS-PASSPHRASE': process.env.BITGET_PASSPHRASE,
-                  'Content-Type': 'application/json'
-                },
-                timeout: 10000
-              });
-              
-              if (response.data && response.data.code === '00000') {
-                // Since we queried specifically for USDT, we should have only one asset in the response
-                if (response.data.data && response.data.data.length > 0) {
-                  const asset = response.data.data[0];
-                  console.log(`Available USDT balance: ${asset.available}`);
-                  return parseFloat(asset.available);
-                } else {
-                  console.warn("USDT asset not found in account");
-                  return 0;
-                }
-              } else {
-                throw new Error(`Failed to get account assets: ${response.data ? response.data.msg : 'Unknown error'}`);
-              }
-            } catch (error) {
-              console.error("Error fetching USDT balance:", error.message);
-              if (error.response) {
-                console.error("Error response data:", JSON.stringify(error.response.data, null, 2));
-              }
-              return 0;
-            }
-          }
-          
           async function placeOrder() {
             try {
               const apiKey = process.env.BITGET_API_KEY;
@@ -194,40 +143,14 @@ jobs:
               let originalAmount;
               
               if (isBuy) {
-                // BUY ORDER: Check if order_size is a percentage or fixed amount
+                // BUY ORDER: Use the order_size directly as USDT amount
+                // For market buy, size is the amount of USDT to spend
+                
+                // Get the specified order size (in USDT)
                 let investmentAmount = 100; // Default amount in USDT
                 
-                if (signal.order_size) {
-                  const orderSizeStr = signal.order_size.toString();
-                  
-                  if (orderSizeStr.endsWith('%')) {
-                    // It's a percentage - remove the % symbol and convert to float
-                    const percentageValue = parseFloat(orderSizeStr.replace('%', ''));
-                    
-                    if (!isNaN(percentageValue)) {
-                      // Get available USDT balance
-                      const usdtBalance = await getUsdtBalance();
-                      
-                      if (usdtBalance > 0) {
-                        // Calculate the investment amount based on the percentage
-                        investmentAmount = (usdtBalance * percentageValue / 100);
-                        console.log(`Using ${percentageValue}% of available USDT (${usdtBalance}): ${investmentAmount} USDT`);
-                      } else {
-                        throw new Error("Could not retrieve USDT balance or balance is zero");
-                      }
-                    } else {
-                      throw new Error(`Invalid percentage format: ${signal.order_size}`);
-                    }
-                  } else {
-                    // It's a fixed amount
-                    const fixedAmount = parseFloat(orderSizeStr);
-                    if (!isNaN(fixedAmount)) {
-                      investmentAmount = fixedAmount;
-                      console.log(`Using fixed investment amount: ${investmentAmount} USDT`);
-                    } else {
-                      throw new Error(`Invalid order size format: ${signal.order_size}`);
-                    }
-                  }
+                if (signal.order_size && !isNaN(parseFloat(signal.order_size))) {
+                  investmentAmount = parseFloat(signal.order_size);
                 }
                 
                 originalAmount = investmentAmount;
