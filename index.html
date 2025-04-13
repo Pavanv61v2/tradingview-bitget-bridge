@@ -1146,12 +1146,12 @@
                          datasets: [{
                              data: [buyTrades, sellTrades],
                              backgroundColor: [
-                                 'rgba(40, 167, 69, 0.7)',
-                                 'rgba(220, 53, 69, 0.7)'
+                               'rgba(78, 222, 128, 0.7)', // Neon green for buys
+                               'rgba(248, 113, 113, 0.7)' // Neon red for sells
                              ],
                              borderColor: [
-                                 'rgba(40, 167, 69, 1)',
-                                 'rgba(220, 53, 69, 1)'
+                               'rgba(78, 222, 128, 1)',
+                               'rgba(248, 113, 113, 1)'
                              ],
                              borderWidth: 1
                          }]
@@ -1226,10 +1226,11 @@
                      window.portfolioChart = null;
                  }
                  
-                 // Create gradient fill
-                 const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-                 gradient.addColorStop(0, 'rgba(40, 167, 69, 0.4)');
-                 gradient.addColorStop(1, 'rgba(40, 167, 69, 0.0)');
+               // Create neon gradient fill - blue to teal
+               const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+               gradient.addColorStop(0, 'rgba(79, 209, 255, 0.5)');
+               gradient.addColorStop(0.5, 'rgba(0, 200, 255, 0.2)');
+               gradient.addColorStop(1, 'rgba(0, 242, 254, 0.0)');
                  
                  window.portfolioChart = new Chart(ctx, {
                      type: 'line',
