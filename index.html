@@ -3,137 +3,407 @@
    <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Trading Bot Dashboard</title>
+      <title>Enhanced Trading Bot Dashboard</title>
       <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
       <style>
          body {
-         background-color: #f8f9fa;
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
          }
          .card {
-         margin-bottom: 20px;
-         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            border: none;
+            transition: transform 0.2s;
+         }
+         .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
          }
          .card-header {
-         font-weight: bold;
+            font-weight: bold;
+            border-radius: 10px 10px 0 0 !important;
+            background-color: #343a40;
+            color: white;
+            padding: 12px 20px;
          }
          .buy-bg {
-         background-color: rgba(40, 167, 69, 0.1);
+            background-color: rgba(40, 167, 69, 0.1);
          }
          .sell-bg {
-         background-color: rgba(220, 53, 69, 0.1);
+            background-color: rgba(220, 53, 69, 0.1);
          }
          .buy-text {
-         color: #28a745;
+            color: #28a745;
+            font-weight: 600;
          }
          .sell-text {
-         color: #dc3545;
+            color: #dc3545;
+            font-weight: 600;
          }
          .stats-card {
-         transition: all 0.3s;
+            transition: all 0.3s;
+            height: 100%;
          }
          .stats-card:hover {
-         transform: translateY(-5px);
+            transform: translateY(-5px);
          }
          .table td, .table th {
-         vertical-align: middle;
+            vertical-align: middle;
          }
          .failed {
-         background-color: rgba(220, 53, 69, 0.1);
+            background-color: rgba(220, 53, 69, 0.1);
+         }
+         .dashboard-header {
+            background: linear-gradient(135deg, #343a40 0%, #212529 100%);
+            color: white;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            border-radius: 0 0 15px 15px;
+         }
+         .metric-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 5px 0;
+         }
+         .metric-title {
+            font-size: 0.9rem;
+            color: #6c757d;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+         }
+         .asset-row {
+            cursor: pointer;
+            transition: background-color 0.2s;
+         }
+         .asset-row:hover {
+            background-color: rgba(0,0,0,0.03);
+         }
+         .tab-content {
+            padding: 20px 0;
+         }
+         .chart-container {
+            height: 300px;
+            max-height: 300px;
+         }
+         .performance-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+         }
+         .indicator-positive {
+            background-color: #28a745;
+         }
+         .indicator-negative {
+            background-color: #dc3545;
+         }
+         .indicator-neutral {
+            background-color: #6c757d;
+         }
+         .clickable-asset {
+            color: #007bff;
+            cursor: pointer;
+            text-decoration: underline;
+         }
+         .table-striped>tbody>tr:nth-of-type(odd)>* {
+            background-color: rgba(0,0,0,.02);
+         }
+         .table-hover tbody tr:hover {
+            background-color: rgba(0,0,0,.075);
+         }
+         .btn-dark {
+            background-color: #343a40;
+            border-color: #343a40;
+         }
+         .dropdown-menu {
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border: none;
+         }
+         #assetDetailsModal .modal-content {
+            border-radius: 15px;
+            border: none;
+         }
+         #assetDetailsModal .modal-header {
+            background-color: #343a40;
+            color: white;
+            border-radius: 15px 15px 0 0;
+         }
+         .summary-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-right: 5px;
+         }
+         .badge-success {
+            background-color: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+            border: 1px solid rgba(40, 167, 69, 0.2);
+         }
+         .badge-danger {
+            background-color: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+            border: 1px solid rgba(220, 53, 69, 0.2);
+         }
+         .badge-info {
+            background-color: rgba(23, 162, 184, 0.1);
+            color: #17a2b8;
+            border: 1px solid rgba(23, 162, 184, 0.2);
+         }
+         .time-period-selector {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+         }
+         .time-period-selector .btn {
+            border-radius: 20px;
+            padding: 5px 15px;
+            margin: 0 5px;
+            font-size: 0.8rem;
+         }
+         .time-period-selector .btn.active {
+            background-color: #343a40;
+            color: white;
          }
       </style>
    </head>
    <body>
-      <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="dashboard-header shadow">
          <div class="container">
-            <a class="navbar-brand" href="#">
-            <i class="bi bi-robot"></i> TradingView-Bitget Bridge
-            </a>
-         </div>
-      </nav>
-      <div class="container mt-4">
-         <!-- First row of stats -->
-         <div class="row">
-            <div class="col-md-3">
-               <div class="card stats-card text-center">
-                  <div class="card-body">
-                     <h5 class="card-title">Total Trades</h5>
-                     <h2 id="total-trades">0</h2>
-                  </div>
+            <div class="d-flex justify-content-between align-items-center">
+               <div>
+                  <h3><i class="bi bi-robot"></i> TradingView-Bitget Bridge</h3>
+                  <p class="mb-0">Advanced Trading Performance Tracker</p>
                </div>
-            </div>
-            <div class="col-md-3">
-               <div class="card stats-card text-center">
-                  <div class="card-body">
-                     <h5 class="card-title">Successful</h5>
-                     <h2 id="successful-trades" class="buy-text">0</h2>
-                  </div>
-               </div>
-            </div>
-            <div class="col-md-3">
-               <div class="card stats-card text-center">
-                  <div class="card-body">
-                     <h5 class="card-title">Failed</h5>
-                     <h2 id="failed-trades" class="sell-text">0</h2>
-                  </div>
-               </div>
-            </div>
-            <div class="col-md-3">
-               <div class="card stats-card text-center">
-                  <div class="card-body">
-                     <h5 class="card-title">Success Rate</h5>
-                     <h2 id="success-rate">0%</h2>
+               <div>
+                  <button id="refresh-btn" class="btn btn-light btn-sm">
+                     <i class="bi bi-arrow-clockwise"></i> Refresh
+                  </button>
+                  <div class="btn-group ms-2">
+                     <button type="button" class="btn btn-light btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+                        <i class="bi bi-gear"></i> Settings
+                     </button>
+                     <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-clock-history"></i> Set Auto-Refresh (5m)</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-file-earmark-arrow-down"></i> Export Data</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-cloud-arrow-up"></i> Sync with Exchange</a></li>
+                     </ul>
                   </div>
                </div>
             </div>
          </div>
-         <!-- Performance metrics row -->
-         <div class="row mt-3">
+      </div>
+      
+      <div class="container">
+         <!-- Key Metrics -->
+         <div class="row mb-4">
             <div class="col-md-3">
-               <div class="card stats-card text-center">
-                  <div class="card-body">
-                     <h5 class="card-title">Avg Trade Size</h5>
-                     <h2 id="avg-trade-size">0 USDT</h2>
+               <div class="card stats-card text-center h-100">
+                  <div class="card-body d-flex flex-column justify-content-center">
+                     <div class="metric-title">Total Trades</div>
+                     <div class="metric-value" id="total-trades">0</div>
+                     <small class="text-muted">Past 30 Days</small>
                   </div>
                </div>
             </div>
             <div class="col-md-3">
-               <div class="card stats-card text-center">
-                  <div class="card-body">
-                     <h5 class="card-title">Largest Buy</h5>
-                     <h2 id="largest-buy" class="buy-text">0 USDT</h2>
+               <div class="card stats-card text-center h-100">
+                  <div class="card-body d-flex flex-column justify-content-center">
+                     <div class="metric-title">Success Rate</div>
+                     <div class="metric-value" id="success-rate">0%</div>
+                     <small class="text-muted"><span id="successful-trades">0</span> Successful / <span id="failed-trades">0</span> Failed</small>
                   </div>
                </div>
             </div>
             <div class="col-md-3">
-               <div class="card stats-card text-center">
-                  <div class="card-body">
-                     <h5 class="card-title">Largest Sell</h5>
-                     <h2 id="largest-sell" class="sell-text">0</h2>
+               <div class="card stats-card text-center h-100">
+                  <div class="card-body d-flex flex-column justify-content-center">
+                     <div class="metric-title">Total P/L</div>
+                     <div class="metric-value" id="profit-loss">0 USDT</div>
+                     <small class="text-muted">With <span id="roi-percentage">0%</span> ROI</small>
                   </div>
                </div>
             </div>
             <div class="col-md-3">
-               <div class="card stats-card text-center">
-                  <div class="card-body">
-                     <h5 class="card-title">Profit/Loss</h5>
-                     <h2 id="profit-loss">0 USDT</h2>
+               <div class="card stats-card text-center h-100">
+                  <div class="card-body d-flex flex-column justify-content-center">
+                     <div class="metric-title">Avg Trade Size</div>
+                     <div class="metric-value" id="avg-trade-size">0 USDT</div>
+                     <small class="text-muted">Range: <span id="min-trade">0</span> - <span id="max-trade">0</span> USDT</small>
                   </div>
                </div>
             </div>
          </div>
-         <div class="row mt-4">
-            <div class="col-md-12">
+         
+         <!-- Main Tabs -->
+         <ul class="nav nav-tabs" id="dashboardTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+               <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab">Overview</button>
+            </li>
+            <li class="nav-item" role="presentation">
+               <button class="nav-link" id="assets-tab" data-bs-toggle="tab" data-bs-target="#assets" type="button" role="tab">Asset Performance</button>
+            </li>
+            <li class="nav-item" role="presentation">
+               <button class="nav-link" id="trades-tab" data-bs-toggle="tab" data-bs-target="#trades" type="button" role="tab">Recent Trades</button>
+            </li>
+         </ul>
+         
+         <div class="tab-content" id="dashboardTabsContent">
+            <!-- Overview Tab -->
+            <div class="tab-pane fade show active" id="overview" role="tabpanel">
+               <div class="row">
+                  <div class="col-md-8">
+                     <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                           <span>Portfolio Performance</span>
+                           <div class="time-period-selector btn-group" role="group">
+                              <button type="button" class="btn btn-sm btn-outline-secondary active" data-period="7d">7D</button>
+                              <button type="button" class="btn btn-sm btn-outline-secondary" data-period="30d">30D</button>
+                              <button type="button" class="btn btn-sm btn-outline-secondary" data-period="90d">90D</button>
+                              <button type="button" class="btn btn-sm btn-outline-secondary" data-period="all">All</button>
+                           </div>
+                        </div>
+                        <div class="card-body">
+                           <div class="chart-container">
+                              <canvas id="portfolioChart"></canvas>
+                           </div>
+                        </div>
+                     </div>
+                     
+                     <div class="card mt-4">
+                        <div class="card-header">
+                           Trading Volume Comparison
+                        </div>
+                        <div class="card-body">
+                           <div class="chart-container">
+                              <canvas id="volumeComparisonChart"></canvas>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                  
+                  <div class="col-md-4">
+                     <div class="card">
+                        <div class="card-header">
+                           Buy/Sell Ratio
+                        </div>
+                        <div class="card-body text-center">
+                           <canvas id="actionChart" style="max-height: 250px;"></canvas>
+                        </div>
+                     </div>
+                     
+                     <div class="card mt-4">
+                        <div class="card-header">
+                           Top Assets by Volume
+                        </div>
+                        <div class="card-body p-0">
+                           <div class="table-responsive">
+                              <table class="table table-sm mb-0" id="top-assets-table">
+                                 <thead>
+                                    <tr>
+                                       <th>Symbol</th>
+                                       <th>Volume</th>
+                                       <th>P/L</th>
+                                    </tr>
+                                 </thead>
+                                 <tbody>
+                                    <!-- Filled by JavaScript -->
+                                 </tbody>
+                              </table>
+                           </div>
+                        </div>
+                        <div class="card-footer text-center">
+                           <a href="#" class="btn btn-sm btn-outline-dark" id="view-all-assets">View All Assets</a>
+                        </div>
+                     </div>
+                     
+                     <div class="card mt-4">
+                        <div class="card-header">
+                           Trading Performance Summary
+                        </div>
+                        <div class="card-body">
+                           <div class="d-flex justify-content-around mb-3">
+                              <div class="text-center">
+                                 <div><span class="summary-badge badge-success">Win Rate</span></div>
+                                 <h4 id="win-rate">0%</h4>
+                              </div>
+                              <div class="text-center">
+                                 <div><span class="summary-badge badge-info">Avg Hold</span></div>
+                                 <h4 id="avg-hold-time">0h</h4>
+                              </div>
+                              <div class="text-center">
+                                 <div><span class="summary-badge badge-danger">Max Drawdown</span></div>
+                                 <h4 id="max-drawdown">0%</h4>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            
+            <!-- Asset Performance Tab -->
+            <div class="tab-pane fade" id="assets" role="tabpanel">
+               <div class="card">
+                  <div class="card-header d-flex justify-content-between align-items-center">
+                     <span>Asset Performance Breakdown</span>
+                     <div class="input-group input-group-sm" style="width: 200px;">
+                        <input type="text" class="form-control" placeholder="Search assets..." id="asset-search">
+                        <button class="btn btn-outline-secondary" type="button">
+                           <i class="bi bi-search"></i>
+                        </button>
+                     </div>
+                  </div>
+                  <div class="card-body p-0">
+                     <div class="table-responsive">
+                        <table class="table table-hover table-striped mb-0" id="asset-performance-table">
+                           <thead>
+                              <tr>
+                                 <th>Symbol</th>
+                                 <th>Total Trades</th>
+                                 <th>Buy Volume</th>
+                                 <th>Sell Volume</th>
+                                 <th>Avg. Buy Price</th>
+                                 <th>Avg. Sell Price</th>
+                                 <th>P/L (USDT)</th>
+                                 <th>P/L (%)</th>
+                                 <th>Status</th>
+                              </tr>
+                           </thead>
+                           <tbody>
+                              <!-- Filled by JavaScript -->
+                           </tbody>
+                        </table>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            
+            <!-- Recent Trades Tab -->
+            <div class="tab-pane fade" id="trades" role="tabpanel">
                <div class="card">
                   <div class="card-header d-flex justify-content-between align-items-center">
                      <span>Recent Trades</span>
-                     <button id="refresh-btn" class="btn btn-sm btn-outline-primary">
-                     <i class="bi bi-arrow-clockwise"></i> Refresh
-                     </button>
+                     <div>
+                        <div class="btn-group">
+                           <button id="show-all-btn" class="btn btn-sm btn-outline-secondary active">All</button>
+                           <button id="show-buy-btn" class="btn btn-sm btn-outline-success">Buys</button>
+                           <button id="show-sell-btn" class="btn btn-sm btn-outline-danger">Sells</button>
+                        </div>
+                        <button id="trades-refresh-btn" class="btn btn-sm btn-outline-dark ms-2">
+                           <i class="bi bi-arrow-clockwise"></i> Refresh
+                        </button>
+                     </div>
                   </div>
-                  <div class="card-body">
+                  <div class="card-body p-0">
                      <div class="table-responsive">
-                        <table class="table table-striped">
+                        <table class="table table-striped table-hover mb-0">
                            <thead>
                               <tr>
                                  <th>Time</th>
@@ -154,45 +424,152 @@
                </div>
             </div>
          </div>
-         <div class="row mt-4">
-            <div class="col-md-6">
-               <div class="card">
-                  <div class="card-header">
-                     Trades by Symbol
-                  </div>
-                  <div class="card-body">
-                     <canvas id="symbolChart"></canvas>
-                  </div>
-               </div>
-            </div>
-            <div class="col-md-6">
-               <div class="card">
-                  <div class="card-header">
-                     Buy/Sell Ratio
-                  </div>
-                  <div class="card-body">
-                     <canvas id="actionChart"></canvas>
-                  </div>
-               </div>
-            </div>
-         </div>
-         <!-- Timeline Chart Section -->
-         <div class="row mt-4">
-            <div class="col-md-12">
-               <div class="card">
-                  <div class="card-header">
-                     Trade Activity Timeline
-                  </div>
-                  <div class="card-body">
-                     <canvas id="timelineChart"></canvas>
-                  </div>
-               </div>
-            </div>
-         </div>
-         <footer class="mt-5 mb-3 text-center text-muted">
+         
+         <footer class="mt-4 mb-3 text-center text-muted">
             <p>Last updated: <span id="last-updated">Never</span></p>
          </footer>
       </div>
+      
+      <!-- Asset Details Modal -->
+      <div class="modal fade" id="assetDetailsModal" tabindex="-1" aria-hidden="true">
+         <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+               <div class="modal-header">
+                  <h5 class="modal-title" id="assetDetailsTitle">Asset Details</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+               </div>
+               <div class="modal-body">
+                  <div class="row mb-4">
+                     <div class="col-md-6">
+                        <div class="card">
+                           <div class="card-body">
+                              <h5 class="card-title">Performance Summary</h5>
+                              <div class="row">
+                                 <div class="col-6 mb-3">
+                                    <small class="text-muted">Total Trades</small>
+                                    <h5 id="modal-total-trades">0</h5>
+                                 </div>
+                                 <div class="col-6 mb-3">
+                                    <small class="text-muted">Win Rate</small>
+                                    <h5 id="modal-win-rate">0%</h5>
+                                 </div>
+                                 <div class="col-6 mb-3">
+                                    <small class="text-muted">P/L</small>
+                                    <h5 id="modal-pl">0 USDT</h5>
+                                 </div>
+                                 <div class="col-6 mb-3">
+                                    <small class="text-muted">ROI</small>
+                                    <h5 id="modal-roi">0%</h5>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                     <div class="col-md-6">
+                        <div class="card">
+                           <div class="card-body">
+                              <h5 class="card-title">Price History</h5>
+                              <div style="height: 150px;">
+                                 <canvas id="modal-price-chart"></canvas>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                  
+                  <div class="card">
+                     <div class="card-header">
+                        <ul class="nav nav-tabs card-header-tabs" id="assetDetailTabs" role="tablist">
+                           <li class="nav-item" role="presentation">
+                              <button class="nav-link active" id="trades-history-tab" data-bs-toggle="tab" data-bs-target="#trades-history" type="button" role="tab">Trade History</button>
+                           </li>
+                           <li class="nav-item" role="presentation">
+                              <button class="nav-link" id="asset-performance-tab" data-bs-toggle="tab" data-bs-target="#asset-performance" type="button" role="tab">Performance Analysis</button>
+                           </li>
+                        </ul>
+                     </div>
+                     <div class="card-body">
+                        <div class="tab-content" id="assetDetailTabsContent">
+                           <div class="tab-pane fade show active" id="trades-history" role="tabpanel">
+                              <div class="table-responsive">
+                                 <table class="table table-sm table-striped">
+                                    <thead>
+                                       <tr>
+                                          <th>Time</th>
+                                          <th>Action</th>
+                                          <th>Amount</th>
+                                          <th>Price</th>
+                                          <th>Value</th>
+                                          <th>Status</th>
+                                       </tr>
+                                    </thead>
+                                    <tbody id="modal-trade-history">
+                                       <!-- Filled by JavaScript -->
+                                    </tbody>
+                                 </table>
+                              </div>
+                           </div>
+                           <div class="tab-pane fade" id="asset-performance" role="tabpanel">
+                              <div style="height: 250px;">
+                                 <canvas id="modal-performance-chart"></canvas>
+                              </div>
+                              <div class="row mt-4">
+                                 <div class="col-md-6">
+                                    <h6>Buy Analysis</h6>
+                                    <div class="table-responsive">
+                                       <table class="table table-sm">
+                                          <tbody>
+                                             <tr>
+                                                <td>Lowest Buy</td>
+                                                <td id="modal-lowest-buy">0 USDT</td>
+                                             </tr>
+                                             <tr>
+                                                <td>Highest Buy</td>
+                                                <td id="modal-highest-buy">0 USDT</td>
+                                             </tr>
+                                             <tr>
+                                                <td>Average Buy</td>
+                                                <td id="modal-avg-buy">0 USDT</td>
+                                             </tr>
+                                          </tbody>
+                                       </table>
+                                    </div>
+                                 </div>
+                                 <div class="col-md-6">
+                                    <h6>Sell Analysis</h6>
+                                    <div class="table-responsive">
+                                       <table class="table table-sm">
+                                          <tbody>
+                                             <tr>
+                                                <td>Lowest Sell</td>
+                                                <td id="modal-lowest-sell">0 USDT</td>
+                                             </tr>
+                                             <tr>
+                                                <td>Highest Sell</td>
+                                                <td id="modal-highest-sell">0 USDT</td>
+                                             </tr>
+                                             <tr>
+                                                <td>Average Sell</td>
+                                                <td id="modal-avg-sell">0 USDT</td>
+                                             </tr>
+                                          </tbody>
+                                       </table>
+                                    </div>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+               <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  <button type="button" class="btn btn-dark">Export Data</button>
+               </div>
+            </div>
+         </div>
+      </div>
+      
       <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
       <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
       <script>
@@ -205,10 +582,25 @@
                  }
                  
                  const trades = await response.json();
+                 
+                 // Add click event for clickable assets
+                 document.querySelectorAll('#top-assets-table .clickable-asset').forEach(element => {
+                     element.addEventListener('click', function() {
+                         const symbol = this.getAttribute('data-symbol');
+                         showAssetDetails(symbol, trades);
+                     });
+                 });
+                 
+                 // View all assets button
+                 document.getElementById('view-all-assets').addEventListener('click', function(e) {
+                     e.preventDefault();
+                     document.getElementById('assets-tab').click();
+                 }); Process the data for different views
                  displayTrades(trades);
                  updateStats(trades);
                  updateCharts(trades);
-                 updateTimelineChart(trades);
+                 updateAssetPerformance(trades);
+                 updateTopAssets(trades);
                  
                  document.getElementById('last-updated').textContent = new Date().toLocaleString();
              } catch (error) {
@@ -236,6 +628,9 @@
                  }
                  
                  const timestamp = new Date(trade.timestamp).toLocaleString();
+                 
+                 // Add class for filtering
+                 row.classList.add(trade.action === 'buy' ? 'buy-trade' : 'sell-trade');
                  
                  // Prepare amount and price text
                  let amountText = '';
@@ -270,9 +665,12 @@
                      priceText = 'N/A';
                  }
                  
+                 // Make the symbol clickable to show details
+                 const symbolText = `<span class="clickable-asset" data-symbol="${trade.symbol}">${trade.symbol || 'N/A'}</span>`;
+                 
                  row.innerHTML = `
                      <td>${timestamp}</td>
-                     <td>${trade.symbol || 'N/A'}</td>
+                     <td>${symbolText}</td>
                      <td class="${trade.action === 'buy' ? 'buy-text' : 'sell-text'}">
                          ${trade.action === 'buy' ? 'BUY' : 'SELL'}
                      </td>
@@ -287,6 +685,14 @@
                  `;
                  
                  tableBody.appendChild(row);
+             });
+             
+             // Add event listeners to clickable symbols
+             document.querySelectorAll('.clickable-asset').forEach(element => {
+                 element.addEventListener('click', function() {
+                     const symbol = this.getAttribute('data-symbol');
+                     showAssetDetails(symbol, trades);
+                 });
              });
          }
          
@@ -309,59 +715,27 @@
                  
                  // Average trade size (for buys only, as they're in USDT)
                  let avgTradeSize = 0;
-                 if (successfulBuyTrades.length > 0) {
-                     const totalBuySize = successfulBuyTrades.reduce((sum, trade) => {
-                         const size = parseFloat(trade.filledQuoteVolume || trade.usdtEquivalent || trade.orderSize || 0);
-                         return sum + size;
-                     }, 0);
-                     avgTradeSize = (totalBuySize / successfulBuyTrades.length).toFixed(2);
-                 }
-                 document.getElementById('avg-trade-size').textContent = `${avgTradeSize} USDT`;
+                 let minTradeSize = 0;
+                 let maxTradeSize = 0;
                  
-                 // Largest buy
-                 let largestBuy = 0;
                  if (successfulBuyTrades.length > 0) {
-                     largestBuy = Math.max(...successfulBuyTrades.map(t => 
-                         parseFloat(t.filledQuoteVolume || t.usdtEquivalent || t.orderSize || 0)
-                     )).toFixed(2);
-                 }
-                 document.getElementById('largest-buy').textContent = `${largestBuy} USDT`;
-                 
-                 // Largest sell
-                 let largestSell = 0;
-                 let largestSellCoin = '';
-                 if (successfulSellTrades.length > 0) {
-                     const largestSellTrade = successfulSellTrades.reduce((max, trade) => {
-                         const size = parseFloat(trade.usdtEquivalent || 0);
-                         return size > parseFloat(max.usdtEquivalent || 0) ? trade : max;
-                     }, { usdtEquivalent: '0' });
+                     const tradeSizes = successfulBuyTrades.map(trade => 
+                         parseFloat(trade.filledQuoteVolume || trade.usdtEquivalent || trade.orderSize || 0)
+                     );
                      
-                     largestSell = parseFloat(largestSellTrade.usdtEquivalent || 0).toFixed(2);
-                     largestSellCoin = 'USDT';
+                     const totalBuySize = tradeSizes.reduce((sum, size) => sum + size, 0);
+                     avgTradeSize = (totalBuySize / successfulBuyTrades.length).toFixed(2);
+                     minTradeSize = Math.min(...tradeSizes).toFixed(2);
+                     maxTradeSize = Math.max(...tradeSizes).toFixed(2);
                  }
-                 document.getElementById('largest-sell').textContent = largestSell + (largestSellCoin ? ` ${largestSellCoin}` : '');
                  
-                 // Most traded symbol
-                 const symbolCounts = {};
-                 trades.forEach(trade => {
-                     if (trade.symbol) {
-                         symbolCounts[trade.symbol] = (symbolCounts[trade.symbol] || 0) + 1;
-                     }
-                 });
-                 
-                 let mostTraded = 'N/A';
-                 let maxCount = 0;
-                 for (const [symbol, count] of Object.entries(symbolCounts)) {
-                     if (count > maxCount) {
-                         maxCount = count;
-                         mostTraded = symbol;
-                     }
-                 }
-                 document.getElementById('most-traded').textContent = mostTraded;
+                 document.getElementById('avg-trade-size').textContent = `${avgTradeSize} USDT`;
+                 document.getElementById('min-trade').textContent = minTradeSize;
+                 document.getElementById('max-trade').textContent = maxTradeSize;
                  
                  // Calculate profit/loss 
                  let totalProfitLoss = 0;
-                 let profitLossPercentage = 0;
+                 let roiPercentage = 0;
          
                  // Track total USDT spent on buys and received from sells
                  const totalBuyUsdt = trades
@@ -375,89 +749,159 @@
                  // Calculate profit/loss
                  totalProfitLoss = totalSellUsdt - totalBuyUsdt;
          
-                 // Calculate percentage
+                 // Calculate ROI percentage
                  if (totalBuyUsdt > 0) {
-                     profitLossPercentage = (totalProfitLoss / totalBuyUsdt * 100).toFixed(2);
+                     roiPercentage = (totalProfitLoss / totalBuyUsdt * 100).toFixed(2);
                  }
          
                  // Update UI elements
                  const profitLossElement = document.getElementById('profit-loss');
                  if (profitLossElement) {
                      profitLossElement.textContent = `${totalProfitLoss.toFixed(2)} USDT`;
-                     profitLossElement.className = totalProfitLoss >= 0 ? 'buy-text' : 'sell-text';
-         
-                     // Add percentage if meaningful
-                     if (totalBuyUsdt > 0) {
-                         profitLossElement.textContent += ` (${profitLossPercentage}%)`;
-                     }
+                     profitLossElement.className = totalProfitLoss >= 0 ? 'metric-value buy-text' : 'metric-value sell-text';
                  }
+                 
+                 document.getElementById('roi-percentage').textContent = `${roiPercentage}%`;
+                 
+                 // Calculate win rate (profitable trades / total completed trades)
+                 const tradePairs = findTradePairs(trades);
+                 const profitablePairs = tradePairs.filter(pair => pair.profit > 0);
+                 const winRate = tradePairs.length > 0 ? (profitablePairs.length / tradePairs.length * 100).toFixed(1) : 0;
+                 document.getElementById('win-rate').textContent = `${winRate}%`;
+                 
+                 // Calculate average holding time
+                 let totalHoldingTime = 0;
+                 let validPairsCount = 0;
+                 
+                 tradePairs.forEach(pair => {
+                     if (pair.buyTime && pair.sellTime) {
+                         const holdingTimeMs = new Date(pair.sellTime) - new Date(pair.buyTime);
+                         const holdingTimeHours = holdingTimeMs / (1000 * 60 * 60);
+                         totalHoldingTime += holdingTimeHours;
+                         validPairsCount++;
+                     }
+                 });
+                 
+                 const avgHoldTime = validPairsCount > 0 ? (totalHoldingTime / validPairsCount).toFixed(1) : 0;
+                 document.getElementById('avg-hold-time').textContent = `${avgHoldTime}h`;
+                 
+                 // Calculate max drawdown (simplified version)
+                 const maxDrawdown = calculateMaxDrawdown(trades);
+                 document.getElementById('max-drawdown').textContent = `${maxDrawdown.toFixed(1)}%`;
              } catch (error) {
                  console.error('Error updating stats:', error);
+             }
+         }
+         
+         // Helper function to find buy-sell trade pairs
+         function findTradePairs(trades) {
+             const tradePairs = [];
+             const assetBuys = {};
+             
+             // Sort trades by timestamp
+             const sortedTrades = [...trades].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+             
+             sortedTrades.forEach(trade => {
+                 if (trade.status !== 'success' || !trade.symbol) return;
+                 
+                 const symbol = trade.symbol;
+                 
+                 if (trade.action === 'buy') {
+                     if (!assetBuys[symbol]) {
+                         assetBuys[symbol] = [];
+                     }
+                     assetBuys[symbol].push({
+                         amount: parseFloat(trade.filledBaseVolume || trade.orderSize || 0),
+                         price: parseFloat(trade.price || 0),
+                         value: parseFloat(trade.filledQuoteVolume || trade.usdtEquivalent || trade.orderSize || 0),
+                         timestamp: trade.timestamp
+                     });
+                 } else if (trade.action === 'sell') {
+                     if (assetBuys[symbol] && assetBuys[symbol].length > 0) {
+                         const buy = assetBuys[symbol].shift(); // FIFO approach
+                         const sellAmount = parseFloat(trade.filledBaseVolume || trade.orderSize || 0);
+                         const sellPrice = parseFloat(trade.price || 0);
+                         const sellValue = parseFloat(trade.usdtEquivalent || 0);
+                         
+                         if (buy.amount > 0 && sellAmount > 0) {
+                             const profit = sellValue - buy.value;
+                             const profitPercentage = (profit / buy.value * 100);
+                             
+                             tradePairs.push({
+                                 symbol,
+                                 buyAmount: buy.amount,
+                                 buyPrice: buy.price,
+                                 buyValue: buy.value,
+                                 buyTime: buy.timestamp,
+                                 sellAmount: sellAmount,
+                                 sellPrice: sellPrice,
+                                 sellValue: sellValue,
+                                 sellTime: trade.timestamp,
+                                 profit: profit,
+                                 profitPercentage: profitPercentage
+                             });
+                         }
+                     }
+                 }
+             });
+             
+             return tradePairs;
+         }
+         
+         // Calculate max drawdown (simplified)
+         function calculateMaxDrawdown(trades) {
+             try {
+                 // Create a timeline of cumulative profit/loss
+                 const timeline = [];
+                 let cumulativePnL = 0;
+                 
+                 const sortedTrades = [...trades]
+                     .filter(t => t.status === 'success')
+                     .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+                 
+                 sortedTrades.forEach(trade => {
+                     if (trade.action === 'buy') {
+                         cumulativePnL -= parseFloat(trade.filledQuoteVolume || trade.usdtEquivalent || trade.orderSize || 0);
+                     } else if (trade.action === 'sell') {
+                         cumulativePnL += parseFloat(trade.usdtEquivalent || 0);
+                     }
+                     
+                     timeline.push({
+                         timestamp: trade.timestamp,
+                         pnl: cumulativePnL
+                     });
+                 });
+                 
+                 // Find maximum drawdown
+                 let maxDrawdown = 0;
+                 let peak = -Infinity;
+                 
+                 timeline.forEach(point => {
+                     if (point.pnl > peak) {
+                         peak = point.pnl;
+                     }
+                     
+                     const drawdown = peak > 0 ? ((peak - point.pnl) / peak * 100) : 0;
+                     if (drawdown > maxDrawdown) {
+                         maxDrawdown = drawdown;
+                     }
+                 });
+                 
+                 return maxDrawdown;
+             } catch (error) {
+                 console.error('Error calculating max drawdown:', error);
+                 return 0;
              }
          }
          
          // Function to update charts
          function updateCharts(trades) {
              try {
-                 updateSymbolChart(trades);
                  updateActionChart(trades);
+                 updatePortfolioChart(trades);
+                 updateVolumeComparisonChart(trades);
              } catch (error) {
                  console.error('Error updating charts:', error);
-             }
-         }
-         
-         // Function to update symbol distribution chart
-         function updateSymbolChart(trades) {
-             try {
-                 const symbolCounts = {};
-                 
-                 trades.forEach(trade => {
-                     if (trade.symbol) {
-                         symbolCounts[trade.symbol] = (symbolCounts[trade.symbol] || 0) + 1;
-                     }
-                 });
-                 
-                 const labels = Object.keys(symbolCounts);
-                 const data = Object.values(symbolCounts);
-                 
-                 // Generate random colors
-                 const backgroundColors = labels.map(() => 
-                     `rgba(${Math.floor(Math.random() * 200)}, ${Math.floor(Math.random() * 200)}, ${Math.floor(Math.random() * 200)}, 0.6)`
-                 );
-                 
-                 const ctx = document.getElementById('symbolChart').getContext('2d');
-                 
-                 // Safely destroy previous chart if it exists
-                 if (window.symbolChart && typeof window.symbolChart.destroy === 'function') {
-                     window.symbolChart.destroy();
-                 } else if (window.symbolChart) {
-                     window.symbolChart = null;
-                 }
-                 
-                 window.symbolChart = new Chart(ctx, {
-                     type: 'pie',
-                     data: {
-                         labels: labels,
-                         datasets: [{
-                             data: data,
-                             backgroundColor: backgroundColors
-                         }]
-                     },
-                     options: {
-                         responsive: true,
-                         plugins: {
-                             legend: {
-                                 position: 'right',
-                             },
-                             title: {
-                                 display: true,
-                                 text: 'Trade Distribution by Symbol'
-                             }
-                         }
-                     }
-                 });
-             } catch (error) {
-                 console.error('Error updating symbol chart:', error);
              }
          }
          
@@ -483,20 +927,33 @@
                          datasets: [{
                              data: [buyTrades, sellTrades],
                              backgroundColor: [
-                                 'rgba(40, 167, 69, 0.6)',
-                                 'rgba(220, 53, 69, 0.6)'
-                             ]
+                                 'rgba(40, 167, 69, 0.7)',
+                                 'rgba(220, 53, 69, 0.7)'
+                             ],
+                             borderColor: [
+                                 'rgba(40, 167, 69, 1)',
+                                 'rgba(220, 53, 69, 1)'
+                             ],
+                             borderWidth: 1
                          }]
                      },
                      options: {
                          responsive: true,
+                         maintainAspectRatio: false,
+                         cutout: '70%',
                          plugins: {
                              legend: {
                                  position: 'bottom',
                              },
-                             title: {
-                                 display: true,
-                                 text: 'Buy vs Sell Orders'
+                             tooltip: {
+                                 callbacks: {
+                                     label: function(context) {
+                                         const total = buyTrades + sellTrades;
+                                         const value = context.raw;
+                                         const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                                         return `${context.label}: ${value} (${percentage}%)`;
+                                     }
+                                 }
                              }
                          }
                      }
@@ -506,123 +963,443 @@
              }
          }
          
-         // Function to update timeline chart as a bar chart
-         function updateTimelineChart(trades) {
-           try {
-             // Sort trades by timestamp
-             const sortedTrades = [...trades].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-             
-             // Group by day
-             const tradesByDay = {};
-             sortedTrades.forEach(trade => {
-               const date = new Date(trade.timestamp);
-               const dateStr = date.toLocaleDateString();
-               
-               if (!tradesByDay[dateStr]) {
-                 tradesByDay[dateStr] = {
-                   buys: 0,
-                   sells: 0,
-                   buyVolume: 0,
-                   sellVolume: 0
-                 };
-               }
-               
-               if (trade.status === 'success') {
-                 if (trade.action && trade.action.toLowerCase() === 'buy') {
-                   tradesByDay[dateStr].buys++;
-                   tradesByDay[dateStr].buyVolume += parseFloat(trade.usdtEquivalent || trade.orderSize || 0);
-                 } else if (trade.action && trade.action.toLowerCase() === 'sell') {
-                   tradesByDay[dateStr].sells++;
-                   tradesByDay[dateStr].sellVolume += parseFloat(trade.usdtEquivalent || 0);
+         // Function to update portfolio performance chart
+         function updatePortfolioChart(trades) {
+             try {
+                 // Sort trades by timestamp
+                 const sortedTrades = [...trades]
+                     .filter(t => t.status === 'success')
+                     .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+                 
+                 // Group by day and calculate cumulative P/L
+                 const dailyData = {};
+                 let cumulativePnL = 0;
+                 
+                 sortedTrades.forEach(trade => {
+                     const date = new Date(trade.timestamp).toLocaleDateString();
+                     
+                     if (!dailyData[date]) {
+                         dailyData[date] = {
+                             date: date,
+                             rawDate: new Date(trade.timestamp),
+                             pnl: 0
+                         };
+                     }
+                     
+                     if (trade.action === 'buy') {
+                         cumulativePnL -= parseFloat(trade.filledQuoteVolume || trade.usdtEquivalent || trade.orderSize || 0);
+                     } else if (trade.action === 'sell') {
+                         cumulativePnL += parseFloat(trade.usdtEquivalent || 0);
+                     }
+                     
+                     dailyData[date].pnl = cumulativePnL;
+                 });
+                 
+                 // Convert to array and sort by date
+                 const chartData = Object.values(dailyData).sort((a, b) => a.rawDate - b.rawDate);
+                 
+                 const ctx = document.getElementById('portfolioChart').getContext('2d');
+                 
+                 // Safely destroy previous chart if it exists
+                 if (window.portfolioChart && typeof window.portfolioChart.destroy === 'function') {
+                     window.portfolioChart.destroy();
+                 } else if (window.portfolioChart) {
+                     window.portfolioChart = null;
                  }
-               }
-             });
-             
-             // Prepare data for chart
-             const labels = Object.keys(tradesByDay).sort();
-             const buyCountData = labels.map(day => tradesByDay[day].buys);
-             const sellCountData = labels.map(day => tradesByDay[day].sells);
-             const buyVolumeData = labels.map(day => tradesByDay[day].buyVolume);
-             const sellVolumeData = labels.map(day => tradesByDay[day].sellVolume);
-             
-             const ctx = document.getElementById('timelineChart').getContext('2d');
-             
-             // Safely destroy previous chart
-             if (window.timelineChart && typeof window.timelineChart.destroy === 'function') {
-               window.timelineChart.destroy();
-             } else if (window.timelineChart) {
-               window.timelineChart = null;
+                 
+                 // Create gradient fill
+                 const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+                 gradient.addColorStop(0, 'rgba(40, 167, 69, 0.4)');
+                 gradient.addColorStop(1, 'rgba(40, 167, 69, 0.0)');
+                 
+                 window.portfolioChart = new Chart(ctx, {
+                     type: 'line',
+                     data: {
+                         labels: chartData.map(d => d.date),
+                         datasets: [{
+                             label: 'Portfolio P/L (USDT)',
+                             data: chartData.map(d => d.pnl),
+                             borderColor: 'rgba(40, 167, 69, 1)',
+                             backgroundColor: gradient,
+                             borderWidth: 2,
+                             fill: true,
+                             tension: 0.4,
+                             pointRadius: 3,
+                             pointBackgroundColor: 'rgba(40, 167, 69, 1)'
+                         }]
+                     },
+                     options: {
+                         responsive: true,
+                         maintainAspectRatio: false,
+                         scales: {
+                             x: {
+                                 grid: {
+                                     display: false
+                                 }
+                             },
+                             y: {
+                                 grid: {
+                                     color: 'rgba(0, 0, 0, 0.05)'
+                                 },
+                                 ticks: {
+                                     callback: function(value) {
+                                         return value.toFixed(2) + ' USDT';
+                                     }
+                                 }
+                             }
+                         },
+                         plugins: {
+                             tooltip: {
+                                 callbacks: {
+                                     label: function(context) {
+                                         return `P/L: ${context.parsed.y.toFixed(2)} USDT`;
+                                     }
+                                 }
+                             }
+                         }
+                     }
+                 });
+                 
+                 // Add event listeners for time period selectors
+                 document.querySelectorAll('.time-period-selector button').forEach(button => {
+                     button.addEventListener('click', function() {
+                         // Remove active class from all buttons
+                         document.querySelectorAll('.time-period-selector button').forEach(btn => {
+                             btn.classList.remove('active');
+                         });
+                         
+                         // Add active class to clicked button
+                         this.classList.add('active');
+                         
+                         // Filter data based on selected period
+                         const period = this.getAttribute('data-period');
+                         updateChartByTimePeriod(period, chartData);
+                     });
+                 });
+                 
+             } catch (error) {
+                 console.error('Error updating portfolio chart:', error);
              }
-             
-             window.timelineChart = new Chart(ctx, {
-               type: 'line',
-               data: {
-                 labels: labels,
-                 datasets: [
-                   {
-                     label: 'Buy Volume (USDT)',
-                     data: buyVolumeData,
-                     borderColor: 'rgba(40, 167, 69, 1)',
-                     backgroundColor: 'rgba(40, 167, 69, 0.1)',
-                     fill: true,
-                     tension: 0.4
-                   },
-                   {
-                     label: 'Sell Volume (USDT)',
-                     data: sellVolumeData,
-                     borderColor: 'rgba(220, 53, 69, 1)',
-                     backgroundColor: 'rgba(220, 53, 69, 0.1)',
-                     fill: true,
-                     tension: 0.4
-                   }
-                 ]
-               },
-               options: {
-                 responsive: true,
-                 scales: {
-                   x: {
-                     title: {
-                       display: true,
-                       text: 'Date'
-                     }
-                   },
-                   y: {
-                     beginAtZero: true,
-                     title: {
-                       display: true,
-                       text: 'Volume (USDT)'
-                     }
-                   }
-                 },
-                 plugins: {
-                   tooltip: {
-                     callbacks: {
-                       footer: function(tooltipItems) {
-                         const index = tooltipItems[0].dataIndex;
-                         const day = labels[index];
-                         return [
-                           `Buy Orders: ${tradesByDay[day].buys}`,
-                           `Sell Orders: ${tradesByDay[day].sells}`
-                         ];
-                       }
-                     }
-                   }
-                 }
-               }
-             });
-           } catch (error) {
-             console.error('Error updating timeline chart:', error);
-           }
          }
          
-         // Load data when page loads
-         document.addEventListener('DOMContentLoaded', loadTradeData);
+         // Function to update chart based on selected time period
+         function updateChartByTimePeriod(period, fullData) {
+             try {
+                 let filteredData = [...fullData];
+                 const today = new Date();
+                 
+                 if (period === '7d') {
+                     const cutoffDate = new Date(today);
+                     cutoffDate.setDate(today.getDate() - 7);
+                     filteredData = fullData.filter(d => d.rawDate >= cutoffDate);
+                 } else if (period === '30d') {
+                     const cutoffDate = new Date(today);
+                     cutoffDate.setDate(today.getDate() - 30);
+                     filteredData = fullData.filter(d => d.rawDate >= cutoffDate);
+                 } else if (period === '90d') {
+                     const cutoffDate = new Date(today);
+                     cutoffDate.setDate(today.getDate() - 90);
+                     filteredData = fullData.filter(d => d.rawDate >= cutoffDate);
+                 }
+                 
+                 // Update chart with filtered data
+                 if (window.portfolioChart) {
+                     window.portfolioChart.data.labels = filteredData.map(d => d.date);
+                     window.portfolioChart.data.datasets[0].data = filteredData.map(d => d.pnl);
+                     window.portfolioChart.update();
+                 }
+             } catch (error) {
+                 console.error('Error updating chart by time period:', error);
+             }
+         }
          
-         // Refresh button handler
-         document.getElementById('refresh-btn').addEventListener('click', loadTradeData);
+         // Function to update volume comparison chart
+         function updateVolumeComparisonChart(trades) {
+             try {
+                 // Sort trades by timestamp
+                 const sortedTrades = [...trades]
+                     .filter(t => t.status === 'success')
+                     .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+                 
+                 // Group by day and calculate daily volumes
+                 const dailyData = {};
+                 
+                 sortedTrades.forEach(trade => {
+                     const date = new Date(trade.timestamp).toLocaleDateString();
+                     
+                     if (!dailyData[date]) {
+                         dailyData[date] = {
+                             date: date,
+                             rawDate: new Date(trade.timestamp),
+                             buyVolume: 0,
+                             sellVolume: 0
+                         };
+                     }
+                     
+                     if (trade.action === 'buy') {
+                         dailyData[date].buyVolume += parseFloat(trade.filledQuoteVolume || trade.usdtEquivalent || trade.orderSize || 0);
+                     } else if (trade.action === 'sell') {
+                         dailyData[date].sellVolume += parseFloat(trade.usdtEquivalent || 0);
+                     }
+                 });
+                 
+                 // Convert to array and sort by date
+                 const chartData = Object.values(dailyData).sort((a, b) => a.rawDate - b.rawDate);
+                 
+                 const ctx = document.getElementById('volumeComparisonChart').getContext('2d');
+                 
+                 // Safely destroy previous chart if it exists
+                 if (window.volumeChart && typeof window.volumeChart.destroy === 'function') {
+                     window.volumeChart.destroy();
+                 } else if (window.volumeChart) {
+                     window.volumeChart = null;
+                 }
+                 
+                 window.volumeChart = new Chart(ctx, {
+                     type: 'bar',
+                     data: {
+                         labels: chartData.map(d => d.date),
+                         datasets: [
+                             {
+                                 label: 'Buy Volume',
+                                 data: chartData.map(d => d.buyVolume),
+                                 backgroundColor: 'rgba(40, 167, 69, 0.7)',
+                                 borderColor: 'rgba(40, 167, 69, 1)',
+                                 borderWidth: 1
+                             },
+                             {
+                                 label: 'Sell Volume',
+                                 data: chartData.map(d => d.sellVolume),
+                                 backgroundColor: 'rgba(220, 53, 69, 0.7)',
+                                 borderColor: 'rgba(220, 53, 69, 1)',
+                                 borderWidth: 1
+                             }
+                         ]
+                     },
+                     options: {
+                         responsive: true,
+                         maintainAspectRatio: false,
+                         scales: {
+                             x: {
+                                 grid: {
+                                     display: false
+                                 }
+                             },
+                             y: {
+                                 grid: {
+                                     color: 'rgba(0, 0, 0, 0.05)'
+                                 },
+                                 ticks: {
+                                     callback: function(value) {
+                                         return value.toFixed(0) + ' USDT';
+                                     }
+                                 }
+                             }
+                         },
+                         plugins: {
+                             tooltip: {
+                                 callbacks: {
+                                     label: function(context) {
+                                         return `${context.dataset.label}: ${context.parsed.y.toFixed(2)} USDT`;
+                                     }
+                                 }
+                             }
+                         }
+                     }
+                 });
+             } catch (error) {
+                 console.error('Error updating volume comparison chart:', error);
+             }
+         }
          
-         // Auto-refresh every 5 minutes
-         setInterval(loadTradeData, 5 * 60 * 1000);
-      </script>
-   </body>
-</html>
+         // Function to update the asset performance table
+         function updateAssetPerformance(trades) {
+             try {
+                 // Group trades by symbol
+                 const assetPerformance = {};
+                 
+                 trades.forEach(trade => {
+                     if (!trade.symbol || trade.status !== 'success') return;
+                     
+                     const symbol = trade.symbol;
+                     
+                     if (!assetPerformance[symbol]) {
+                         assetPerformance[symbol] = {
+                             symbol: symbol,
+                             totalTrades: 0,
+                             buyCount: 0,
+                             sellCount: 0,
+                             buyVolume: 0,
+                             sellVolume: 0,
+                             buyValueTotal: 0,
+                             sellValueTotal: 0,
+                             profitLoss: 0,
+                             profitLossPercentage: 0,
+                             status: 'neutral' // 'positive', 'negative', or 'neutral'
+                         };
+                     }
+                     
+                     assetPerformance[symbol].totalTrades++;
+                     
+                     if (trade.action === 'buy') {
+                         assetPerformance[symbol].buyCount++;
+                         const buyValue = parseFloat(trade.filledQuoteVolume || trade.usdtEquivalent || trade.orderSize || 0);
+                         assetPerformance[symbol].buyVolume += buyValue;
+                         assetPerformance[symbol].buyValueTotal += buyValue;
+                     } else if (trade.action === 'sell') {
+                         assetPerformance[symbol].sellCount++;
+                         const sellValue = parseFloat(trade.usdtEquivalent || 0);
+                         assetPerformance[symbol].sellVolume += sellValue;
+                         assetPerformance[symbol].sellValueTotal += sellValue;
+                     }
+                 });
+                 
+                 // Calculate P/L and additional metrics
+                 Object.values(assetPerformance).forEach(asset => {
+                     asset.profitLoss = asset.sellValueTotal - asset.buyValueTotal;
+                     
+                     if (asset.buyValueTotal > 0) {
+                         asset.profitLossPercentage = (asset.profitLoss / asset.buyValueTotal * 100);
+                     }
+                     
+                     asset.avgBuyPrice = asset.buyCount > 0 ? (asset.buyValueTotal / asset.buyCount) : 0;
+                     asset.avgSellPrice = asset.sellCount > 0 ? (asset.sellValueTotal / asset.sellCount) : 0;
+                     
+                     // Determine status
+                     if (asset.profitLoss > 0) {
+                         asset.status = 'positive';
+                     } else if (asset.profitLoss < 0) {
+                         asset.status = 'negative';
+                     }
+                 });
+                 
+                 // Update the asset performance table
+                 const tableBody = document.getElementById('asset-performance-table').querySelector('tbody');
+                 tableBody.innerHTML = '';
+                 
+                 // Sort assets by P/L (highest to lowest)
+                 const sortedAssets = Object.values(assetPerformance).sort((a, b) => b.profitLoss - a.profitLoss);
+                 
+                 sortedAssets.forEach(asset => {
+                     const row = document.createElement('tr');
+                     row.classList.add('asset-row');
+                     row.setAttribute('data-symbol', asset.symbol);
+                     
+                     // Format numbers
+                     const buyVolume = asset.buyVolume.toFixed(2);
+                     const sellVolume = asset.sellVolume.toFixed(2);
+                     const avgBuyPrice = asset.avgBuyPrice.toFixed(2);
+                     const avgSellPrice = asset.avgSellPrice.toFixed(2);
+                     const profitLoss = asset.profitLoss.toFixed(2);
+                     const profitLossPercentage = asset.profitLossPercentage.toFixed(2);
+                     
+                     // Determine P/L classes
+                     const plClass = asset.profitLoss >= 0 ? 'buy-text' : 'sell-text';
+                     
+                     row.innerHTML = `
+                         <td><span class="clickable-asset" data-symbol="${asset.symbol}">${asset.symbol}</span></td>
+                         <td>${asset.totalTrades}</td>
+                         <td>${buyVolume} USDT</td>
+                         <td>${sellVolume} USDT</td>
+                         <td>${avgBuyPrice} USDT</td>
+                         <td>${avgSellPrice} USDT</td>
+                         <td class="${plClass}">${profitLoss} USDT</td>
+                         <td class="${plClass}">${profitLossPercentage}%</td>
+                         <td>
+                             <span class="performance-indicator indicator-${asset.status}"></span>
+                             ${asset.status.charAt(0).toUpperCase() + asset.status.slice(1)}
+                         </td>
+                     `;
+                     
+                     tableBody.appendChild(row);
+                     
+                     // Add click event to show asset details
+                     row.addEventListener('click', function() {
+                         const symbol = this.getAttribute('data-symbol');
+                         showAssetDetails(symbol, trades);
+                     });
+                 });
+                 
+                 // Add search functionality
+                 document.getElementById('asset-search').addEventListener('input', function() {
+                     const searchTerm = this.value.toLowerCase();
+                     const rows = document.querySelectorAll('#asset-performance-table tbody tr');
+                     
+                     rows.forEach(row => {
+                         const symbol = row.getAttribute('data-symbol').toLowerCase();
+                         if (symbol.includes(searchTerm)) {
+                             row.style.display = '';
+                         } else {
+                             row.style.display = 'none';
+                         }
+                     });
+                 });
+                 
+             } catch (error) {
+                 console.error('Error updating asset performance:', error);
+             }
+         }
+         
+         // Function to update top assets display
+         function updateTopAssets(trades) {
+             try {
+                 // Group trades by symbol
+                 const assetStats = {};
+                 
+                 trades.filter(t => t.status === 'success').forEach(trade => {
+                     if (!trade.symbol) return;
+                     
+                     const symbol = trade.symbol;
+                     
+                     if (!assetStats[symbol]) {
+                         assetStats[symbol] = {
+                             symbol: symbol,
+                             volume: 0,
+                             buyVolume: 0,
+                             sellVolume: 0,
+                             profitLoss: 0
+                         };
+                     }
+                     
+                     if (trade.action === 'buy') {
+                         const buyValue = parseFloat(trade.filledQuoteVolume || trade.usdtEquivalent || trade.orderSize || 0);
+                         assetStats[symbol].volume += buyValue;
+                         assetStats[symbol].buyVolume += buyValue;
+                     } else if (trade.action === 'sell') {
+                         const sellValue = parseFloat(trade.usdtEquivalent || 0);
+                         assetStats[symbol].volume += sellValue;
+                         assetStats[symbol].sellVolume += sellValue;
+                     }
+                 });
+                 
+                 // Calculate P/L
+                 Object.values(assetStats).forEach(asset => {
+                     asset.profitLoss = asset.sellVolume - asset.buyVolume;
+                 });
+                 
+                 // Sort by volume (highest to lowest) and get top 5
+                 const topAssets = Object.values(assetStats)
+                     .sort((a, b) => b.volume - a.volume)
+                     .slice(0, 5);
+                 
+                 // Update the table
+                 const tableBody = document.getElementById('top-assets-table').querySelector('tbody');
+                 tableBody.innerHTML = '';
+                 
+                 topAssets.forEach(asset => {
+                     const row = document.createElement('tr');
+                     row.classList.add('asset-row');
+                     
+                     // Determine P/L class
+                     const plClass = asset.profitLoss >= 0 ? 'buy-text' : 'sell-text';
+                     
+                     row.innerHTML = `
+                         <td><span class="clickable-asset" data-symbol="${asset.symbol}">${asset.symbol}</span></td>
+                         <td>${asset.volume.toFixed(2)} USDT</td>
+                         <td class="${plClass}">${asset.profitLoss.toFixed(2)} USDT</td>
+                     `;
+                     
+                     tableBody.appendChild(row);
+                 });
+                 
+                 //
