@@ -52,20 +52,6 @@
     "status": "success"
   },
   {
-    "timestamp": "2025-03-23T08:43:17.041Z",
-    "symbol": "SUIUSD",
-    "action": "sell",
-    "status": "failed",
-    "error": "All 3 attempts failed: Request failed with status code 400"
-  },
-  {
-    "timestamp": "2025-03-23T08:43:59.474Z",
-    "symbol": "BTCUSD",
-    "action": "sell",
-    "status": "failed",
-    "error": "All 3 attempts failed: Request failed with status code 400"
-  },
-  {
     "timestamp": "2025-03-23T08:44:27.910Z",
     "symbol": "SOLUSDT",
     "action": "sell",
@@ -144,36 +130,6 @@
     "status": "success"
   },
   {
-    "timestamp": "2025-03-23T11:06:45.815Z",
-    "symbol": "BNBUSDT",
-    "action": "sell",
-    "orderSize": null,
-    "originalAmount": null,
-    "price": null,
-    "status": "failed",
-    "error": "All 3 attempts failed: Request failed with status code 400"
-  },
-  {
-    "timestamp": "2025-03-23T14:11:45.287Z",
-    "symbol": "BNBUSDT",
-    "action": "sell",
-    "orderSize": null,
-    "originalAmount": null,
-    "price": null,
-    "status": "failed",
-    "error": "All 3 attempts failed: Request failed with status code 400"
-  },
-  {
-    "timestamp": "2025-03-24T02:44:08.200Z",
-    "symbol": "BNBUSDT",
-    "action": "sell",
-    "orderSize": null,
-    "originalAmount": null,
-    "price": null,
-    "status": "failed",
-    "error": "All 3 attempts failed: Request failed with status code 400"
-  },
-  {
     "timestamp": "2025-03-24T08:00:25.875Z",
     "symbol": "ETHUSDT",
     "action": "buy",
@@ -211,106 +167,6 @@
     "usdtEquivalent": 1.994304,
     "orderId": "1294947193942274069",
     "status": "success"
-  },
-  {
-    "timestamp": "2025-04-12T13:59:14.969Z",
-    "symbol": "SOLUSDT",
-    "action": "buy",
-    "orderSize": null,
-    "originalAmount": null,
-    "price": null,
-    "status": "failed",
-    "error": "All 3 attempts failed: Request failed with status code 400"
-  },
-  {
-    "timestamp": "2025-04-12T14:00:07.470Z",
-    "symbol": "SOLUSDT",
-    "action": "buy",
-    "orderSize": null,
-    "originalAmount": null,
-    "price": null,
-    "status": "failed",
-    "error": "All 3 attempts failed: Request failed with status code 400"
-  },
-  {
-    "timestamp": "2025-04-12T14:06:49.242Z",
-    "symbol": "SOLUSDT",
-    "action": "buy",
-    "orderSize": null,
-    "originalAmount": null,
-    "price": null,
-    "status": "failed",
-    "error": "All 3 attempts failed: Request failed with status code 400"
-  },
-  {
-    "timestamp": "2025-04-12T14:07:49.389Z",
-    "symbol": "SOLUSDT",
-    "action": "buy",
-    "orderSize": null,
-    "originalAmount": null,
-    "price": null,
-    "status": "failed",
-    "error": "All 3 attempts failed: Request failed with status code 400"
-  },
-  {
-    "timestamp": "2025-04-12T14:44:39.681Z",
-    "symbol": "SOLUSDT",
-    "action": "buy",
-    "orderSize": null,
-    "originalAmount": null,
-    "price": null,
-    "status": "failed",
-    "error": "usdtAsset is not defined"
-  },
-  {
-    "timestamp": "2025-04-12T14:45:19.806Z",
-    "symbol": "SOLUSDT",
-    "action": "buy",
-    "orderSize": null,
-    "originalAmount": null,
-    "price": null,
-    "status": "failed",
-    "error": "usdtAsset is not defined"
-  },
-  {
-    "timestamp": "2025-04-12T14:47:16.691Z",
-    "symbol": "SOLUSDT",
-    "action": "buy",
-    "orderSize": null,
-    "originalAmount": null,
-    "price": null,
-    "status": "failed",
-    "error": "All 3 attempts failed: Request failed with status code 400"
-  },
-  {
-    "timestamp": "2025-04-12T14:49:29.342Z",
-    "symbol": "SOLUSDT",
-    "action": "buy",
-    "orderSize": null,
-    "originalAmount": null,
-    "price": null,
-    "status": "failed",
-    "error": "All 3 attempts failed: Request failed with status code 400"
-  },
-  {
-    "timestamp": "2025-04-12T14:53:07.837Z",
-    "symbol": "SOLUSDT",
-    "action": "buy",
-    "orderSize": null,
-    "originalAmount": null,
-    "price": null,
-    "status": "failed",
-    "error": "All 3 attempts failed: Request failed with status code 400"
-  },
-  {
-    "timestamp": "2025-04-12T14:55:50.515Z",
-    "symbol": "SOLUSDT",
-    "action": "buy",
-    "orderSize": null,
-    "originalAmount": null,
-    "price": null,
-    "status": "failed",
-    "error": "All 3 attempts failed: Request failed with status code 400"
   },
   {
     "timestamp": "2025-04-12T14:56:42.927Z",
