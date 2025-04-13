@@ -6,7 +6,6 @@
       <title>Jnanomics Crypto Dashboard</title>
       <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cryptocoins-icons@2.9.0/webfont/cryptocoins.css">
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@scavengerbot/cryptofont@1.6.0/style.min.css">
       <style>
          body {
@@ -82,15 +81,6 @@
          width: 24px;
          text-align: center;
          }
-         .cc.BTC { color: #f7931a; }
-         .cc.ETH { color: #627eea; }
-         .cc.BNB { color: #f3ba2f; }
-         .cc.SOL { color: #00ffbd; }
-         .cc.XRP { color: #23292f; }
-         .cc.ADA { color: #3cc8c8; }
-         .cc.DOT { color: #e6007a; }
-         .cc.DOGE { color: #c3a634; }
-         .cc.SUI { color: #4ba3ff; }
          .generic-crypto-icon {
          display: inline-flex;
          align-items: center;
@@ -700,7 +690,7 @@
                   const hasIcon = hasCryptoIcon(baseCurrency);
                   const symbolText = `<span class="d-flex align-items-center">
                       ${hasIcon ? 
-                          `<i class="cc ${baseCurrency.toUpperCase()} crypto-icon me-2"></i>` : 
+                          `<i class="sbi sbi-${baseCurrency.toLowerCase()} crypto-icon me-2"></i>` : 
                           `<span class="generic-crypto-icon me-2">${baseCurrency.charAt(0)}</span>`}
                       <span class="clickable-asset" data-symbol="${trade.symbol}">${trade.symbol || 'N/A'}</span>
                   </span>`;
@@ -1293,7 +1283,7 @@
                          <td>
                              <span class="d-flex align-items-center">
                                  ${hasIcon ? 
-                                     `<i class="cc ${baseCurrency.toUpperCase()} crypto-icon me-2"></i>` : 
+                                     `<i class="sbi sbi-${baseCurrency.toLowerCase()} crypto-icon me-2"></i>` : 
                                      `<span class="generic-crypto-icon me-2">${baseCurrency.charAt(0)}</span>`}
                                  <span class="clickable-asset" data-symbol="${asset.symbol}">${asset.symbol}</span>
                              </span>
@@ -1393,13 +1383,13 @@
                      // Determine P/L class
                      const plClass = asset.profitLoss >= 0 ? 'buy-text' : 'sell-text';
                      const baseCurrency = asset.symbol.replace('USDT', '');
-                     const hasIcon = hasCryptoIcon(baseCurrency);
+                     const hasIcon = (baseCurrency);
                     
                      row.innerHTML = `
                          <td>
                              <span class="d-flex align-items-center">
                                  ${hasIcon ? 
-                                     `<i class="cc ${baseCurrency.toUpperCase()} crypto-icon me-2"></i>` : 
+                                     `<i class="sbi sbi-${baseCurrency.toLowerCase()} crypto-icon me-2"></i>` : 
                                      `<span class="generic-crypto-icon me-2">${baseCurrency.charAt(0)}</span>`}
                                  <span class="clickable-asset" data-symbol="${asset.symbol}">${asset.symbol}</span>
                              </span>
