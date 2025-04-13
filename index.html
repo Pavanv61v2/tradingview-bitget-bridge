@@ -6,7 +6,6 @@
       <title>Jnanomics Crypto Dashboard</title>
       <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@scavengerbot/cryptofont@1.6.0/style.min.css">
       <style>
          body {
          background-color: #f8f9fa;
@@ -76,10 +75,11 @@
          }
          }
          .crypto-icon {
-         font-size: 18px;
-         display: inline-block;
-         width: 24px;
-         text-align: center;
+             width: 24px;
+             height: 24px;
+             border-radius: 50%;
+             object-fit: cover;
+             margin-right: 5px;
          }
          .generic-crypto-icon {
          display: inline-flex;
@@ -619,14 +619,11 @@
              }
          }
          
-         // Add this helper function inside your <script> tags
-         function hasCryptoIcon(symbol) {
-             // List of common cryptocurrencies that have icons in the CryptoFont library
-             const knownSymbols = ['BTC', 'ETH', 'LTC', 'XRP', 'DASH', 'XMR', 'BCH', 'ETC', 
-                                 'ZEC', 'USDT', 'XLM', 'ADA', 'NEO', 'EOS', 'BNB', 'LINK', 
-                                 'TRX', 'DOT', 'DOGE', 'SOL', 'MATIC', 'AVAX'];
-                                 
-             return knownSymbols.includes(symbol);
+         // Function to get cryptocurrency icon URL from CryptoCompare
+         function getCryptoIconUrl(symbol) {
+             // Remove USDT suffix and convert to lowercase
+             const baseSymbol = symbol.replace(/USDT|USD|BUSD/g, '').toLowerCase();
+             return `https://cryptocompare.com/media/37746251/${baseSymbol}.png`;
          }
          
          // Function to display trades in the table
@@ -687,11 +684,10 @@
                  
                  // Make the symbol clickable to show details
                   const baseCurrency = (trade.symbol || '').replace('USDT', '');
-                  const hasIcon = hasCryptoIcon(baseCurrency);
                   const symbolText = `<span class="d-flex align-items-center">
-                      ${hasIcon ? 
-                          `<i class="sbi sbi-${baseCurrency.toLowerCase()} crypto-icon me-2"></i>` : 
-                          `<span class="generic-crypto-icon me-2">${baseCurrency.charAt(0)}</span>`}
+                      <img src="${getCryptoIconUrl(baseCurrency)}" alt="${baseCurrency}" 
+                          class="crypto-icon" 
+                          onerror="this.onerror=null; this.src=''; this.parentNode.innerHTML = this.parentNode.innerHTML.replace(this.outerHTML, '<span class=\'generic-crypto-icon me-2\'>${baseCurrency.charAt(0)}</span>')">
                       <span class="clickable-asset" data-symbol="${trade.symbol}">${trade.symbol || 'N/A'}</span>
                   </span>`;
                  
@@ -1277,14 +1273,13 @@
                      // Determine P/L classes
                      const plClass = asset.profitLoss >= 0 ? 'buy-text' : 'sell-text';
                      const baseCurrency = asset.symbol.replace('USDT', '');
-                     const hasIcon = hasCryptoIcon(baseCurrency);
-                    
+                     
                      row.innerHTML = `
                          <td>
                              <span class="d-flex align-items-center">
-                                 ${hasIcon ? 
-                                     `<i class="sbi sbi-${baseCurrency.toLowerCase()} crypto-icon me-2"></i>` : 
-                                     `<span class="generic-crypto-icon me-2">${baseCurrency.charAt(0)}</span>`}
+                                 <img src="${getCryptoIconUrl(baseCurrency)}" alt="${baseCurrency}" 
+                                     class="crypto-icon" 
+                                     onerror="this.onerror=null; this.src=''; this.parentNode.innerHTML = this.parentNode.innerHTML.replace(this.outerHTML, '<span class=\'generic-crypto-icon me-2\'>${baseCurrency.charAt(0)}</span>')">
                                  <span class="clickable-asset" data-symbol="${asset.symbol}">${asset.symbol}</span>
                              </span>
                          </td>
@@ -1382,15 +1377,15 @@
                      
                      // Determine P/L class
                      const plClass = asset.profitLoss >= 0 ? 'buy-text' : 'sell-text';
-                     const baseCurrency = asset.symbol.replace('USDT', '');
-                     const hasIcon = (baseCurrency);
-                    
+                     
+                    const baseCurrency = asset.symbol.replace('USDT', '');
+                     
                      row.innerHTML = `
                          <td>
                              <span class="d-flex align-items-center">
-                                 ${hasIcon ? 
-                                     `<i class="sbi sbi-${baseCurrency.toLowerCase()} crypto-icon me-2"></i>` : 
-                                     `<span class="generic-crypto-icon me-2">${baseCurrency.charAt(0)}</span>`}
+                                 <img src="${getCryptoIconUrl(baseCurrency)}" alt="${baseCurrency}" 
+                                     class="crypto-icon" 
+                                     onerror="this.onerror=null; this.src=''; this.parentNode.innerHTML = this.parentNode.innerHTML.replace(this.outerHTML, '<span class=\'generic-crypto-icon me-2\'>${baseCurrency.charAt(0)}</span>')">
                                  <span class="clickable-asset" data-symbol="${asset.symbol}">${asset.symbol}</span>
                              </span>
                          </td>
