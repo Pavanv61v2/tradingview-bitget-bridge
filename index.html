@@ -1151,12 +1151,12 @@
                          datasets: [{
                              data: [buyTrades, sellTrades],
                              backgroundColor: [
-                               'rgba(78, 222, 128, 0.7)', // Neon green for buys
-                               'rgba(248, 113, 113, 0.7)' // Neon red for sells
+                               'rgba(56, 178, 172, 0.7)', // Teal for buys
+                               'rgba(237, 137, 54, 0.7)'  // Orange for sells
                              ],
                              borderColor: [
-                               'rgba(78, 222, 128, 1)',
-                               'rgba(248, 113, 113, 1)'
+                               'rgba(56, 178, 172, 1)',   // Solid teal border
+                               'rgba(237, 137, 54, 1)'    // Solid orange border
                              ],
                              borderWidth: 1
                          }]
@@ -1234,11 +1234,10 @@
                      window.portfolioChart = null;
                  }
                  
-               // Create neon gradient fill - blue to teal
-               const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-               gradient.addColorStop(0, 'rgba(79, 209, 255, 0.5)');
-               gradient.addColorStop(0.5, 'rgba(0, 200, 255, 0.2)');
-               gradient.addColorStop(1, 'rgba(0, 242, 254, 0.0)');
+                  const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+                  // Change these color values
+                  gradient.addColorStop(0, 'rgba(56, 178, 172, 0.4)'); // Teal with opacity
+                  gradient.addColorStop(1, 'rgba(56, 178, 172, 0.0)'); // Transparent teal
                  
                  window.portfolioChart = new Chart(ctx, {
                      type: 'line',
@@ -1247,15 +1246,15 @@
                          datasets: [{
                             label: 'Portfolio P/L (USDT)',
                             data: chartData.map(d => d.pnl),
-                            borderColor: 'rgba(79, 209, 255, 1)', // CHANGE THIS LINE
+                            borderColor: 'rgba(56, 178, 172, 1)',
                             backgroundColor: gradient,
                             borderWidth: 2,
                             fill: true,
                             tension: 0.4,
                             pointRadius: 4, // CHANGE THIS LINE
-                            pointBackgroundColor: 'rgba(79, 209, 255, 1)', // ADD THIS LINE
-                            pointBorderColor: 'rgba(255, 255, 255, 1)', // ADD THIS LINE
-                            pointBorderWidth: 2 // ADD THIS LINE
+                            pointBackgroundColor: 'rgba(56, 178, 172, 1)',
+                            pointBorderColor: 'rgba(255, 255, 255, 1)',
+                            pointBorderWidth: 2
                          }]
                      },
                      options: {
@@ -1397,15 +1396,15 @@
                              {
                                  label: 'Buy Volume',
                                  data: chartData.map(d => d.buyVolume),
-                                 backgroundColor: 'rgba(78, 222, 128, 0.7)',
-                                 borderColor: 'rgba(40, 167, 69, 1)',
+                                 backgroundColor: 'rgba(56, 178, 172, 0.7)', // Teal for buys
+                                 borderColor: 'rgba(56, 178, 172, 1)',       // Solid teal border
                                  borderWidth: 1
                              },
                              {
                                  label: 'Sell Volume',
                                  data: chartData.map(d => d.sellVolume),
-                                 backgroundColor: 'rgba(248, 113, 113, 0.7)',
-                                 borderColor: 'rgba(220, 53, 69, 1)',
+                                 backgroundColor: 'rgba(237, 137, 54, 0.7)', // Orange for sells
+                                 borderColor: 'rgba(237, 137, 54, 1)',       // Solid orange border
                                  borderWidth: 1
                              }
                          ]
