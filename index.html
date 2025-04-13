@@ -619,11 +619,11 @@
              }
          }
          
-         // Function to get cryptocurrency icon URL from CryptoCompare
+         // Function to get cryptocurrency icon URL from local folder
          function getCryptoIconUrl(symbol) {
              // Remove USDT suffix and convert to lowercase
              const baseSymbol = symbol.replace(/USDT|USD|BUSD/g, '').toLowerCase();
-             return `https://cryptocompare.com/media/37746251/${baseSymbol}.png`;
+             return `crypto-icons/${baseSymbol}.png`;
          }
          
          // Function to display trades in the table
