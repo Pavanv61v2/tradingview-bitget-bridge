@@ -1151,12 +1151,12 @@
                          datasets: [{
                              data: [buyTrades, sellTrades],
                              backgroundColor: [
-                               'rgba(56, 178, 172, 0.7)', // Teal for buys
-                               'rgba(237, 137, 54, 0.7)'  // Orange for sells
+                               'rgba(0, 242, 195, 0.7)', // Teal for buys
+                               'rgba(255, 140, 55, 0.7)'  // Orange for sells
                              ],
                              borderColor: [
-                               'rgba(56, 178, 172, 1)',   // Solid teal border
-                               'rgba(237, 137, 54, 1)'    // Solid orange border
+                               'rgba(0, 242, 195, 1)',   // Solid teal border
+                               'rgba(255, 140, 55, 1)'    // Solid orange border
                              ],
                              borderWidth: 1
                          }]
@@ -1236,8 +1236,8 @@
                  
                   const gradient = ctx.createLinearGradient(0, 0, 0, 400);
                   // Change these color values
-                  gradient.addColorStop(0, 'rgba(56, 178, 172, 0.4)'); // Teal with opacity
-                  gradient.addColorStop(1, 'rgba(56, 178, 172, 0.0)'); // Transparent teal
+                  gradient.addColorStop(0, 'rgba(0, 242, 195, 0.4)'); // Teal with opacity
+                  gradient.addColorStop(1, 'rgba(0, 242, 195, 0.0)'); // Transparent teal
                  
                  window.portfolioChart = new Chart(ctx, {
                      type: 'line',
@@ -1246,13 +1246,13 @@
                          datasets: [{
                             label: 'Portfolio P/L (USDT)',
                             data: chartData.map(d => d.pnl),
-                            borderColor: 'rgba(56, 178, 172, 1)',
+                            borderColor: 'rgba(0, 242, 195, 1)', // Neon teal line
                             backgroundColor: gradient,
                             borderWidth: 2,
                             fill: true,
                             tension: 0.4,
                             pointRadius: 4, // CHANGE THIS LINE
-                            pointBackgroundColor: 'rgba(56, 178, 172, 1)',
+                            pointBackgroundColor: 'rgba(0, 242, 195, 1)',
                             pointBorderColor: 'rgba(255, 255, 255, 1)',
                             pointBorderWidth: 2
                          }]
@@ -1396,15 +1396,15 @@
                              {
                                  label: 'Buy Volume',
                                  data: chartData.map(d => d.buyVolume),
-                                 backgroundColor: 'rgba(56, 178, 172, 0.7)', // Teal for buys
-                                 borderColor: 'rgba(56, 178, 172, 1)',       // Solid teal border
+                                 backgroundColor: 'rgba(0, 242, 195, 0.7)', // Teal for buys
+                                 borderColor: 'rgba(0, 242, 195, 1)',       // Solid teal border
                                  borderWidth: 1
                              },
                              {
                                  label: 'Sell Volume',
                                  data: chartData.map(d => d.sellVolume),
-                                 backgroundColor: 'rgba(237, 137, 54, 0.7)', // Orange for sells
-                                 borderColor: 'rgba(237, 137, 54, 1)',       // Solid orange border
+                                 backgroundColor: 'rgba(255, 140, 55, 0.7)', // Orange for sells
+                                 borderColor: 'rgba(255, 140, 55, 1)',       // Solid orange border
                                  borderWidth: 1
                              }
                          ]
