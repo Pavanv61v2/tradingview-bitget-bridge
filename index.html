@@ -329,6 +329,11 @@
          #assetDetailsModal .modal-footer {
             border-top: 1px solid rgba(255, 255, 255, 0.1);
          }
+
+         #win-rate, #avg-hold-time, #max-drawdown {
+             color: white !important;
+             font-weight: 600;
+         }
          
          .summary-badge {
             padding: 5px 10px;
@@ -1163,6 +1168,9 @@
                          plugins: {
                              legend: {
                                  position: 'bottom',
+                                 labels: {
+                                 color: 'rgba(255, 255, 255, 0.8)' // ADD THIS LINE
+                                 }
                              },
                              tooltip: {
                                  callbacks: {
@@ -1237,15 +1245,17 @@
                      data: {
                          labels: chartData.map(d => d.date),
                          datasets: [{
-                             label: 'Portfolio P/L (USDT)',
-                             data: chartData.map(d => d.pnl),
-                             borderColor: 'rgba(40, 167, 69, 1)',
-                             backgroundColor: gradient,
-                             borderWidth: 2,
-                             fill: true,
-                             tension: 0.4,
-                             pointRadius: 3,
-                             pointBackgroundColor: 'rgba(40, 167, 69, 1)'
+                            label: 'Portfolio P/L (USDT)',
+                            data: chartData.map(d => d.pnl),
+                            borderColor: 'rgba(79, 209, 255, 1)', // CHANGE THIS LINE
+                            backgroundColor: gradient,
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 4, // CHANGE THIS LINE
+                            pointBackgroundColor: 'rgba(79, 209, 255, 1)', // ADD THIS LINE
+                            pointBorderColor: 'rgba(255, 255, 255, 1)', // ADD THIS LINE
+                            pointBorderWidth: 2 // ADD THIS LINE
                          }]
                      },
                      options: {
@@ -1255,14 +1265,18 @@
                              x: {
                                  grid: {
                                      display: false
-                                 }
+                                 },
+                                 ticks: {
+                                    color: 'rgba(255, 255, 255, 0.8)' // ADD THIS LINE
+                                }
                              },
                              y: {
                                  grid: {
                                      color: 'rgba(0, 0, 0, 0.05)'
                                  },
                                  ticks: {
-                                     callback: function(value) {
+                                    color: 'rgba(255, 255, 255, 0.8)', 
+                                    callback: function(value) {
                                          return value.toFixed(2) + ' USDT';
                                      }
                                  }
@@ -1383,14 +1397,14 @@
                              {
                                  label: 'Buy Volume',
                                  data: chartData.map(d => d.buyVolume),
-                                 backgroundColor: 'rgba(40, 167, 69, 0.7)',
+                                 backgroundColor: 'rgba(78, 222, 128, 0.7)',
                                  borderColor: 'rgba(40, 167, 69, 1)',
                                  borderWidth: 1
                              },
                              {
                                  label: 'Sell Volume',
                                  data: chartData.map(d => d.sellVolume),
-                                 backgroundColor: 'rgba(220, 53, 69, 0.7)',
+                                 backgroundColor: 'rgba(248, 113, 113, 0.7)',
                                  borderColor: 'rgba(220, 53, 69, 1)',
                                  borderWidth: 1
                              }
@@ -1403,14 +1417,18 @@
                              x: {
                                  grid: {
                                      display: false
-                                 }
+                                 },
+                                 ticks: {
+                                    color: 'rgba(255, 255, 255, 0.8)' // ADD THIS LINE
+                             }
                              },
                              y: {
                                  grid: {
                                      color: 'rgba(0, 0, 0, 0.05)'
                                  },
                                  ticks: {
-                                     callback: function(value) {
+                                    color: 'rgba(255, 255, 255, 0.8)', 
+                                    callback: function(value) {
                                          return value.toFixed(0) + ' USDT';
                                      }
                                  }
@@ -1423,7 +1441,12 @@
                                          return `${context.dataset.label}: ${context.parsed.y.toFixed(2)} USDT`;
                                      }
                                  }
-                             }
+                             },
+                                legend: {
+                                      labels: {
+                                          color: 'rgba(255, 255, 255, 0.8)' // This makes legend text white
+                                      }
+                                  }
                          }
                      }
                  });
