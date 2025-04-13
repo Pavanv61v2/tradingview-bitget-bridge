@@ -583,19 +583,7 @@
                  
                  const trades = await response.json();
                  
-                 // Add click event for clickable assets
-                 document.querySelectorAll('#top-assets-table .clickable-asset').forEach(element => {
-                     element.addEventListener('click', function() {
-                         const symbol = this.getAttribute('data-symbol');
-                         showAssetDetails(symbol, trades);
-                     });
-                 });
-                 
-                 // View all assets button
-                 document.getElementById('view-all-assets').addEventListener('click', function(e) {
-                     e.preventDefault();
-                     document.getElementById('assets-tab').click();
-                 }); Process the data for different views
+                 // Process the data for different views
                  displayTrades(trades);
                  updateStats(trades);
                  updateCharts(trades);
@@ -846,52 +834,6 @@
              });
              
              return tradePairs;
-         }
-         
-         // Calculate max drawdown (simplified)
-         function calculateMaxDrawdown(trades) {
-             try {
-                 // Create a timeline of cumulative profit/loss
-                 const timeline = [];
-                 let cumulativePnL = 0;
-                 
-                 const sortedTrades = [...trades]
-                     .filter(t => t.status === 'success')
-                     .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-                 
-                 sortedTrades.forEach(trade => {
-                     if (trade.action === 'buy') {
-                         cumulativePnL -= parseFloat(trade.filledQuoteVolume || trade.usdtEquivalent || trade.orderSize || 0);
-                     } else if (trade.action === 'sell') {
-                         cumulativePnL += parseFloat(trade.usdtEquivalent || 0);
-                     }
-                     
-                     timeline.push({
-                         timestamp: trade.timestamp,
-                         pnl: cumulativePnL
-                     });
-                 });
-                 
-                 // Find maximum drawdown
-                 let maxDrawdown = 0;
-                 let peak = -Infinity;
-                 
-                 timeline.forEach(point => {
-                     if (point.pnl > peak) {
-                         peak = point.pnl;
-                     }
-                     
-                     const drawdown = peak > 0 ? ((peak - point.pnl) / peak * 100) : 0;
-                     if (drawdown > maxDrawdown) {
-                         maxDrawdown = drawdown;
-                     }
-                 });
-                 
-                 return maxDrawdown;
-             } catch (error) {
-                 console.error('Error calculating max drawdown:', error);
-                 return 0;
-             }
          }
          
          // Function to update charts
@@ -1402,4 +1344,327 @@
                      tableBody.appendChild(row);
                  });
                  
-                 //
+                 // Add click event for clickable assets
+                 document.querySelectorAll('#top-assets-table .clickable-asset').forEach(element => {
+                     element.addEventListener('click', function() {
+                         const symbol = this.getAttribute('data-symbol');
+                         showAssetDetails(symbol, trades);
+                     });
+                 });
+                 
+             } catch (error) {
+                 console.error('Error updating top assets:', error);
+             }
+         }
+         
+         // Function to show asset details in modal
+         function showAssetDetails(symbol, trades) {
+             try {
+                 // Filter trades for this symbol
+                 const assetTrades = trades.filter(t => t.symbol === symbol && t.status === 'success');
+                 
+                 if (assetTrades.length === 0) {
+                     console.error('No trades found for symbol:', symbol);
+                     return;
+                 }
+                 
+                 // Set modal title
+                 document.getElementById('assetDetailsTitle').textContent = `${symbol} Details`;
+                 
+                 // Calculate key metrics
+                 const totalTrades = assetTrades.length;
+                 const buyTrades = assetTrades.filter(t => t.action === 'buy');
+                 const sellTrades = assetTrades.filter(t => t.action === 'sell');
+                 
+                 const buyVolume = buyTrades.reduce((sum, trade) => 
+                     sum + parseFloat(trade.filledQuoteVolume || trade.usdtEquivalent || trade.orderSize || 0), 0);
+                     
+                 const sellVolume = sellTrades.reduce((sum, trade) => 
+                     sum + parseFloat(trade.usdtEquivalent || 0), 0);
+                 
+                 const profitLoss = sellVolume - buyVolume;
+                 const roi = buyVolume > 0 ? (profitLoss / buyVolume * 100) : 0;
+                 
+                 // Find trade pairs for win rate calculation
+                 const tradePairs = findTradePairs(assetTrades);
+                 const profitablePairs = tradePairs.filter(pair => pair.profit > 0);
+                 const winRate = tradePairs.length > 0 ? (profitablePairs.length / tradePairs.length * 100) : 0;
+                 
+                 // Update modal content
+                 document.getElementById('modal-total-trades').textContent = totalTrades;
+                 document.getElementById('modal-win-rate').textContent = `${winRate.toFixed(1)}%`;
+                 document.getElementById('modal-pl').textContent = `${profitLoss.toFixed(2)} USDT`;
+                 document.getElementById('modal-roi').textContent = `${roi.toFixed(2)}%`;
+                 
+                 // Update trade history table
+                 updateModalTradeHistory(assetTrades);
+                 
+                 // Update price and performance charts
+                 updateModalCharts(assetTrades);
+                 
+                 // Update buy/sell analysis
+                 updateBuySellAnalysis(assetTrades);
+                 
+                 // Show the modal
+                 const modal = new bootstrap.Modal(document.getElementById('assetDetailsModal'));
+                 modal.show();
+                 
+             } catch (error) {
+                 console.error('Error showing asset details:', error);
+             }
+         }
+         
+         // Function to update modal trade history
+         function updateModalTradeHistory(trades) {
+             try {
+                 const tableBody = document.getElementById('modal-trade-history');
+                 tableBody.innerHTML = '';
+                 
+                 // Sort trades by timestamp (newest first)
+                 const sortedTrades = [...trades].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                 
+                 sortedTrades.forEach(trade => {
+                     const row = document.createElement('tr');
+                     
+                     const timestamp = new Date(trade.timestamp).toLocaleString();
+                     const amount = trade.filledBaseVolume || trade.orderSize || 0;
+                     const price = trade.price || 0;
+                     const value = trade.action === 'buy' 
+                         ? (trade.filledQuoteVolume || trade.usdtEquivalent || trade.orderSize || 0)
+                         : (trade.usdtEquivalent || 0);
+                     
+                     row.innerHTML = `
+                         <td>${timestamp}</td>
+                         <td class="${trade.action === 'buy' ? 'buy-text' : 'sell-text'}">${trade.action.toUpperCase()}</td>
+                         <td>${amount}</td>
+                         <td>${price} USDT</td>
+                         <td>${parseFloat(value).toFixed(2)} USDT</td>
+                         <td>
+                             ${trade.status === 'success' 
+                                 ? '<span class="badge bg-success">Success</span>' 
+                                 : '<span class="badge bg-danger">Failed</span>'}
+                         </td>
+                     `;
+                     
+                     tableBody.appendChild(row);
+                 });
+                 
+             } catch (error) {
+                 console.error('Error updating modal trade history:', error);
+             }
+         }
+         
+         // Function to update modal charts
+         function updateModalCharts(trades) {
+             try {
+                 // Sort trades by timestamp
+                 const sortedTrades = [...trades].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+                 
+                 // Price history chart
+                 const priceCtx = document.getElementById('modal-price-chart').getContext('2d');
+                 
+                 // Safely destroy previous chart if it exists
+                 if (window.modalPriceChart && typeof window.modalPriceChart.destroy === 'function') {
+                     window.modalPriceChart.destroy();
+                 } else if (window.modalPriceChart) {
+                     window.modalPriceChart = null;
+                 }
+                 
+                 // Extract price data from trades
+                 const priceData = sortedTrades
+                     .filter(trade => trade.price)
+                     .map(trade => ({
+                         x: new Date(trade.timestamp),
+                         y: parseFloat(trade.price)
+                     }));
+                 
+                 // Create price chart
+                 window.modalPriceChart = new Chart(priceCtx, {
+                     type: 'line',
+                     data: {
+                         datasets: [{
+                             label: 'Price (USDT)',
+                             data: priceData,
+                             borderColor: 'rgba(0, 123, 255, 1)',
+                             backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                             borderWidth: 2,
+                             tension: 0.4,
+                             fill: true
+                         }]
+                     },
+                     options: {
+                         responsive: true,
+                         maintainAspectRatio: false,
+                         scales: {
+                             x: {
+                                 type: 'time',
+                                 time: {
+                                     unit: 'day'
+                                 },
+                                 grid: {
+                                     display: false
+                                 }
+                             },
+                             y: {
+                                 grid: {
+                                     color: 'rgba(0, 0, 0, 0.05)'
+                                 }
+                             }
+                         }
+                     }
+                 });
+                 
+                 // Performance chart
+                 const perfCtx = document.getElementById('modal-performance-chart').getContext('2d');
+                 
+                 // Safely destroy previous chart if it exists
+                 if (window.modalPerfChart && typeof window.modalPerfChart.destroy === 'function') {
+                     window.modalPerfChart.destroy();
+                 } else if (window.modalPerfChart) {
+                     window.modalPerfChart = null;
+                 }
+                 
+                 // Calculate cumulative P/L
+                 let cumulativePnL = 0;
+                 const perfData = sortedTrades.map(trade => {
+                     if (trade.action === 'buy') {
+                         cumulativePnL -= parseFloat(trade.filledQuoteVolume || trade.usdtEquivalent || trade.orderSize || 0);
+                     } else if (trade.action === 'sell') {
+                         cumulativePnL += parseFloat(trade.usdtEquivalent || 0);
+                     }
+                     
+                     return {
+                         x: new Date(trade.timestamp),
+                         y: cumulativePnL
+                     };
+                 });
+                 
+                 // Create performance chart
+                 window.modalPerfChart = new Chart(perfCtx, {
+                     type: 'line',
+                     data: {
+                         datasets: [{
+                             label: 'Cumulative P/L (USDT)',
+                             data: perfData,
+                             borderColor: cumulativePnL >= 0 ? 'rgba(40, 167, 69, 1)' : 'rgba(220, 53, 69, 1)',
+                             backgroundColor: cumulativePnL >= 0 ? 'rgba(40, 167, 69, 0.1)' : 'rgba(220, 53, 69, 0.1)',
+                             borderWidth: 2,
+                             tension: 0.1,
+                             fill: true
+                         }]
+                     },
+                     options: {
+                         responsive: true,
+                         maintainAspectRatio: false,
+                         scales: {
+                             x: {
+                                 type: 'time',
+                                 time: {
+                                     unit: 'day'
+                                 },
+                                 grid: {
+                                     display: false
+                                 }
+                             },
+                             y: {
+                                 grid: {
+                                     color: 'rgba(0, 0, 0, 0.05)'
+                                 },
+                                 ticks: {
+                                     callback: function(value) {
+                                         return value.toFixed(2) + ' USDT';
+                                     }
+                                 }
+                             }
+                         }
+                     }
+                 });
+                 
+             } catch (error) {
+                 console.error('Error updating modal charts:', error);
+             }
+         }
+         
+         // Function to update buy/sell analysis
+         function updateBuySellAnalysis(trades) {
+             try {
+                 const buyPrices = trades
+                     .filter(t => t.action === 'buy' && t.price)
+                     .map(t => parseFloat(t.price));
+                     
+                 const sellPrices = trades
+                     .filter(t => t.action === 'sell' && t.price)
+                     .map(t => parseFloat(t.price));
+                 
+                 // Calculate buy statistics
+                 const lowestBuy = buyPrices.length > 0 ? Math.min(...buyPrices) : 0;
+                 const highestBuy = buyPrices.length > 0 ? Math.max(...buyPrices) : 0;
+                 const avgBuy = buyPrices.length > 0 
+                     ? buyPrices.reduce((sum, price) => sum + price, 0) / buyPrices.length 
+                     : 0;
+                 
+                 // Calculate sell statistics
+                 const lowestSell = sellPrices.length > 0 ? Math.min(...sellPrices) : 0;
+                 const highestSell = sellPrices.length > 0 ? Math.max(...sellPrices) : 0;
+                 const avgSell = sellPrices.length > 0 
+                     ? sellPrices.reduce((sum, price) => sum + price, 0) / sellPrices.length 
+                     : 0;
+                 
+                 // Update the UI
+                 document.getElementById('modal-lowest-buy').textContent = `${lowestBuy.toFixed(2)} USDT`;
+                 document.getElementById('modal-highest-buy').textContent = `${highestBuy.toFixed(2)} USDT`;
+                 document.getElementById('modal-avg-buy').textContent = `${avgBuy.toFixed(2)} USDT`;
+                 
+                 document.getElementById('modal-lowest-sell').textContent = `${lowestSell.toFixed(2)} USDT`;
+                 document.getElementById('modal-highest-sell').textContent = `${highestSell.toFixed(2)} USDT`;
+                 document.getElementById('modal-avg-sell').textContent = `${avgSell.toFixed(2)} USDT`;
+                 
+             } catch (error) {
+                 console.error('Error updating buy/sell analysis:', error);
+             }
+         }
+         
+         // Initialize the dashboard when page loads
+         document.addEventListener('DOMContentLoaded', function() {
+             loadTradeData();
+             
+             // Set up refresh button functionality
+             document.getElementById('refresh-btn').addEventListener('click', function() {
+                 loadTradeData();
+             });
+             
+             // Set up trades refresh button functionality
+             document.getElementById('trades-refresh-btn').addEventListener('click', function() {
+                 loadTradeData();
+             });
+             
+             // Set up filter buttons for trades
+             document.getElementById('show-all-btn').addEventListener('click', function() {
+                 document.querySelectorAll('.buy-trade, .sell-trade').forEach(el => el.style.display = '');
+                 document.querySelectorAll('#show-all-btn, #show-buy-btn, #show-sell-btn').forEach(btn => btn.classList.remove('active'));
+                 this.classList.add('active');
+             });
+             
+             document.getElementById('show-buy-btn').addEventListener('click', function() {
+                 document.querySelectorAll('.buy-trade').forEach(el => el.style.display = '');
+                 document.querySelectorAll('.sell-trade').forEach(el => el.style.display = 'none');
+                 document.querySelectorAll('#show-all-btn, #show-buy-btn, #show-sell-btn').forEach(btn => btn.classList.remove('active'));
+                 this.classList.add('active');
+             });
+             
+             document.getElementById('show-sell-btn').addEventListener('click', function() {
+                 document.querySelectorAll('.sell-trade').forEach(el => el.style.display = '');
+                 document.querySelectorAll('.buy-trade').forEach(el => el.style.display = 'none');
+                 document.querySelectorAll('#show-all-btn, #show-buy-btn, #show-sell-btn').forEach(btn => btn.classList.remove('active'));
+                 this.classList.add('active');
+             });
+             
+             // Set up view all assets button
+             document.getElementById('view-all-assets').addEventListener('click', function(e) {
+                 e.preventDefault();
+                 document.getElementById('assets-tab').click();
+             });
+         });
+      </script>
+   </body>
+</html>
