@@ -81,14 +81,14 @@
          width: 24px;
          text-align: center;
          }
-         .cc.BTC { color: #f7931a; }
-         .cc.ETH { color: #627eea; }
-         .cc.BNB { color: #f3ba2f; }
-         .cc.SOL { color: #00ffbd; }
-         .cc.XRP { color: #23292f; }
-         .cc.ADA { color: #3cc8c8; }
-         .cc.DOT { color: #e6007a; }
-         .cc.DOGE { color: #c3a634; }
+         .cc-BTC { color: #f7931a; }
+         .cc-ETH { color: #627eea; }
+         .cc-BNB { color: #f3ba2f; }
+         .cc-SOL { color: #00ffbd; }
+         .cc-XRP { color: #23292f; }
+         .cc-ADA { color: #3cc8c8; }
+         .cc-DOT { color: #e6007a; }
+         .cc-DOGE { color: #c3a634; }
          .generic-crypto-icon {
          display: inline-flex;
          align-items: center;
@@ -698,7 +698,7 @@
                   const hasIcon = hasCryptoIcon(baseCurrency);
                   const symbolText = `<span class="d-flex align-items-center">
                       ${hasIcon ? 
-                          `<i class="cc-${baseCurrency.toUpperCase()} crypto-icon me-2"></i>` : 
+                          `<i class="cc ${baseCurrency.toUpperCase()} crypto-icon me-2"></i>` : 
                           `<span class="generic-crypto-icon me-2">${baseCurrency.charAt(0)}</span>`}
                       <span class="clickable-asset" data-symbol="${trade.symbol}">${trade.symbol || 'N/A'}</span>
                   </span>`;
@@ -1291,7 +1291,7 @@
                          <td>
                              <span class="d-flex align-items-center">
                                  ${hasIcon ? 
-                                     `<i class="cc-${baseCurrency.toUpperCase()} crypto-icon me-2"></i>` : 
+                                     `<i class="cc ${baseCurrency.toUpperCase()} crypto-icon me-2"></i>` : 
                                      `<span class="generic-crypto-icon me-2">${baseCurrency.charAt(0)}</span>`}
                                  <span class="clickable-asset" data-symbol="${asset.symbol}">${asset.symbol}</span>
                              </span>
