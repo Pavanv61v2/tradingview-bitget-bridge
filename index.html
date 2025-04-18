@@ -10,448 +10,378 @@
       <link rel="shortcut icon" href="logo.jpg" type="image/jpeg">
       <style>
          :root {
-            --primary-gradient: linear-gradient(135deg, #1e5799 0%, #2989d8 50%, #207cca 51%, #7db9e8 100%);
-            --dark-blue: #0a1929;
-            --medium-blue: #1a365d;
-            --light-blue: #2c5282;
-            --accent-blue: #4299e1;
-            --accent-teal: #38b2ac;
-            --neon-blue: #00c8ff;
-            --neon-purple: #9d4edd;
-            --card-bg: rgba(13, 24, 45, 0.9);
-            --card-header: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            --success-color: #4ade80;
-            --danger-color: #f87171;
+         --primary-gradient: linear-gradient(135deg, #1e5799 0%, #2989d8 50%, #207cca 51%, #7db9e8 100%);
+         --dark-blue: #0a1929;
+         --medium-blue: #1a365d;
+         --light-blue: #2c5282;
+         --accent-blue: #4299e1;
+         --accent-teal: #38b2ac;
+         --neon-blue: #00c8ff;
+         --neon-purple: #9d4edd;
+         --card-bg: rgba(13, 24, 45, 0.9);
+         --card-header: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+         --success-color: #4ade80;
+         --danger-color: #f87171;
          }
-         
          body {
-            background: linear-gradient(135deg, var(--light-blue) 40%, var(--medium-blue) 60%);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #e2e8f0;
+         background: linear-gradient(135deg, var(--light-blue) 40%, var(--medium-blue) 60%);
+         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+         color: #e2e8f0;
          }
-         
          .card {
-            margin-bottom: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: transform 0.2s, box-shadow 0.2s;
-            background-color: var(--card-bg);
-            backdrop-filter: blur(10px);
+         margin-bottom: 20px;
+         box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+         border-radius: 10px;
+         border: 1px solid rgba(255, 255, 255, 0.1);
+         transition: transform 0.2s, box-shadow 0.2s;
+         background-color: var(--card-bg);
+         backdrop-filter: blur(10px);
          }
-         
          .card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0, 200, 255, 0.15);
+         transform: translateY(-3px);
+         box-shadow: 0 8px 25px rgba(0, 200, 255, 0.15);
          }
-         
          .card-header {
-            font-weight: bold;
-            border-radius: 10px 10px 0 0 !important;
-            background: var(--card-header);
-            color: white;
-            padding: 12px 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+         font-weight: bold;
+         border-radius: 10px 10px 0 0 !important;
+         background: var(--card-header);
+         color: white;
+         padding: 12px 20px;
+         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
          }
-         
          .buy-bg {
-            background-color: rgba(78, 222, 128, 0.1);
+         background-color: rgba(78, 222, 128, 0.1);
          }
-         
          .sell-bg {
-            background-color: rgba(248, 113, 113, 0.1);
+         background-color: rgba(248, 113, 113, 0.1);
          }
-         
          .buy-text {
-            color: var(--success-color);
-            font-weight: 600;
-            text-shadow: 0 0 8px rgba(78, 222, 128, 0.4);
+         color: var(--success-color);
+         font-weight: 600;
+         text-shadow: 0 0 8px rgba(78, 222, 128, 0.4);
          }
-         
          .sell-text {
-            color: var(--danger-color);
-            font-weight: 600;
-            text-shadow: 0 0 8px rgba(248, 113, 113, 0.4);
+         color: var(--danger-color);
+         font-weight: 600;
+         text-shadow: 0 0 8px rgba(248, 113, 113, 0.4);
          }
-         
          .stats-card {
-            transition: all 0.3s;
-            height: 100%;
-            background: linear-gradient(145deg, rgba(13, 24, 45, 0.8), rgba(26, 54, 93, 0.8));
-            border: 1px solid rgba(255, 255, 255, 0.1);
+         transition: all 0.3s;
+         height: 100%;
+         background: linear-gradient(145deg, rgba(13, 24, 45, 0.8), rgba(26, 54, 93, 0.8));
+         border: 1px solid rgba(255, 255, 255, 0.1);
          }
-         
          .stats-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 200, 255, 0.2);
+         transform: translateY(-5px);
+         box-shadow: 0 10px 20px rgba(0, 200, 255, 0.2);
          }
-         
          .table td, .table th {
-            vertical-align: middle;
-            color: #e2e8f0;
-            border-color: rgba(255, 255, 255, 0.1);
+         vertical-align: middle;
+         color: #e2e8f0;
+         border-color: rgba(255, 255, 255, 0.1);
          }
-         
          .table {
-            --bs-table-bg: transparent;
+         --bs-table-bg: transparent;
          }
-         
          .failed {
-            background-color: rgba(248, 113, 113, 0.1);
+         background-color: rgba(248, 113, 113, 0.1);
          }
-         
          .dashboard-header {
-            background: linear-gradient(135deg, #1e5799 0%, #2989d8 50%, #207cca 51%, #7db9e8 100%);
-            color: white;
-            padding: 20px 0;
-            margin-bottom: 30px;
-            border-radius: 0 0 15px 15px;
-            box-shadow: 0 4px 20px rgba(0, 200, 255, 0.3);
+         background: linear-gradient(135deg, #1e5799 0%, #2989d8 50%, #207cca 51%, #7db9e8 100%);
+         color: white;
+         padding: 20px 0;
+         margin-bottom: 30px;
+         border-radius: 0 0 15px 15px;
+         box-shadow: 0 4px 20px rgba(0, 200, 255, 0.3);
          }
-         
          .dashboard-logo {
-            height: 60px;
-            width: auto;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-            border: 2px solid rgba(255, 255, 255, 0.3);
+         height: 60px;
+         width: auto;
+         border-radius: 8px;
+         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+         border: 2px solid rgba(255, 255, 255, 0.3);
          }
-         
          @media (max-width: 768px) {
-            .dashboard-logo {
-               height: 40px;
-            }
+         .dashboard-logo {
+         height: 40px;
          }
-         
+         }
          .crypto-icon {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-right: 5px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background-color: rgba(255, 255, 255, 0.1);
+         width: 24px;
+         height: 24px;
+         border-radius: 50%;
+         object-fit: cover;
+         margin-right: 5px;
+         border: 1px solid rgba(255, 255, 255, 0.2);
+         background-color: rgba(255, 255, 255, 0.1);
          }
-         
          .generic-crypto-icon {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 24px;
-            height: 24px;
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            color: white;
-            border-radius: 50%;
-            font-size: 10px;
-            font-weight: bold;
-            box-shadow: 0 0 5px rgba(0, 242, 254, 0.5);
+         display: inline-flex;
+         align-items: center;
+         justify-content: center;
+         width: 24px;
+         height: 24px;
+         background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+         color: white;
+         border-radius: 50%;
+         font-size: 10px;
+         font-weight: bold;
+         box-shadow: 0 0 5px rgba(0, 242, 254, 0.5);
          }
-         
          .metric-value {
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin: 5px 0;
-            background: linear-gradient(135deg, #fff 0%, #bbdefb 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 10px rgba(0, 200, 255, 0.3);
+         font-size: 1.8rem;
+         font-weight: 700;
+         margin: 5px 0;
+         background: linear-gradient(135deg, #fff 0%, #bbdefb 100%);
+         -webkit-background-clip: text;
+         -webkit-text-fill-color: transparent;
+         text-shadow: 0 0 10px rgba(0, 200, 255, 0.3);
          }
-
          .text-muted {
-            background: linear-gradient(135deg, #fff 0%, #bbdefb 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+         background: linear-gradient(135deg, #fff 0%, #bbdefb 100%);
+         -webkit-background-clip: text;
+         -webkit-text-fill-color: transparent;
          }
-         
          .metric-title {
-            font-size: 0.9rem;
-            color: #90caf9;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+         font-size: 0.9rem;
+         color: #90caf9;
+         font-weight: 600;
+         text-transform: uppercase;
+         letter-spacing: 0.5px;
          }
-         
          .asset-row {
-            cursor: pointer;
-            transition: background-color 0.2s;
+         cursor: pointer;
+         transition: background-color 0.2s;
          }
-         
          .asset-row:hover {
-            background-color: rgba(66, 153, 225, 0.1);
+         background-color: rgba(66, 153, 225, 0.1);
          }
-         
          .nav-tabs {
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
          }
-         
          .nav-tabs .nav-link {
-            color: #90caf9;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px 5px 0 0;
-            margin-right: 5px;
-            font-weight: 500;
+         color: #90caf9;
+         border: none;
+         padding: 10px 20px;
+         border-radius: 5px 5px 0 0;
+         margin-right: 5px;
+         font-weight: 500;
          }
-         
          .nav-tabs .nav-link:hover {
-            color: #e2e8f0;
-            background-color: rgba(66, 153, 225, 0.1);
-            border-color: transparent;
+         color: #e2e8f0;
+         background-color: rgba(66, 153, 225, 0.1);
+         border-color: transparent;
          }
-         
          .nav-tabs .nav-link.active {
-            color: #fff;
-            background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
-            border-color: transparent;
-            box-shadow: 0 0 10px rgba(0, 200, 255, 0.3);
+         color: #fff;
+         background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
+         border-color: transparent;
+         box-shadow: 0 0 10px rgba(0, 200, 255, 0.3);
          }
-         
          .tab-content {
-            padding: 20px 0;
+         padding: 20px 0;
          }
-         
          .chart-container {
-            height: 300px;
-            max-height: 300px;
-            background-color: rgba(10, 25, 41, 0.7);
-            border-radius: 10px;
-            padding: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+         height: 300px;
+         max-height: 300px;
+         background-color: rgba(10, 25, 41, 0.7);
+         border-radius: 10px;
+         padding: 15px;
+         border: 1px solid rgba(255, 255, 255, 0.05);
          }
-         
          .performance-indicator {
-            display: inline-block;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            margin-right: 5px;
+         display: inline-block;
+         width: 10px;
+         height: 10px;
+         border-radius: 50%;
+         margin-right: 5px;
          }
-         
          .indicator-positive {
-            background-color: var(--success-color);
-            box-shadow: 0 0 5px var(--success-color);
+         background-color: var(--success-color);
+         box-shadow: 0 0 5px var(--success-color);
          }
-         
          .indicator-negative {
-            background-color: var(--danger-color);
-            box-shadow: 0 0 5px var(--danger-color);
+         background-color: var(--danger-color);
+         box-shadow: 0 0 5px var(--danger-color);
          }
-         
          .indicator-neutral {
-            background-color: #90caf9;
-            box-shadow: 0 0 5px #90caf9;
+         background-color: #90caf9;
+         box-shadow: 0 0 5px #90caf9;
          }
-         
          .clickable-asset {
-            color: #90caf9;
-            cursor: pointer;
-            text-decoration: underline;
-            font-weight: 500;
-            transition: all 0.2s;
+         color: #90caf9;
+         cursor: pointer;
+         text-decoration: underline;
+         font-weight: 500;
+         transition: all 0.2s;
          }
-         
          .clickable-asset:hover {
-            color: var(--neon-blue);
-            text-shadow: 0 0 5px rgba(0, 200, 255, 0.5);
+         color: var(--neon-blue);
+         text-shadow: 0 0 5px rgba(0, 200, 255, 0.5);
          }
-         
          .table-striped>tbody>tr:nth-of-type(odd)>* {
-            background-color: rgba(26, 54, 93, 0.2);
+         background-color: rgba(26, 54, 93, 0.2);
          }
-         
          .table-hover tbody tr:hover {
-            background-color: rgba(66, 153, 225, 0.1);
+         background-color: rgba(66, 153, 225, 0.1);
          }
-         
          .btn-dark {
-            background: linear-gradient(to right, #1e3c72 0%, #2a5298 100%);
-            border: none;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+         background: linear-gradient(to right, #1e3c72 0%, #2a5298 100%);
+         border: none;
+         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
          }
-         
          .btn-dark:hover {
-            background: linear-gradient(to right, #2a5298 0%, #1e3c72 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+         background: linear-gradient(to right, #2a5298 0%, #1e3c72 100%);
+         transform: translateY(-2px);
+         box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
          }
-         
          .btn-light {
-            background: linear-gradient(to right, #e0e0e0 0%, #f5f5f5 100%);
-            border: none;
-            color: #1a365d;
-            font-weight: 500;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+         background: linear-gradient(to right, #e0e0e0 0%, #f5f5f5 100%);
+         border: none;
+         color: #1a365d;
+         font-weight: 500;
+         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
          }
-         
          .btn-light:hover {
-            background: linear-gradient(to right, #f5f5f5 0%, #e0e0e0 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+         background: linear-gradient(to right, #f5f5f5 0%, #e0e0e0 100%);
+         transform: translateY(-2px);
+         box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
          }
-         
          .btn-outline-secondary {
-            border-color: rgba(255, 255, 255, 0.2);
-            color: #90caf9;
+         border-color: rgba(255, 255, 255, 0.2);
+         color: #90caf9;
          }
-         
          .btn-outline-secondary:hover, .btn-outline-secondary.active {
-            background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
-            border-color: transparent;
-            color: white;
-            box-shadow: 0 0 10px rgba(0, 200, 255, 0.3);
+         background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
+         border-color: transparent;
+         color: white;
+         box-shadow: 0 0 10px rgba(0, 200, 255, 0.3);
          }
-         
          .dropdown-menu {
-            background-color: var(--card-bg);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
+         background-color: var(--card-bg);
+         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+         border: 1px solid rgba(255, 255, 255, 0.1);
+         border-radius: 10px;
          }
-         
          .dropdown-item {
-            color: #e2e8f0;
+         color: #e2e8f0;
          }
-         
          .dropdown-item:hover {
-            background-color: rgba(66, 153, 225, 0.1);
-            color: #fff;
+         background-color: rgba(66, 153, 225, 0.1);
+         color: #fff;
          }
-         
          #assetDetailsModal .modal-content {
-            background-color: var(--card-bg);
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+         background-color: var(--card-bg);
+         border-radius: 15px;
+         border: 1px solid rgba(255, 255, 255, 0.1);
+         backdrop-filter: blur(10px);
+         box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
          }
-         
          #assetDetailsModal .modal-header {
-            background: var(--card-header);
-            color: white;
-            border-radius: 15px 15px 0 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+         background: var(--card-header);
+         color: white;
+         border-radius: 15px 15px 0 0;
+         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
          }
-         
          #assetDetailsModal .modal-footer {
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+         border-top: 1px solid rgba(255, 255, 255, 0.1);
          }
-
          #win-rate, #avg-hold-time, #max-drawdown {
-             color: white !important;
-             font-weight: 600;
+         color: white !important;
+         font-weight: 600;
          }
-         
          .summary-badge {
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            margin-right: 5px;
+         padding: 5px 10px;
+         border-radius: 20px;
+         font-size: 0.8rem;
+         font-weight: 600;
+         margin-right: 5px;
          }
-         
          .badge-success {
-            background-color: rgba(78, 222, 128, 0.1);
-            color: var(--success-color);
-            border: 1px solid rgba(78, 222, 128, 0.2);
+         background-color: rgba(78, 222, 128, 0.1);
+         color: var(--success-color);
+         border: 1px solid rgba(78, 222, 128, 0.2);
          }
-         
          .badge-danger {
-            background-color: rgba(248, 113, 113, 0.1);
-            color: var(--danger-color);
-            border: 1px solid rgba(248, 113, 113, 0.2);
+         background-color: rgba(248, 113, 113, 0.1);
+         color: var(--danger-color);
+         border: 1px solid rgba(248, 113, 113, 0.2);
          }
-         
          .badge-info {
-            background-color: rgba(56, 189, 248, 0.1);
-            color: #38bdf8;
-            border: 1px solid rgba(56, 189, 248, 0.2);
+         background-color: rgba(56, 189, 248, 0.1);
+         color: #38bdf8;
+         border: 1px solid rgba(56, 189, 248, 0.2);
          }
-         
          .time-period-selector {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
+         display: flex;
+         justify-content: center;
+         margin-bottom: 20px;
          }
-         
          .time-period-selector .btn {
-            border-radius: 20px;
-            padding: 5px 15px;
-            margin: 0 5px;
-            font-size: 0.8rem;
+         border-radius: 20px;
+         padding: 5px 15px;
+         margin: 0 5px;
+         font-size: 0.8rem;
          }
-         
          .time-period-selector .btn.active {
-            background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
-            color: white;
-            box-shadow: 0 0 10px rgba(0, 200, 255, 0.3);
+         background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
+         color: white;
+         box-shadow: 0 0 10px rgba(0, 200, 255, 0.3);
          }
-         
          /* Additional neon effects */
          .neon-glow {
-            box-shadow: 0 0 10px rgba(0, 200, 255, 0.5), 0 0 20px rgba(0, 200, 255, 0.3), 0 0 30px rgba(0, 200, 255, 0.1);
+         box-shadow: 0 0 10px rgba(0, 200, 255, 0.5), 0 0 20px rgba(0, 200, 255, 0.3), 0 0 30px rgba(0, 200, 255, 0.1);
          }
-         
          .badge {
-            text-shadow: 0 0 5px currentColor;
+         text-shadow: 0 0 5px currentColor;
          }
-         
          .badge.bg-success {
-            background-color: rgba(78, 222, 128, 0.2) !important;
-            color: var(--success-color);
-            border: 1px solid rgba(78, 222, 128, 0.3);
-            box-shadow: 0 0 5px rgba(78, 222, 128, 0.3);
+         background-color: rgba(78, 222, 128, 0.2) !important;
+         color: var(--success-color);
+         border: 1px solid rgba(78, 222, 128, 0.3);
+         box-shadow: 0 0 5px rgba(78, 222, 128, 0.3);
          }
-         
          .badge.bg-danger {
-            background-color: rgba(248, 113, 113, 0.2) !important;
-            color: var(--danger-color);
-            border: 1px solid rgba(248, 113, 113, 0.3);
-            box-shadow: 0 0 5px rgba(248, 113, 113, 0.3);
+         background-color: rgba(248, 113, 113, 0.2) !important;
+         color: var(--danger-color);
+         border: 1px solid rgba(248, 113, 113, 0.3);
+         box-shadow: 0 0 5px rgba(248, 113, 113, 0.3);
          }
-         
          /* Custom scrollbar */
          ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+         width: 8px;
+         height: 8px;
          }
-         
          ::-webkit-scrollbar-track {
-            background: rgba(26, 54, 93, 0.1);
-            border-radius: 4px;
+         background: rgba(26, 54, 93, 0.1);
+         border-radius: 4px;
          }
-         
          ::-webkit-scrollbar-thumb {
-            background: linear-gradient(to bottom, #4facfe 0%, #00f2fe 100%);
-            border-radius: 4px;
+         background: linear-gradient(to bottom, #4facfe 0%, #00f2fe 100%);
+         border-radius: 4px;
          }
-         
          ::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(to bottom, #00f2fe 0%, #4facfe 100%);
+         background: linear-gradient(to bottom, #00f2fe 0%, #4facfe 100%);
          }
-         
          /* Responsive adjustments */
          @media (max-width: 992px) {
-            .chart-container {
-               height: 250px;
-            }
-            
-            .metric-value {
-               font-size: 1.5rem;
-            }
+         .chart-container {
+         height: 250px;
          }
-         
+         .metric-value {
+         font-size: 1.5rem;
+         }
+         }
          @media (max-width: 768px) {
-            .dashboard-header {
-               padding: 15px 0;
-            }
-            
-            .stats-card {
-               margin-bottom: 15px;
-            }
-            
-            .chart-container {
-               height: 200px;
-            }
+         .dashboard-header {
+         padding: 15px 0;
+         }
+         .stats-card {
+         margin-bottom: 15px;
+         }
+         .chart-container {
+         height: 200px;
+         }
          }
       </style>
    </head>
@@ -971,7 +901,7 @@
                  });
              });
          }
-
+         
                function calculateRealizedProfitLoss(trades, symbolFilter = null) {
                 const buys = [];
                 let realizedProfit = 0;
@@ -1012,159 +942,397 @@
             
                 return realizedProfit;
             }
-
-         // Function to update statistics
-         function updateStats(trades) {
-             try {
-                 const totalTrades = trades.length;
-                 const successfulTrades = trades.filter(t => t.status === 'success').length;
-                 const failedTrades = trades.filter(t => t.status === 'failed').length;
-                 const successRate = totalTrades > 0 ? ((successfulTrades / totalTrades) * 100).toFixed(1) : 0;
-                 
-                 document.getElementById('total-trades').textContent = totalTrades;
-                 document.getElementById('successful-trades').textContent = successfulTrades;
-                 document.getElementById('failed-trades').textContent = failedTrades;
-                 document.getElementById('success-rate').textContent = `${successRate}%`;
-                 
-                 // Calculate new metrics
-                 const successfulBuyTrades = trades.filter(t => t.status === 'success' && t.action && t.action.toLowerCase() === 'buy');
-                 const successfulSellTrades = trades.filter(t => t.status === 'success' && t.action && t.action.toLowerCase() === 'sell');
-                 
-                 // Average trade size (for buys only, as they're in USDT)
-                 let avgTradeSize = 0;
-                 let minTradeSize = 0;
-                 let maxTradeSize = 0;
-                 
-                 if (successfulBuyTrades.length > 0) {
-                     const tradeSizes = successfulBuyTrades.map(trade => 
-                         parseFloat(trade.filledQuoteVolume || trade.usdtEquivalent || trade.orderSize || 0)
-                     );
-                     
-                     const totalBuySize = tradeSizes.reduce((sum, size) => sum + size, 0);
-                     avgTradeSize = (totalBuySize / successfulBuyTrades.length).toFixed(2);
-                     minTradeSize = Math.min(...tradeSizes).toFixed(2);
-                     maxTradeSize = Math.max(...tradeSizes).toFixed(2);
-                 }
-                 
-                 document.getElementById('avg-trade-size').textContent = `${avgTradeSize} USDT`;
-                 document.getElementById('min-trade').textContent = minTradeSize;
-                 document.getElementById('max-trade').textContent = maxTradeSize;
-                 
-                 // Calculate profit/loss 
          
-                  const totalProfitLoss = calculateRealizedProfitLoss(trades);
+                     /**
+             * Updates the overall statistics with separate realized and unrealized P/L
+             * @param {Array} trades - The array of trades
+             */
+            function updateStats(trades) {
+                try {
+                    const totalTrades = trades.length;
+                    const successfulTrades = trades.filter(t => t.status === 'success').length;
+                    const failedTrades = trades.filter(t => t.status === 'failed').length;
+                    const successRate = totalTrades > 0 ? ((successfulTrades / totalTrades) * 100).toFixed(1) : 0;
+                    
+                    document.getElementById('total-trades').textContent = totalTrades;
+                    document.getElementById('successful-trades').textContent = successfulTrades;
+                    document.getElementById('failed-trades').textContent = failedTrades;
+                    document.getElementById('success-rate').textContent = `${successRate}%`;
+                    
+                    // Calculate new metrics using our improved function
+                    const { tradePairs, openPositions } = findTradePositions(trades);
+                    
+                    // Calculate average trade size (for buys only, as they're in USDT)
+                    const successfulBuyTrades = trades.filter(t => t.status === 'success' && t.action && t.action.toLowerCase() === 'buy');
+                    let avgTradeSize = 0;
+                    let minTradeSize = 0;
+                    let maxTradeSize = 0;
+                    
+                    if (successfulBuyTrades.length > 0) {
+                        const tradeSizes = successfulBuyTrades.map(trade => 
+                            parseFloat(trade.filledQuoteVolume || trade.usdtEquivalent || trade.orderSize || 0)
+                        );
+                        
+                        const totalBuySize = tradeSizes.reduce((sum, size) => sum + size, 0);
+                        avgTradeSize = (totalBuySize / successfulBuyTrades.length).toFixed(2);
+                        minTradeSize = Math.min(...tradeSizes).toFixed(2);
+                        maxTradeSize = Math.max(...tradeSizes).toFixed(2);
+                    }
+                    
+                    document.getElementById('avg-trade-size').textContent = `${avgTradeSize} USDT`;
+                    document.getElementById('min-trade').textContent = minTradeSize;
+                    document.getElementById('max-trade').textContent = maxTradeSize;
+                    
+                    // Calculate profit/loss with realized and unrealized components
+                    let realizedProfitLoss = 0;
+                    let unrealizedProfitLoss = 0;
+                    
+                    // Sum up realized P/L from all positions
+                    Object.values(openPositions).forEach(position => {
+                        realizedProfitLoss += position.realizedPnL;
+                        unrealizedProfitLoss += position.unrealizedPnL;
+                    });
+                    
+                    // Total P/L is realized + unrealized
+                    const totalProfitLoss = realizedProfitLoss + unrealizedProfitLoss;
+                    
+                    // Calculate ROI percentage based on total buy volume
+                    const totalBuyVolume = trades
+                        .filter(t => t.status === 'success' && t.action === 'buy')
+                        .reduce((sum, trade) => sum + (parseFloat(trade.filledQuoteVolume || trade.usdtEquivalent || trade.orderSize || 0)), 0);
+                    
+                    const roiPercentage = totalBuyVolume > 0 ? (totalProfitLoss / totalBuyVolume * 100).toFixed(2) : 0;
+                    
+                    // Update UI elements with our new calculation
+                    const profitLossElement = document.getElementById('profit-loss');
+                    if (profitLossElement) {
+                        // Display total (realized + unrealized) profit/loss
+                        profitLossElement.textContent = `${totalProfitLoss.toFixed(2)} USDT`;
+                        profitLossElement.className = totalProfitLoss >= 0 ? 'metric-value buy-text' : 'metric-value sell-text';
+                        
+                        // Add detail about realized vs unrealized in the small text below
+                        const roiElement = document.getElementById('roi-percentage');
+                        if (roiElement) {
+                            roiElement.innerHTML = `${roiPercentage}% <span class="text-muted small">(${realizedProfitLoss.toFixed(2)} realized)</span>`;
+                        }
+                    }
+                    
+                    // Calculate win rate (profitable trades / total completed trades)
+                    const profitablePairs = tradePairs.filter(pair => pair.profit > 0);
+                    const winRate = tradePairs.length > 0 ? (profitablePairs.length / tradePairs.length * 100).toFixed(1) : 0;
+                    document.getElementById('win-rate').textContent = `${winRate}%`;
+                    
+                    // Calculate average holding time
+                    let totalHoldingTime = 0;
+                    let validPairsCount = 0;
+                    
+                    tradePairs.forEach(pair => {
+                        if (pair.buyTime && pair.sellTime) {
+                            const holdingTimeMs = new Date(pair.sellTime) - new Date(pair.buyTime);
+                            const holdingTimeHours = holdingTimeMs / (1000 * 60 * 60);
+                            totalHoldingTime += holdingTimeHours;
+                            validPairsCount++;
+                        }
+                    });
+                    
+                    const avgHoldTime = validPairsCount > 0 ? (totalHoldingTime / validPairsCount).toFixed(1) : 0;
+                    document.getElementById('avg-hold-time').textContent = `${avgHoldTime}h`;
+                    
+                    // Calculate max drawdown (simplified version)
+                    const maxDrawdown = calculateMaxDrawdown(trades);
+                    document.getElementById('max-drawdown').textContent = `${maxDrawdown.toFixed(1)}%`;
+                } catch (error) {
+                    console.error('Error updating stats:', error);
+                }
+            }
          
-                  const investedCapital = trades
-                      .filter(t => t.status === 'success' && t.action === 'buy')
-                      .reduce((sum, trade) => sum + parseFloat(trade.filledQuoteVolume || trade.usdtEquivalent || 0), 0);
-                  
-                  const roiPercentage = investedCapital > 0 ? (totalProfitLoss / investedCapital * 100).toFixed(2) : 0;
-
+               // Helper function to calculate max drawdown
+               function calculateMaxDrawdown(trades) {
+                   try {
+                       // Get position data with accurate P/L calculation
+                       const { tradePairs, openPositions } = findTradePositions(trades);
+                       
+                       // Sort trades by timestamp
+                       const sortedTrades = [...trades]
+                           .filter(t => t.status === 'success')
+                           .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+                       
+                       // Calculate cumulative P/L at each point
+                       let peak = 0;
+                       let maxDrawdown = 0;
+                       let runningPnL = 0;
+                       let runningBuyVolume = 0;
+                       let runningSellVolume = 0;
+                       let holdingValues = {}; // Track holdings by symbol
+                       
+                       // Process trades chronologically
+                       sortedTrades.forEach(trade => {
+                           const symbol = trade.symbol;
+                           const price = parseFloat(trade.price || 0);
+                           
+                           // Initialize tracking for this symbol if needed
+                           if (!holdingValues[symbol]) {
+                               holdingValues[symbol] = {
+                                   amount: 0,
+                                   costBasis: 0,
+                                   lastPrice: 0
+                               };
+                           }
+                           
+                           // Process buys and sells
+                           if (trade.action === 'buy') {
+                               const buyAmount = parseFloat(trade.filledBaseVolume || trade.orderSize || 0);
+                               const buyValue = parseFloat(trade.filledQuoteVolume || trade.usdtEquivalent || trade.orderSize || 0);
+                               
+                               runningBuyVolume += buyValue;
+                               holdingValues[symbol].amount += buyAmount;
+                               holdingValues[symbol].costBasis += buyValue;
+                               holdingValues[symbol].lastPrice = price;
+                           } else if (trade.action === 'sell') {
+                               const sellAmount = parseFloat(trade.filledBaseVolume || trade.orderSize || 0);
+                               const sellValue = parseFloat(trade.usdtEquivalent || 0);
+                               
+                               // Calculate realized P/L for this sell
+                               if (holdingValues[symbol].amount >= sellAmount) {
+                                   const portionOfHolding = sellAmount / holdingValues[symbol].amount;
+                                   const costBasisPortion = holdingValues[symbol].costBasis * portionOfHolding;
+                                   const realizedPnL = sellValue - costBasisPortion;
+                                   
+                                   runningPnL += realizedPnL;
+                                   runningSellVolume += sellValue;
+                                   
+                                   // Update holdings
+                                   holdingValues[symbol].amount -= sellAmount;
+                                   holdingValues[symbol].costBasis -= costBasisPortion;
+                                   holdingValues[symbol].lastPrice = price;
+                               }
+                           }
+                           
+                           // Calculate total portfolio value
+                           let portfolioValue = runningSellVolume; // Cash from sells
+                           
+                           // Add current value of holdings
+                           Object.keys(holdingValues).forEach(sym => {
+                               const holding = holdingValues[sym];
+                               if (holding.amount > 0 && holding.lastPrice > 0) {
+                                   portfolioValue += holding.amount * holding.lastPrice;
+                               }
+                           });
+                           
+                           // Total P/L
+                           const currentPnL = portfolioValue - runningBuyVolume;
+                           
+                           // Update peak and drawdown
+                           if (currentPnL > peak) {
+                               peak = currentPnL;
+                           }
+                           
+                           if (peak > 0) {
+                               const drawdown = ((peak - currentPnL) / peak) * 100;
+                               if (drawdown > maxDrawdown) {
+                                   maxDrawdown = drawdown;
+                               }
+                           }
+                       });
+                       
+                       return maxDrawdown;
+                   } catch (error) {
+                       console.error('Error calculating max drawdown:', error);
+                       return 0;
+                   }
+               }
          
-                 // Update UI elements
-                 const profitLossElement = document.getElementById('profit-loss');
-                 if (profitLossElement) {
-                     profitLossElement.textContent = `${totalProfitLoss.toFixed(2)} USDT`;
-                     profitLossElement.className = totalProfitLoss >= 0 ? 'metric-value buy-text' : 'metric-value sell-text';
-                 }
-                 
-                 document.getElementById('roi-percentage').textContent = `${roiPercentage}%`;
-                 
-                 // Calculate win rate (profitable trades / total completed trades)
-                 const tradePairs = findTradePairs(trades);
-                 const profitablePairs = tradePairs.filter(pair => pair.profit > 0);
-                 const winRate = tradePairs.length > 0 ? (profitablePairs.length / tradePairs.length * 100).toFixed(1) : 0;
-                 document.getElementById('win-rate').textContent = `${winRate}%`;
-                 
-                 // Calculate average holding time
-                 let totalHoldingTime = 0;
-                 let validPairsCount = 0;
-                 
-                 tradePairs.forEach(pair => {
-                     if (pair.buyTime && pair.sellTime) {
-                         const holdingTimeMs = new Date(pair.sellTime) - new Date(pair.buyTime);
-                         const holdingTimeHours = holdingTimeMs / (1000 * 60 * 60);
-                         totalHoldingTime += holdingTimeHours;
-                         validPairsCount++;
-                     }
-                 });
-                 
-                 const avgHoldTime = validPairsCount > 0 ? (totalHoldingTime / validPairsCount).toFixed(1) : 0;
-                 document.getElementById('avg-hold-time').textContent = `${avgHoldTime}h`;
-                 
-                 // Calculate max drawdown (simplified version)
-                 const maxDrawdown = calculateMaxDrawdown(trades);
-                 document.getElementById('max-drawdown').textContent = `${maxDrawdown.toFixed(1)}%`;
-             } catch (error) {
-                 console.error('Error updating stats:', error);
-             }
-         }
+                     /**
+             * Find trade pairs and open positions
+             * @param {Array} trades - The array of trades
+             * @returns {Object} - Contains tradePairs (closed positions) and openPositions
+             */
+            function findTradePositions(trades) {
+                const tradePairs = []; // For completed buy-sell pairs (closed positions)
+                const openPositions = {}; // For tracking open positions by symbol
+                const assetBuys = {};
+                
+                // Sort trades by timestamp (oldest first)
+                const sortedTrades = [...trades].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+                
+                // Process all trades chronologically
+                sortedTrades.forEach(trade => {
+                    if (trade.status !== 'success' || !trade.symbol) return;
+                    
+                    const symbol = trade.symbol;
+                    
+                    // Initialize trackers for this symbol if needed
+                    if (!assetBuys[symbol]) {
+                        assetBuys[symbol] = [];
+                    }
+                    
+                    if (!openPositions[symbol]) {
+                        openPositions[symbol] = {
+                            symbol: symbol,
+                            totalBuyAmount: 0, // Total asset amount bought
+                            totalBuyValue: 0,  // Total USDT spent
+                            totalSellAmount: 0, // Total asset amount sold
+                            totalSellValue: 0,  // Total USDT received
+                            avgBuyPrice: 0,     // Average buy price
+                            remainingAmount: 0,  // Remaining asset amount (open position)
+                            costBasis: 0,        // Cost basis of remaining position
+                            unrealizedPnL: 0,    // Unrealized P/L for open position
+                            realizedPnL: 0,      // Realized P/L from closed positions
+                            lastPrice: 0,        // Last known price
+                            trades: []           // List of trades for this asset
+                        };
+                    }
+                    
+                    const position = openPositions[symbol];
+                    position.trades.push(trade);
+                    
+                    // Process buy orders
+                    if (trade.action === 'buy') {
+                        const buyAmount = parseFloat(trade.filledBaseVolume || trade.orderSize || 0);
+                        const buyPrice = parseFloat(trade.price || 0);
+                        const buyValue = parseFloat(trade.filledQuoteVolume || trade.usdtEquivalent || trade.orderSize || 0);
+                        
+                        // Track this buy for potential future pairing
+                        assetBuys[symbol].push({
+                            amount: buyAmount,
+                            price: buyPrice,
+                            value: buyValue,
+                            timestamp: trade.timestamp
+                        });
+                        
+                        // Update the open position
+                        position.totalBuyAmount += buyAmount;
+                        position.totalBuyValue += buyValue;
+                        position.remainingAmount += buyAmount;
+                        position.costBasis += buyValue;
+                        position.lastPrice = buyPrice; // Update last known price
+                        
+                        // Recalculate average buy price
+                        if (position.totalBuyAmount > 0) {
+                            position.avgBuyPrice = position.totalBuyValue / position.totalBuyAmount;
+                        }
+                    } 
+                    // Process sell orders
+                    else if (trade.action === 'sell') {
+                        const sellAmount = parseFloat(trade.filledBaseVolume || trade.orderSize || 0);
+                        const sellPrice = parseFloat(trade.price || 0);
+                        const sellValue = parseFloat(trade.usdtEquivalent || 0);
+                        
+                        position.totalSellAmount += sellAmount;
+                        position.totalSellValue += sellValue;
+                        position.lastPrice = sellPrice; // Update last known price
+                        
+                        // If we have buy orders to pair with
+                        if (assetBuys[symbol] && assetBuys[symbol].length > 0) {
+                            let remainingSellAmount = sellAmount;
+                            
+                            // Match sell with buys until fully matched (FIFO approach)
+                            while (remainingSellAmount > 0 && assetBuys[symbol].length > 0) {
+                                const buy = assetBuys[symbol][0]; // Get the oldest buy
+                                
+                                if (buy.amount <= remainingSellAmount) {
+                                    // This buy is fully consumed
+                                    remainingSellAmount -= buy.amount;
+                                    const matchedSellValue = (buy.amount / sellAmount) * sellValue;
+                                    const profit = matchedSellValue - buy.value;
+                                    const profitPercentage = (profit / buy.value * 100);
+                                    
+                                    // Record the completed pair
+                                    tradePairs.push({
+                                        symbol,
+                                        buyAmount: buy.amount,
+                                        buyPrice: buy.price,
+                                        buyValue: buy.value,
+                                        buyTime: buy.timestamp,
+                                        sellAmount: buy.amount, // Only the matched portion
+                                        sellPrice: sellPrice,
+                                        sellValue: matchedSellValue,
+                                        sellTime: trade.timestamp,
+                                        profit: profit,
+                                        profitPercentage: profitPercentage
+                                    });
+                                    
+                                    // Add profit to realized P/L
+                                    position.realizedPnL += profit;
+                                    
+                                    // Remove this buy as it's fully matched
+                                    assetBuys[symbol].shift();
+                                } else {
+                                    // This buy is partially consumed
+                                    const partialBuyAmount = remainingSellAmount;
+                                    const partialBuyValue = (partialBuyAmount / buy.amount) * buy.value;
+                                    const matchedSellValue = (partialBuyAmount / sellAmount) * sellValue;
+                                    const profit = matchedSellValue - partialBuyValue;
+                                    const profitPercentage = (profit / partialBuyValue * 100);
+                                    
+                                    // Record the completed pair
+                                    tradePairs.push({
+                                        symbol,
+                                        buyAmount: partialBuyAmount,
+                                        buyPrice: buy.price,
+                                        buyValue: partialBuyValue,
+                                        buyTime: buy.timestamp,
+                                        sellAmount: partialBuyAmount,
+                                        sellPrice: sellPrice,
+                                        sellValue: matchedSellValue,
+                                        sellTime: trade.timestamp,
+                                        profit: profit,
+                                        profitPercentage: profitPercentage
+                                    });
+                                    
+                                    // Add profit to realized P/L
+                                    position.realizedPnL += profit;
+                                    
+                                    // Update the buy with reduced amount
+                                    buy.amount -= partialBuyAmount;
+                                    buy.value -= partialBuyValue;
+                                    
+                                    remainingSellAmount = 0;
+                                }
+                            }
+                            
+                            // Update the remaining amount and cost basis
+                            position.remainingAmount = position.totalBuyAmount - position.totalSellAmount;
+                            
+                            // Recalculate cost basis based on remaining buys
+                            if (position.remainingAmount > 0) {
+                                position.costBasis = assetBuys[symbol].reduce((sum, buy) => sum + buy.value, 0);
+                                
+                                // Calculate unrealized P/L based on last known price
+                                const currentValue = position.remainingAmount * position.lastPrice;
+                                position.unrealizedPnL = currentValue - position.costBasis;
+                            } else {
+                                position.costBasis = 0;
+                                position.unrealizedPnL = 0;
+                            }
+                        }
+                    }
+                });
+                
+                // Calculate final values for each position
+                Object.values(openPositions).forEach(position => {
+                    // Total P/L is realized + unrealized
+                    position.totalPnL = position.realizedPnL + position.unrealizedPnL;
+                    
+                    // Calculate ROI
+                    if (position.totalBuyValue > 0) {
+                        position.roi = (position.totalPnL / position.totalBuyValue) * 100;
+                    }
+                });
+                
+                return { tradePairs, openPositions };
+            }
          
-         // Helper function to find buy-sell trade pairs
-         function findTradePairs(trades) {
-             const tradePairs = [];
-             const assetBuys = {};
-             
-             // Sort trades by timestamp
-             const sortedTrades = [...trades].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-             
-             sortedTrades.forEach(trade => {
-                 if (trade.status !== 'success' || !trade.symbol) return;
-                 
-                 const symbol = trade.symbol;
-                 
-                 if (trade.action === 'buy') {
-                     if (!assetBuys[symbol]) {
-                         assetBuys[symbol] = [];
-                     }
-                     assetBuys[symbol].push({
-                         amount: parseFloat(trade.filledBaseVolume || trade.orderSize || 0),
-                         price: parseFloat(trade.price || 0),
-                         value: parseFloat(trade.filledQuoteVolume || trade.usdtEquivalent || trade.orderSize || 0),
-                         timestamp: trade.timestamp
-                     });
-                 } else if (trade.action === 'sell') {
-                     if (assetBuys[symbol] && assetBuys[symbol].length > 0) {
-                         const buy = assetBuys[symbol].shift(); // FIFO approach
-                         const sellAmount = parseFloat(trade.filledBaseVolume || trade.orderSize || 0);
-                         const sellPrice = parseFloat(trade.price || 0);
-                         const sellValue = parseFloat(trade.usdtEquivalent || 0);
-                         
-                         if (buy.amount > 0 && sellAmount > 0) {
-                             const profit = sellValue - buy.value;
-                             const profitPercentage = (profit / buy.value * 100);
-                             
-                             tradePairs.push({
-                                 symbol,
-                                 buyAmount: buy.amount,
-                                 buyPrice: buy.price,
-                                 buyValue: buy.value,
-                                 buyTime: buy.timestamp,
-                                 sellAmount: sellAmount,
-                                 sellPrice: sellPrice,
-                                 sellValue: sellValue,
-                                 sellTime: trade.timestamp,
-                                 profit: profit,
-                                 profitPercentage: profitPercentage
-                             });
-                         }
-                     }
-                 }
-             });
-             
-             return tradePairs;
-         }
-         
-         // Function to update charts
-         function updateCharts(trades) {
-             try {
-                 updateActionChart(trades);
-                 updatePortfolioChart(trades);
-                 updateVolumeComparisonChart(trades);
-             } catch (error) {
-                 console.error('Error updating charts:', error);
-             }
-         }
+            // Function to update charts
+            function updateCharts(trades) {
+                try {
+                    updateActionChart(trades);
+                    updatePortfolioChart(trades); // This now uses our improved function
+                    updateVolumeComparisonChart(trades);
+                } catch (error) {
+                    console.error('Error updating charts:', error);
+                }
+            }
          
          // Function to update buy/sell ratio chart
          function updateActionChart(trades) {
@@ -1227,130 +1395,201 @@
              }
          }
          
-         // Function to update portfolio performance chart
-         function updatePortfolioChart(trades) {
-             try {
-                 // Sort trades by timestamp
-                 const sortedTrades = [...trades]
-                     .filter(t => t.status === 'success')
-                     .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-                 
-                 // Group by day and calculate cumulative P/L
-                 const dailyData = {};
-                 let cumulativePnL = 0;
-                 
-                 sortedTrades.forEach(trade => {
-                     const date = new Date(trade.timestamp).toLocaleDateString();
-                     
-                     if (!dailyData[date]) {
-                         dailyData[date] = {
-                             date: date,
-                             rawDate: new Date(trade.timestamp),
-                             pnl: 0
-                         };
-                     }
-                     
-                     if (trade.action === 'buy') {
-                         cumulativePnL -= parseFloat(trade.filledQuoteVolume || trade.usdtEquivalent || trade.orderSize || 0);
-                     } else if (trade.action === 'sell') {
-                         cumulativePnL += parseFloat(trade.usdtEquivalent || 0);
-                     }
-                     
-                     dailyData[date].pnl = cumulativePnL;
-                 });
-                 
-                 // Convert to array and sort by date
-                 const chartData = Object.values(dailyData).sort((a, b) => a.rawDate - b.rawDate);
-                 
-                 const ctx = document.getElementById('portfolioChart').getContext('2d');
-                 
-                 // Safely destroy previous chart if it exists
-                 if (window.portfolioChart && typeof window.portfolioChart.destroy === 'function') {
-                     window.portfolioChart.destroy();
-                 } else if (window.portfolioChart) {
-                     window.portfolioChart = null;
-                 }
-                 
-                  const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-                  // Change these color values
-                  gradient.addColorStop(0, 'rgba(0, 242, 195, 0.4)'); // Teal with opacity
-                  gradient.addColorStop(1, 'rgba(0, 242, 195, 0.0)'); // Transparent teal
-                 
-                 window.portfolioChart = new Chart(ctx, {
-                     type: 'line',
-                     data: {
-                         labels: chartData.map(d => d.date),
-                         datasets: [{
-                            label: 'Portfolio P/L (USDT)',
-                            data: chartData.map(d => d.pnl),
-                            borderColor: 'rgba(0, 242, 195, 1)', // Neon teal line
-                            backgroundColor: gradient,
-                            borderWidth: 2,
-                            fill: true,
-                            tension: 0.4,
-                            pointRadius: 4, // CHANGE THIS LINE
-                            pointBackgroundColor: 'rgba(0, 242, 195, 1)',
-                            pointBorderColor: 'rgba(255, 255, 255, 1)',
-                            pointBorderWidth: 2
-                         }]
-                     },
-                     options: {
-                         responsive: true,
-                         maintainAspectRatio: false,
-                         scales: {
-                             x: {
-                                 grid: {
-                                     display: false
-                                 },
-                                 ticks: {
-                                    color: 'rgba(255, 255, 255, 0.8)' // ADD THIS LINE
+                     /**
+             * Updates the portfolio performance chart with accurate P/L calculation
+             * @param {Array} trades - The array of trades
+             */
+            function updatePortfolioChart(trades) {
+                try {
+                    // Get detailed position data
+                    const { tradePairs, openPositions } = findTradePositions(trades);
+                    
+                    // Sort trades by timestamp
+                    const sortedTrades = [...trades]
+                        .filter(t => t.status === 'success')
+                        .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+                    
+                    // Prepare data for portfolio performance chart
+                    const chartData = [];
+                    let runningBuyVolume = 0;
+                    let runningSellVolume = 0;
+                    let holdingValues = {}; // Track holding amounts and values by symbol
+                    
+                    sortedTrades.forEach(trade => {
+                        const date = new Date(trade.timestamp);
+                        const symbol = trade.symbol;
+                        const price = parseFloat(trade.price || 0);
+                        
+                        // Initialize tracking for this symbol if needed
+                        if (!holdingValues[symbol]) {
+                            holdingValues[symbol] = {
+                                amount: 0,
+                                costBasis: 0,
+                                lastPrice: 0
+                            };
+                        }
+                        
+                        // Process buy orders
+                        if (trade.action === 'buy') {
+                            const buyAmount = parseFloat(trade.filledBaseVolume || trade.orderSize || 0);
+                            const buyValue = parseFloat(trade.filledQuoteVolume || trade.usdtEquivalent || trade.orderSize || 0);
+                            
+                            runningBuyVolume += buyValue;
+                            holdingValues[symbol].amount += buyAmount;
+                            holdingValues[symbol].costBasis += buyValue;
+                            holdingValues[symbol].lastPrice = price;
+                        } 
+                        // Process sell orders
+                        else if (trade.action === 'sell') {
+                            const sellAmount = parseFloat(trade.filledBaseVolume || trade.orderSize || 0);
+                            const sellValue = parseFloat(trade.usdtEquivalent || 0);
+                            
+                            // Update tracking for this symbol
+                            if (holdingValues[symbol].amount >= sellAmount) {
+                                // Calculate cost basis for this portion being sold
+                                const portionOfHolding = sellAmount / holdingValues[symbol].amount;
+                                const costBasisPortion = holdingValues[symbol].costBasis * portionOfHolding;
+                                
+                                // Update remaining holdings
+                                holdingValues[symbol].amount -= sellAmount;
+                                holdingValues[symbol].costBasis -= costBasisPortion;
+                                holdingValues[symbol].lastPrice = price;
+                                
+                                runningSellVolume += sellValue;
+                            } else {
+                                console.warn(`Warning: Selling more ${symbol} than available in records`);
+                            }
+                        }
+                        
+                        // Calculate portfolio value at this point
+                        let portfolioValue = runningSellVolume; // Start with all realized cash
+                        
+                        // Add current value of all holdings
+                        Object.keys(holdingValues).forEach(sym => {
+                            const holding = holdingValues[sym];
+                            if (holding.amount > 0 && holding.lastPrice > 0) {
+                                portfolioValue += holding.amount * holding.lastPrice;
+                            }
+                        });
+                        
+                        // P/L is current portfolio value minus investment
+                        const pnl = portfolioValue - runningBuyVolume;
+                        
+                        // Group by day for chart readability
+                        const dateString = date.toLocaleDateString();
+                        
+                        // Store in chart data
+                        chartData.push({
+                            date: dateString,
+                            rawDate: date,
+                            pnl: pnl
+                        });
+                    });
+                    
+                    // Make sure we have unique dates (take the last value for each day)
+                    const uniqueDates = {};
+                    chartData.forEach(point => {
+                        uniqueDates[point.date] = point;
+                    });
+                    
+                    // Convert to array and sort by date
+                    const finalChartData = Object.values(uniqueDates).sort((a, b) => a.rawDate - b.rawDate);
+                    
+                    const ctx = document.getElementById('portfolioChart').getContext('2d');
+                    
+                    // Safely destroy previous chart if it exists
+                    if (window.portfolioChart && typeof window.portfolioChart.destroy === 'function') {
+                        window.portfolioChart.destroy();
+                    } else if (window.portfolioChart) {
+                        window.portfolioChart = null;
+                    }
+                    
+                    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+                    // Teal with opacity
+                    gradient.addColorStop(0, 'rgba(0, 242, 195, 0.4)');
+                    // Transparent teal
+                    gradient.addColorStop(1, 'rgba(0, 242, 195, 0.0)');
+                    
+                    window.portfolioChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: finalChartData.map(d => d.date),
+                            datasets: [{
+                                label: 'Portfolio P/L (USDT)',
+                                data: finalChartData.map(d => d.pnl),
+                                borderColor: 'rgba(0, 242, 195, 1)', // Neon teal line
+                                backgroundColor: gradient,
+                                borderWidth: 2,
+                                fill: true,
+                                tension: 0.4,
+                                pointRadius: 4,
+                                pointBackgroundColor: 'rgba(0, 242, 195, 1)',
+                                pointBorderColor: 'rgba(255, 255, 255, 1)',
+                                pointBorderWidth: 2
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                x: {
+                                    grid: {
+                                        display: false
+                                    },
+                                    ticks: {
+                                        color: 'rgba(255, 255, 255, 0.8)'
+                                    }
+                                },
+                                y: {
+                                    grid: {
+                                        color: 'rgba(0, 0, 0, 0.05)'
+                                    },
+                                    ticks: {
+                                        color: 'rgba(255, 255, 255, 0.8)',
+                                        callback: function(value) {
+                                            return value.toFixed(2) + ' USDT';
+                                        }
+                                    }
                                 }
-                             },
-                             y: {
-                                 grid: {
-                                     color: 'rgba(0, 0, 0, 0.05)'
-                                 },
-                                 ticks: {
-                                    color: 'rgba(255, 255, 255, 0.8)', 
-                                    callback: function(value) {
-                                         return value.toFixed(2) + ' USDT';
-                                     }
-                                 }
-                             }
-                         },
-                         plugins: {
-                             tooltip: {
-                                 callbacks: {
-                                     label: function(context) {
-                                         return `P/L: ${context.parsed.y.toFixed(2)} USDT`;
-                                     }
-                                 }
-                             }
-                         }
-                     }
-                 });
-                 
-                 // Add event listeners for time period selectors
-                 document.querySelectorAll('.time-period-selector button').forEach(button => {
-                     button.addEventListener('click', function() {
-                         // Remove active class from all buttons
-                         document.querySelectorAll('.time-period-selector button').forEach(btn => {
-                             btn.classList.remove('active');
-                         });
-                         
-                         // Add active class to clicked button
-                         this.classList.add('active');
-                         
-                         // Filter data based on selected period
-                         const period = this.getAttribute('data-period');
-                         updateChartByTimePeriod(period, chartData);
-                     });
-                 });
-                 
-             } catch (error) {
-                 console.error('Error updating portfolio chart:', error);
-             }
-         }
+                            },
+                            plugins: {
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return `P/L: ${context.parsed.y.toFixed(2)} USDT`;
+                                        }
+                                    }
+                                },
+                                legend: {
+                                    labels: {
+                                        color: 'rgba(255, 255, 255, 0.8)'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    
+                    // Add event listeners for time period selectors
+                    document.querySelectorAll('.time-period-selector button').forEach(button => {
+                        button.addEventListener('click', function() {
+                            // Remove active class from all buttons
+                            document.querySelectorAll('.time-period-selector button').forEach(btn => {
+                                btn.classList.remove('active');
+                            });
+                            
+                            // Add active class to clicked button
+                            this.classList.add('active');
+                            
+                            // Filter data based on selected period
+                            const period = this.getAttribute('data-period');
+                            updateChartByTimePeriod(period, finalChartData);
+                        });
+                    });
+                    
+                } catch (error) {
+                    console.error('Error updating portfolio chart:', error);
+                }
+            }
          
          // Function to update chart based on selected time period
          function updateChartByTimePeriod(period, fullData) {
@@ -1491,291 +1730,243 @@
              }
          }
          
-         // Function to update the asset performance table
-         function updateAssetPerformance(trades) {
-             try {
-                 // Group trades by symbol
-                 const assetPerformance = {};
-                 
-                 trades.forEach(trade => {
-                     if (!trade.symbol || trade.status !== 'success') return;
-                     
-                     const symbol = trade.symbol;
-                     
-                     if (!assetPerformance[symbol]) {
-                         assetPerformance[symbol] = {
-                             symbol: symbol,
-                             totalTrades: 0,
-                             buyCount: 0,
-                             sellCount: 0,
-                             buyVolume: 0,
-                             sellVolume: 0,
-                             buyValueTotal: 0,
-                             sellValueTotal: 0,
-                             profitLoss: 0,
-                             profitLossPercentage: 0,
-                             status: 'neutral' // 'positive', 'negative', or 'neutral'
-                         };
-                     }
-                     
-                     assetPerformance[symbol].totalTrades++;
-                     
-                     if (trade.action === 'buy') {
-                         assetPerformance[symbol].buyCount++;
-                         const buyValue = parseFloat(trade.filledQuoteVolume || trade.usdtEquivalent || trade.orderSize || 0);
-                         assetPerformance[symbol].buyVolume += buyValue;
-                         assetPerformance[symbol].buyValueTotal += buyValue;
-                     } else if (trade.action === 'sell') {
-                         assetPerformance[symbol].sellCount++;
-                         const sellValue = parseFloat(trade.usdtEquivalent || 0);
-                         assetPerformance[symbol].sellVolume += sellValue;
-                         assetPerformance[symbol].sellValueTotal += sellValue;
-                     }
-                 });
-                 
-                 // Calculate P/L and additional metrics
-                 Object.values(assetPerformance).forEach(asset => {
-                     asset.profitLoss = asset.sellValueTotal - asset.buyValueTotal;
-                     
-                     if (asset.buyValueTotal > 0) {
-                         asset.profitLossPercentage = (asset.profitLoss / asset.buyValueTotal * 100);
-                     }
-                     
-                     asset.avgBuyPrice = asset.buyCount > 0 ? (asset.buyValueTotal / asset.buyCount) : 0;
-                     asset.avgSellPrice = asset.sellCount > 0 ? (asset.sellValueTotal / asset.sellCount) : 0;
-                     
-                     // Determine status
-                     if (asset.profitLoss > 0) {
-                         asset.status = 'positive';
-                     } else if (asset.profitLoss < 0) {
-                         asset.status = 'negative';
-                     }
-                 });
-                 
-                 // Update the asset performance table
-                 const tableBody = document.getElementById('asset-performance-table').querySelector('tbody');
-                 tableBody.innerHTML = '';
-                 
-                 // Sort assets by P/L (highest to lowest)
-                 const sortedAssets = Object.values(assetPerformance).sort((a, b) => b.profitLoss - a.profitLoss);
-                 
-                 sortedAssets.forEach(asset => {
-                     const row = document.createElement('tr');
-                     row.classList.add('asset-row');
-                     row.setAttribute('data-symbol', asset.symbol);
-                     
-                     // Format numbers
-                     const buyVolume = asset.buyVolume.toFixed(2);
-                     const sellVolume = asset.sellVolume.toFixed(2);
-                     const avgBuyPrice = asset.avgBuyPrice.toFixed(2);
-                     const avgSellPrice = asset.avgSellPrice.toFixed(2);
-                     const profitLoss = asset.profitLoss.toFixed(2);
-                     const profitLossPercentage = asset.profitLossPercentage.toFixed(2);
-                     
-                     // Determine P/L classes
-                     const plClass = asset.profitLoss >= 0 ? 'buy-text' : 'sell-text';
-                     const baseCurrency = asset.symbol.replace('USDT', '');
-                     
-                     row.innerHTML = `
-                         <td>
-                             <span class="d-flex align-items-center">
-                                 <img src="${getCryptoIconUrl(baseCurrency)}" alt="${baseCurrency}" 
-                                     class="crypto-icon" 
-                                     onerror="this.onerror=null; this.src=''; this.parentNode.innerHTML = this.parentNode.innerHTML.replace(this.outerHTML, '<span class=\'generic-crypto-icon me-2\'>${baseCurrency.charAt(0)}</span>')">
-                                 <span class="clickable-asset" data-symbol="${asset.symbol}">${asset.symbol}</span>
-                             </span>
-                         </td>
-                         <td>${asset.totalTrades}</td>
-                         <td>${buyVolume} USDT</td>
-                         <td>${sellVolume} USDT</td>
-                         <td>${avgBuyPrice} USDT</td>
-                         <td>${avgSellPrice} USDT</td>
-                         <td class="${plClass}">${profitLoss} USDT</td>
-                         <td class="${plClass}">${profitLossPercentage}%</td>
-                         <td>
-                             <span class="performance-indicator indicator-${asset.status}"></span>
-                             ${asset.status.charAt(0).toUpperCase() + asset.status.slice(1)}
-                         </td>
-                     `;
-                     
-                     tableBody.appendChild(row);
-                     
-                     // Add click event to show asset details
-                     row.addEventListener('click', function() {
-                         const symbol = this.getAttribute('data-symbol');
-                         showAssetDetails(symbol, trades);
-                     });
-                 });
-                 
-                 // Add search functionality
-                 document.getElementById('asset-search').addEventListener('input', function() {
-                     const searchTerm = this.value.toLowerCase();
-                     const rows = document.querySelectorAll('#asset-performance-table tbody tr');
-                     
-                     rows.forEach(row => {
-                         const symbol = row.getAttribute('data-symbol').toLowerCase();
-                         if (symbol.includes(searchTerm)) {
-                             row.style.display = '';
-                         } else {
-                             row.style.display = 'none';
-                         }
-                     });
-                 });
-                 
-             } catch (error) {
-                 console.error('Error updating asset performance:', error);
-             }
-         }
+                     /**
+             * Updates the asset performance table with separate realized and unrealized P/L
+             * @param {Array} trades - The array of trades
+             */
+            function updateAssetPerformance(trades) {
+                try {
+                    // Use our new function to get detailed position information
+                    const { tradePairs, openPositions } = findTradePositions(trades);
+                    
+                    // Update the asset performance table
+                    const tableBody = document.getElementById('asset-performance-table').querySelector('tbody');
+                    tableBody.innerHTML = '';
+                    
+                    // Sort assets by Total P/L (highest to lowest)
+                    const sortedAssets = Object.values(openPositions).sort((a, b) => b.totalPnL - a.totalPnL);
+                    
+                    sortedAssets.forEach(asset => {
+                        const row = document.createElement('tr');
+                        row.classList.add('asset-row');
+                        row.setAttribute('data-symbol', asset.symbol);
+                        
+                        // Format numbers
+                        const buyVolume = asset.totalBuyValue.toFixed(2);
+                        const sellVolume = asset.totalSellValue.toFixed(2);
+                        const avgBuyPrice = asset.avgBuyPrice.toFixed(2);
+                        const avgSellPrice = asset.totalSellAmount > 0 ? (asset.totalSellValue / asset.totalSellAmount).toFixed(2) : '0.00';
+                        const realizedPL = asset.realizedPnL.toFixed(2);
+                        const unrealizedPL = asset.unrealizedPnL.toFixed(2);
+                        const totalPL = asset.totalPnL.toFixed(2);
+                        const plPercentage = asset.roi ? asset.roi.toFixed(2) : '0.00';
+                        
+                        // Determine P/L classes
+                        const plClass = asset.totalPnL >= 0 ? 'buy-text' : 'sell-text';
+                        const baseCurrency = asset.symbol.replace('USDT', '');
+                        
+                        // Create a "Status" text that shows whether the position is open or closed
+                        let statusText = 'Neutral';
+                        let statusClass = 'indicator-neutral';
+                        
+                        if (asset.remainingAmount > 0) {
+                            statusText = 'Open';
+                            statusClass = asset.unrealizedPnL >= 0 ? 'indicator-positive' : 'indicator-negative';
+                        } else if (asset.realizedPnL > 0) {
+                            statusText = 'Closed (Profit)';
+                            statusClass = 'indicator-positive';
+                        } else if (asset.realizedPnL < 0) {
+                            statusText = 'Closed (Loss)';
+                            statusClass = 'indicator-negative';
+                        }
+                        
+                        row.innerHTML = `
+                            <td>
+                                <span class="d-flex align-items-center">
+                                    <img src="${getCryptoIconUrl(baseCurrency)}" alt="${baseCurrency}" 
+                                        class="crypto-icon" 
+                                        onerror="this.onerror=null; this.src=''; this.parentNode.innerHTML = this.parentNode.innerHTML.replace(this.outerHTML, '<span class=\'generic-crypto-icon me-2\'>${baseCurrency.charAt(0)}</span>')">
+                                    <span class="clickable-asset" data-symbol="${asset.symbol}">${asset.symbol}</span>
+                                </span>
+                            </td>
+                            <td>${asset.trades.length}</td>
+                            <td>${buyVolume} USDT</td>
+                            <td>${sellVolume} USDT</td>
+                            <td>${avgBuyPrice} USDT</td>
+                            <td>${avgSellPrice} USDT</td>
+                            <td class="${plClass}">
+                                ${totalPL} USDT
+                                ${asset.unrealizedPnL !== 0 ? `<br><small>(${realizedPL} realized)</small>` : ''}
+                            </td>
+                            <td class="${plClass}">${plPercentage}%</td>
+                            <td>
+                                <span class="performance-indicator ${statusClass}"></span>
+                                ${statusText}
+                            </td>
+                        `;
+                        
+                        tableBody.appendChild(row);
+                        
+                        // Add click event to show asset details
+                        row.addEventListener('click', function() {
+                            const symbol = this.getAttribute('data-symbol');
+                            showAssetDetails(symbol, trades);
+                        });
+                    });
+                    
+                    // Add search functionality
+                    document.getElementById('asset-search').addEventListener('input', function() {
+                        const searchTerm = this.value.toLowerCase();
+                        const rows = document.querySelectorAll('#asset-performance-table tbody tr');
+                        
+                        rows.forEach(row => {
+                            const symbol = row.getAttribute('data-symbol').toLowerCase();
+                            if (symbol.includes(searchTerm)) {
+                                row.style.display = '';
+                            } else {
+                                row.style.display = 'none';
+                            }
+                        });
+                    });
+                    
+                } catch (error) {
+                    console.error('Error updating asset performance:', error);
+                }
+            }
          
-         // Function to update top assets display
-         function updateTopAssets(trades) {
-             try {
-                 // Group trades by symbol
-                 const assetStats = {};
-                 
-                 trades.filter(t => t.status === 'success').forEach(trade => {
-                     if (!trade.symbol) return;
-                     
-                     const symbol = trade.symbol;
-                     
-                     if (!assetStats[symbol]) {
-                         assetStats[symbol] = {
-                             symbol: symbol,
-                             volume: 0,
-                             buyVolume: 0,
-                             sellVolume: 0,
-                             profitLoss: 0
-                         };
-                     }
-                     
-                     if (trade.action === 'buy') {
-                         const buyValue = parseFloat(trade.filledQuoteVolume || trade.usdtEquivalent || trade.orderSize || 0);
-                         assetStats[symbol].volume += buyValue;
-                         assetStats[symbol].buyVolume += buyValue;
-                     } else if (trade.action === 'sell') {
-                         const sellValue = parseFloat(trade.usdtEquivalent || 0);
-                         assetStats[symbol].volume += sellValue;
-                         assetStats[symbol].sellVolume += sellValue;
-                     }
-                 });
-                 
-                 // Calculate P/L
-                 Object.values(assetStats).forEach(asset => {
-                     asset.profitLoss = asset.sellVolume - asset.buyVolume;
-                 });
-                 
-                 // Sort by volume (highest to lowest) and get top 5
-                 const topAssets = Object.values(assetStats)
-                     .sort((a, b) => b.volume - a.volume)
-                     .slice(0, 5);
-                 
-                 // Update the table
-                 const tableBody = document.getElementById('top-assets-table').querySelector('tbody');
-                 tableBody.innerHTML = '';
-                 
-                 topAssets.forEach(asset => {
-                     const row = document.createElement('tr');
-                     row.classList.add('asset-row');
-                     
-                     // Determine P/L class
-                     const plClass = asset.profitLoss >= 0 ? 'buy-text' : 'sell-text';
-                     
-                    const baseCurrency = asset.symbol.replace('USDT', '');
-                     
-                     row.innerHTML = `
-                         <td>
-                             <span class="d-flex align-items-center">
-                                 <img src="${getCryptoIconUrl(baseCurrency)}" alt="${baseCurrency}" 
-                                     class="crypto-icon" 
-                                     onerror="this.onerror=null; this.src=''; this.parentNode.innerHTML = this.parentNode.innerHTML.replace(this.outerHTML, '<span class=\'generic-crypto-icon me-2\'>${baseCurrency.charAt(0)}</span>')">
-                                 <span class="clickable-asset" data-symbol="${asset.symbol}">${asset.symbol}</span>
-                             </span>
-                         </td>
-                         <td>${asset.volume.toFixed(2)} USDT</td>
-                         <td class="${plClass}">${asset.profitLoss.toFixed(2)} USDT</td>
-                     `;
-                     
-                     tableBody.appendChild(row);
-                 });
-                 
-                 // Add click event for clickable assets
-                 document.querySelectorAll('#top-assets-table .clickable-asset').forEach(element => {
-                     element.addEventListener('click', function() {
-                         const symbol = this.getAttribute('data-symbol');
-                         showAssetDetails(symbol, trades);
-                     });
-                 });
-                 
-             } catch (error) {
-                 console.error('Error updating top assets:', error);
-             }
-         }
+                     /**
+             * Updates the top assets display with separate realized and unrealized P/L
+             * @param {Array} trades - The array of trades
+             */
+            function updateTopAssets(trades) {
+                try {
+                    // Use our new function to get detailed position information
+                    const { tradePairs, openPositions } = findTradePositions(trades);
+                    
+                    // Sort by volume (highest to lowest) and get top 5
+                    const topAssets = Object.values(openPositions)
+                        .sort((a, b) => (b.totalBuyValue + b.totalSellValue) - (a.totalBuyValue + a.totalSellValue))
+                        .slice(0, 5);
+                    
+                    // Update the table
+                    const tableBody = document.getElementById('top-assets-table').querySelector('tbody');
+                    tableBody.innerHTML = '';
+                    
+                    topAssets.forEach(asset => {
+                        const row = document.createElement('tr');
+                        row.classList.add('asset-row');
+                        
+                        // Calculate total volume
+                        const totalVolume = (asset.totalBuyValue + asset.totalSellValue).toFixed(2);
+                        
+                        // Format P/L
+                        const realizedPL = asset.realizedPnL.toFixed(2);
+                        const unrealizedPL = asset.unrealizedPnL.toFixed(2);
+                        const totalPL = asset.totalPnL.toFixed(2);
+                        
+                        // Determine P/L class
+                        const plClass = asset.totalPnL >= 0 ? 'buy-text' : 'sell-text';
+                        
+                        const baseCurrency = asset.symbol.replace('USDT', '');
+                        
+                        row.innerHTML = `
+                            <td>
+                                <span class="d-flex align-items-center">
+                                    <img src="${getCryptoIconUrl(baseCurrency)}" alt="${baseCurrency}" 
+                                        class="crypto-icon" 
+                                        onerror="this.onerror=null; this.src=''; this.parentNode.innerHTML = this.parentNode.innerHTML.replace(this.outerHTML, '<span class=\'generic-crypto-icon me-2\'>${baseCurrency.charAt(0)}</span>')">
+                                    <span class="clickable-asset" data-symbol="${asset.symbol}">${asset.symbol}</span>
+                                </span>
+                            </td>
+                            <td>${totalVolume} USDT</td>
+                            <td class="${plClass}">
+                                ${totalPL} USDT
+                                ${asset.unrealizedPnL !== 0 ? `<br><small>(${realizedPL} realized)</small>` : ''}
+                            </td>
+                        `;
+                        
+                        tableBody.appendChild(row);
+                    });
+                    
+                    // Add click event for clickable assets
+                    document.querySelectorAll('#top-assets-table .clickable-asset').forEach(element => {
+                        element.addEventListener('click', function() {
+                            const symbol = this.getAttribute('data-symbol');
+                            showAssetDetails(symbol, trades);
+                        });
+                    });
+                    
+                } catch (error) {
+                    console.error('Error updating top assets:', error);
+                }
+            }
          
-         // Function to show asset details in modal
-         function showAssetDetails(symbol, trades) {
-             try {
-                 // Filter trades for this symbol
-                 const assetTrades = trades.filter(t => t.symbol === symbol && t.status === 'success');
-                 
-                 if (assetTrades.length === 0) {
-                     console.error('No trades found for symbol:', symbol);
-                     return;
-                 }
-                 
-                 // Set modal title
-                 document.getElementById('assetDetailsTitle').textContent = `${symbol} Details`;
-                 
-                 // Calculate key metrics
-                 const totalTrades = assetTrades.length;
-                 const buyTrades = assetTrades.filter(t => t.action === 'buy');
-                 const sellTrades = assetTrades.filter(t => t.action === 'sell');
-                 
-                 const buyVolume = buyTrades.reduce((sum, trade) => 
-                     sum + parseFloat(trade.filledQuoteVolume || trade.usdtEquivalent || trade.orderSize || 0), 0);
-                     
-                 const sellVolume = sellTrades.reduce((sum, trade) => 
-                     sum + parseFloat(trade.usdtEquivalent || 0), 0);
-                 
-                 const profitLoss = calculateRealizedProfitLoss(assetTrades, symbol);
-
-                  // Calculate only the matched portion of capital used
-                  const matchedBuyVolume = assetTrades
-                      .filter(t => t.status === 'success' && t.action === 'buy')
-                      .reduce((sum, trade) => sum + parseFloat(trade.filledQuoteVolume || trade.usdtEquivalent || 0), 0);
-                  
-                  // You can optionally improve this further to sum only matched buy volume (from FIFO logic)
-                  // But for now, just do:
-                  const roi = matchedBuyVolume > 0 ? (profitLoss / matchedBuyVolume * 100) : 0;
-
-                 
-                 // Find trade pairs for win rate calculation
-                 const tradePairs = findTradePairs(assetTrades);
-                 const profitablePairs = tradePairs.filter(pair => pair.profit > 0);
-                 const winRate = tradePairs.length > 0 ? (profitablePairs.length / tradePairs.length * 100) : 0;
-                 
-                 // Update modal content
-                 document.getElementById('modal-total-trades').textContent = totalTrades;
-                 document.getElementById('modal-win-rate').textContent = `${winRate.toFixed(1)}%`;
-                 document.getElementById('modal-pl').textContent = `${profitLoss.toFixed(2)} USDT`;
-                 document.getElementById('modal-roi').textContent = `${roi.toFixed(2)}%`;
-                 
-                 // Update trade history table
-                 updateModalTradeHistory(assetTrades);
-                 
-                 // Update price and performance charts
-                 updateModalCharts(assetTrades);
-                 
-                 // Update buy/sell analysis
-                 updateBuySellAnalysis(assetTrades);
-                 
-                 // Show the modal
-                 const modal = new bootstrap.Modal(document.getElementById('assetDetailsModal'));
-                 modal.show();
-                 
-             } catch (error) {
-                 console.error('Error showing asset details:', error);
-             }
-         }
+                     /**
+             * Shows asset details in modal with separate realized and unrealized P/L
+             * @param {string} symbol - The asset symbol
+             * @param {Array} trades - The array of trades
+             */
+            function showAssetDetails(symbol, trades) {
+                try {
+                    // Filter trades for this symbol
+                    const assetTrades = trades.filter(t => t.symbol === symbol && t.status === 'success');
+                    
+                    if (assetTrades.length === 0) {
+                        console.error('No trades found for symbol:', symbol);
+                        return;
+                    }
+                    
+                    // Set modal title
+                    document.getElementById('assetDetailsTitle').textContent = `${symbol} Details`;
+                    
+                    // Calculate key metrics using our improved function
+                    const { tradePairs: allTradePairs, openPositions } = findTradePositions(trades);
+                    const position = openPositions[symbol];
+                    
+                    if (!position) {
+                        console.error('Position data not found for symbol:', symbol);
+                        return;
+                    }
+                    
+                    // Filter trade pairs for this symbol
+                    const tradePairs = allTradePairs.filter(pair => pair.symbol === symbol);
+                    
+                    // Calculate win rate
+                    const profitablePairs = tradePairs.filter(pair => pair.profit > 0);
+                    const winRate = tradePairs.length > 0 ? (profitablePairs.length / tradePairs.length * 100).toFixed(1) : 0;
+                    
+                    // Update modal content with realized and unrealized P/L
+                    document.getElementById('modal-total-trades').textContent = position.trades.length;
+                    document.getElementById('modal-win-rate').textContent = `${winRate}%`;
+                    
+                    // Format P/L display with realized and unrealized components
+                    const plElement = document.getElementById('modal-pl');
+                    if (position.unrealizedPnL !== 0) {
+                        plElement.innerHTML = `${position.totalPnL.toFixed(2)} USDT<br><small>${position.realizedPnL.toFixed(2)} realized</small>`;
+                    } else {
+                        plElement.textContent = `${position.totalPnL.toFixed(2)} USDT`;
+                    }
+                    
+                    // Update ROI display
+                    document.getElementById('modal-roi').textContent = `${position.roi ? position.roi.toFixed(2) : 0}%`;
+                    
+                    // Update trade history table
+                    updateModalTradeHistory(assetTrades);
+                    
+                    // Update price and performance charts
+                    updateModalCharts(assetTrades, position);
+                    
+                    // Update buy/sell analysis
+                    updateBuySellAnalysis(assetTrades);
+                    
+                    // Show the modal
+                    const modal = new bootstrap.Modal(document.getElementById('assetDetailsModal'));
+                    modal.show();
+                    
+                } catch (error) {
+                    console.error('Error showing asset details:', error);
+                }
+            }
          
          // Function to update modal trade history
          function updateModalTradeHistory(trades) {
@@ -1817,136 +2008,241 @@
              }
          }
          
-         // Function to update modal charts
-         function updateModalCharts(trades) {
-             try {
-                 // Sort trades by timestamp
-                 const sortedTrades = [...trades].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-                 
-                 // Price history chart
-                 const priceCtx = document.getElementById('modal-price-chart').getContext('2d');
-                 
-                 // Safely destroy previous chart if it exists
-                 if (window.modalPriceChart && typeof window.modalPriceChart.destroy === 'function') {
-                     window.modalPriceChart.destroy();
-                 } else if (window.modalPriceChart) {
-                     window.modalPriceChart = null;
-                 }
-                 
-                 // Extract price data from trades
-                 const priceData = sortedTrades
-                     .filter(trade => trade.price)
-                     .map(trade => ({
-                         x: new Date(trade.timestamp),
-                         y: parseFloat(trade.price)
-                     }));
-                 
-                 // Create price chart
-                 window.modalPriceChart = new Chart(priceCtx, {
-                     type: 'line',
-                     data: {
-                         datasets: [{
-                             label: 'Price (USDT)',
-                             data: priceData,
-                             borderColor: 'rgba(0, 123, 255, 1)',
-                             backgroundColor: 'rgba(0, 123, 255, 0.1)',
-                             borderWidth: 2,
-                             tension: 0.4,
-                             fill: true
-                         }]
-                     },
-                     options: {
-                         responsive: true,
-                         maintainAspectRatio: false,
-                         scales: {
-                             x: {
-                                 type: 'time',
-                                 time: {
-                                     unit: 'day'
-                                 },
-                                 grid: {
-                                     display: false
-                                 }
-                             },
-                             y: {
-                                 grid: {
-                                     color: 'rgba(0, 0, 0, 0.05)'
-                                 }
-                             }
-                         }
-                     }
-                 });
-                 
-                 // Performance chart
-                 const perfCtx = document.getElementById('modal-performance-chart').getContext('2d');
-                 
-                 // Safely destroy previous chart if it exists
-                 if (window.modalPerfChart && typeof window.modalPerfChart.destroy === 'function') {
-                     window.modalPerfChart.destroy();
-                 } else if (window.modalPerfChart) {
-                     window.modalPerfChart = null;
-                 }
-                 
-                 // Calculate cumulative P/L
-                 let cumulativePnL = 0;
-                 const perfData = sortedTrades.map(trade => {
-                     if (trade.action === 'buy') {
-                         cumulativePnL -= parseFloat(trade.filledQuoteVolume || trade.usdtEquivalent || trade.orderSize || 0);
-                     } else if (trade.action === 'sell') {
-                         cumulativePnL += parseFloat(trade.usdtEquivalent || 0);
-                     }
-                     
-                     return {
-                         x: new Date(trade.timestamp),
-                         y: cumulativePnL
-                     };
-                 });
-                 
-                 // Create performance chart
-                 window.modalPerfChart = new Chart(perfCtx, {
-                     type: 'line',
-                     data: {
-                         datasets: [{
-                             label: 'Cumulative P/L (USDT)',
-                             data: perfData,
-                             borderColor: cumulativePnL >= 0 ? 'rgba(40, 167, 69, 1)' : 'rgba(220, 53, 69, 1)',
-                             backgroundColor: cumulativePnL >= 0 ? 'rgba(40, 167, 69, 0.1)' : 'rgba(220, 53, 69, 0.1)',
-                             borderWidth: 2,
-                             tension: 0.1,
-                             fill: true
-                         }]
-                     },
-                     options: {
-                         responsive: true,
-                         maintainAspectRatio: false,
-                         scales: {
-                             x: {
-                                 type: 'time',
-                                 time: {
-                                     unit: 'day'
-                                 },
-                                 grid: {
-                                     display: false
-                                 }
-                             },
-                             y: {
-                                 grid: {
-                                     color: 'rgba(0, 0, 0, 0.05)'
-                                 },
-                                 ticks: {
-                                     callback: function(value) {
-                                         return value.toFixed(2) + ' USDT';
-                                     }
-                                 }
-                             }
-                         }
-                     }
-                 });
-                 
-             } catch (error) {
-                 console.error('Error updating modal charts:', error);
-             }
-         }
+                    /**
+             * Updates modal charts with more accurate P/L data
+             * @param {Array} trades - The trades for this asset
+             * @param {Object} position - The position data for this asset
+             */
+            function updateModalCharts(assetTrades, position) {
+                try {
+                    // Sort trades by timestamp
+                    const sortedTrades = [...assetTrades].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+                    
+                    // Price history chart
+                    const priceCtx = document.getElementById('modal-price-chart').getContext('2d');
+                    
+                    // Safely destroy previous chart if it exists
+                    if (window.modalPriceChart && typeof window.modalPriceChart.destroy === 'function') {
+                        window.modalPriceChart.destroy();
+                    } else if (window.modalPriceChart) {
+                        window.modalPriceChart = null;
+                    }
+                    
+                    // Extract price data from trades
+                    const priceData = sortedTrades
+                        .filter(trade => trade.price)
+                        .map(trade => ({
+                            x: new Date(trade.timestamp),
+                            y: parseFloat(trade.price)
+                        }));
+                    
+                    // Create price chart
+                    window.modalPriceChart = new Chart(priceCtx, {
+                        type: 'line',
+                        data: {
+                            datasets: [{
+                                label: 'Price (USDT)',
+                                data: priceData,
+                                borderColor: 'rgba(0, 123, 255, 1)',
+                                backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                                borderWidth: 2,
+                                tension: 0.4,
+                                fill: true
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                x: {
+                                    type: 'time',
+                                    time: {
+                                        unit: 'day'
+                                    },
+                                    grid: {
+                                        display: false
+                                    },
+                                    ticks: {
+                                        color: 'rgba(255, 255, 255, 0.8)'
+                                    }
+                                },
+                                y: {
+                                    grid: {
+                                        color: 'rgba(0, 0, 0, 0.05)'
+                                    },
+                                    ticks: {
+                                        color: 'rgba(255, 255, 255, 0.8)',
+                                        callback: function(value) {
+                                            return value.toFixed(2) + ' USDT';
+                                        }
+                                    }
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    labels: {
+                                        color: 'rgba(255, 255, 255, 0.8)'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    
+                    // Performance chart with correct P/L calculation
+                    const perfCtx = document.getElementById('modal-performance-chart').getContext('2d');
+                    
+                    // Safely destroy previous chart if it exists
+                    if (window.modalPerfChart && typeof window.modalPerfChart.destroy === 'function') {
+                        window.modalPerfChart.destroy();
+                    } else if (window.modalPerfChart) {
+                        window.modalPerfChart = null;
+                    }
+                    
+                    // Calculate P/L progression using accurate accounting
+                    const perfData = [];
+                    let runningPnL = 0;
+                    let runningBuyVolume = 0;
+                    let runningSellVolume = 0;
+                    let holdingAmount = 0;
+                    
+                    sortedTrades.forEach(trade => {
+                        const timestamp = new Date(trade.timestamp);
+                        const price = parseFloat(trade.price || 0);
+                        
+                        if (trade.action === 'buy') {
+                            const buyAmount = parseFloat(trade.filledBaseVolume || trade.orderSize || 0);
+                            const buyValue = parseFloat(trade.filledQuoteVolume || trade.usdtEquivalent || trade.orderSize || 0);
+                            
+                            runningBuyVolume += buyValue;
+                            holdingAmount += buyAmount;
+                            
+                            // Unrealized P/L changes when we buy more
+                            const holdingValue = holdingAmount * price;
+                            const costBasis = runningBuyVolume - runningSellVolume;
+                            const currentPnL = (runningSellVolume + holdingValue) - runningBuyVolume;
+                            
+                            perfData.push({
+                                x: timestamp,
+                                y: currentPnL,
+                                type: 'buy'
+                            });
+                        } else if (trade.action === 'sell') {
+                            const sellAmount = parseFloat(trade.filledBaseVolume || trade.orderSize || 0);
+                            const sellValue = parseFloat(trade.usdtEquivalent || 0);
+                            
+                            // Calculate realized P/L for this sell
+                            const avgCostPerUnit = holdingAmount > 0 ? (runningBuyVolume - runningSellVolume) / holdingAmount : 0;
+                            const costBasisSold = avgCostPerUnit * sellAmount;
+                            const realizedPnLForThisSell = sellValue - costBasisSold;
+                            
+                            runningPnL += realizedPnLForThisSell;
+                            runningSellVolume += sellValue;
+                            holdingAmount -= sellAmount;
+                            
+                            // Current total P/L is realized + unrealized
+                            const remainingHoldingValue = holdingAmount * price;
+                            const currentUnrealizedPnL = holdingAmount > 0 ? 
+                                remainingHoldingValue - ((runningBuyVolume - runningSellVolume) - costBasisSold) : 0;
+                            
+                            perfData.push({
+                                x: timestamp,
+                                y: runningPnL + currentUnrealizedPnL,
+                                type: 'sell'
+                            });
+                        }
+                    });
+                    
+                    // Add a final data point for current position value
+                    if (holdingAmount > 0 && position.lastPrice > 0) {
+                        const finalTimestamp = new Date();
+                        const holdingValue = holdingAmount * position.lastPrice;
+                        const costBasis = runningBuyVolume - runningSellVolume;
+                        const finalPnL = (runningSellVolume + holdingValue) - runningBuyVolume;
+                        
+                        perfData.push({
+                            x: finalTimestamp,
+                            y: finalPnL,
+                            type: 'current'
+                        });
+                    }
+                    
+                    // Create performance chart with accurate P/L
+                    window.modalPerfChart = new Chart(perfCtx, {
+                        type: 'line',
+                        data: {
+                            datasets: [{
+                                label: 'P/L (USDT)',
+                                data: perfData,
+                                borderColor: position.totalPnL >= 0 ? 'rgba(40, 167, 69, 1)' : 'rgba(220, 53, 69, 1)',
+                                backgroundColor: position.totalPnL >= 0 ? 'rgba(40, 167, 69, 0.1)' : 'rgba(220, 53, 69, 0.1)',
+                                borderWidth: 2,
+                                tension: 0.1,
+                                fill: true,
+                                pointBackgroundColor: function(context) {
+                                    const point = context.dataset.data[context.dataIndex];
+                                    if (point.type === 'buy') return 'rgba(0, 242, 195, 1)';
+                                    if (point.type === 'sell') return 'rgba(255, 140, 55, 1)';
+                                    return 'rgba(255, 255, 255, 1)';
+                                }
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                x: {
+                                    type: 'time',
+                                    time: {
+                                        unit: 'day'
+                                    },
+                                    grid: {
+                                        display: false
+                                    },
+                                    ticks: {
+                                        color: 'rgba(255, 255, 255, 0.8)'
+                                    }
+                                },
+                                y: {
+                                    grid: {
+                                        color: 'rgba(0, 0, 0, 0.05)'
+                                    },
+                                    ticks: {
+                                        color: 'rgba(255, 255, 255, 0.8)',
+                                        callback: function(value) {
+                                            return value.toFixed(2) + ' USDT';
+                                        }
+                                    }
+                                }
+                            },
+                            plugins: {
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            const point = context.dataset.data[context.dataIndex];
+                                            const value = point.y.toFixed(2);
+                                            if (point.type === 'buy') {
+                                                return `Buy: P/L ${value} USDT`;
+                                            } else if (point.type === 'sell') {
+                                                return `Sell: P/L ${value} USDT`;
+                                            } else {
+                                                return `Current: P/L ${value} USDT`;
+                                            }
+                                        }
+                                    }
+                                },
+                                legend: {
+                                    labels: {
+                                        color: 'rgba(255, 255, 255, 0.8)'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    
+                } catch (error) {
+                    console.error('Error updating modal charts:', error);
+                }
+            }
          
          // Function to update buy/sell analysis
          function updateBuySellAnalysis(trades) {
