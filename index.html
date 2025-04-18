@@ -778,6 +778,24 @@
       <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
       <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
       <script>
+         // Function to load account assets data
+         async function loadAccountAssets() {
+             try {
+                 const response = await fetch('account_assets.json');
+                 if (!response.ok) {
+                     console.warn(`Failed to load account assets: ${response.status}`);
+                     return null;
+                 }
+                 
+                 const data = await response.json();
+                 console.log("Account assets loaded:", data);
+                 return data;
+             } catch (error) {
+                 console.error('Error loading account assets:', error);
+                 return null;
+             }
+         }
+         
          // Function to load and display trade data
          async function loadTradeData() {
              try {
@@ -787,13 +805,16 @@
                  }
                  
                  const trades = await response.json();
+         
+                  // Load account assets
+                 const accountAssets = await loadAccountAssets();
                  
                  // Process the data for different views
                  displayTrades(trades);
                  updateStats(trades);
                  updateCharts(trades);
-                 updateAssetPerformance(trades);
-                 updateTopAssets(trades);
+                 updateAssetPerformance(trades, accountAssets);
+                 updateTopAssets(trades, accountAssets);
                  
                  document.getElementById('last-updated').textContent = new Date().toLocaleString();
              } catch (error) {
@@ -1734,7 +1755,7 @@
              * Updates the asset performance table with separate realized and unrealized P/L
              * @param {Array} trades - The array of trades
              */
-            function updateAssetPerformance(trades) {
+            function updateAssetPerformance(trades, accountAssets) {
                 try {
                     // Use our new function to get detailed position information
                     const { tradePairs, openPositions } = findTradePositions(trades);
@@ -1765,32 +1786,60 @@
                         const plClass = asset.totalPnL >= 0 ? 'buy-text' : 'sell-text';
                         const baseCurrency = asset.symbol.replace('USDT', '');
                         
-                         // Create a proper status based on actual remaining amount
+                         // Inside updateAssetPerformance function, replace the status determination code:
+                        
+                        // Create a proper status based on actual account data
                         let statusText = 'Closed';
                         let statusClass = 'indicator-neutral';
                         
-                        // Consider a position open ONLY if there's a meaningful remaining amount
-                        // (anything less than 0.001 units is considered dust/rounding error)
-                        if (asset.remainingAmount > 0.001) {
-                            statusText = 'Open';
-                            if (asset.unrealizedPnL >= 0) {
-                                statusClass = 'indicator-positive';
-                                statusText = 'Open';
+                        // Use the account assets data to determine if position is really open
+                        if (accountAssets && accountAssets.assets) {
+                            const baseCoin = asset.symbol.replace('USDT', '');
+                            const actualHolding = accountAssets.assets[asset.symbol] || 0;
+                            
+                            // Position is truly open if we have a non-zero amount in the account
+                            if (actualHolding > 0.001) {
+                                if (asset.unrealizedPnL >= 0) {
+                                    statusText = 'Open (Profit)';
+                                    statusClass = 'indicator-positive';
+                                } else {
+                                    statusText = 'Open (Loss)';
+                                    statusClass = 'indicator-negative';
+                                }
                             } else {
-                                statusClass = 'indicator-negative';
-                                statusText = 'Open';
+                                // Position is closed - determine profit/loss status
+                                if (asset.realizedPnL > 0.01) {
+                                    statusText = 'Closed (Profit)';
+                                    statusClass = 'indicator-positive';
+                                } else if (asset.realizedPnL < -0.01) {
+                                    statusText = 'Closed (Loss)';
+                                    statusClass = 'indicator-negative'; 
+                                } else {
+                                    statusText = 'Closed';
+                                    statusClass = 'indicator-neutral';
+                                }
                             }
                         } else {
-                            // Position is closed - determine profit/loss status
-                            if (asset.realizedPnL > 0.01) {
-                                statusText = 'Closed (Profit)';
-                                statusClass = 'indicator-positive';
-                            } else if (asset.realizedPnL < -0.01) {
-                                statusText = 'Closed (Loss)';
-                                statusClass = 'indicator-negative'; 
+                            // Fallback to estimation if we don't have account data
+                            if (asset.remainingAmount > 0.001) {
+                                statusText = 'Open';
+                                if (asset.unrealizedPnL >= 0) {
+                                    statusClass = 'indicator-positive';
+                                } else {
+                                    statusClass = 'indicator-negative';
+                                }
                             } else {
-                                statusText = 'Closed';
-                                statusClass = 'indicator-neutral';
+                                // Position is closed - determine profit/loss status
+                                if (asset.realizedPnL > 0.01) {
+                                    statusText = 'Closed (Profit)';
+                                    statusClass = 'indicator-positive';
+                                } else if (asset.realizedPnL < -0.01) {
+                                    statusText = 'Closed (Loss)';
+                                    statusClass = 'indicator-negative'; 
+                                } else {
+                                    statusText = 'Closed';
+                                    statusClass = 'indicator-neutral';
+                                }
                             }
                         }
                         
@@ -1852,7 +1901,7 @@
              * Updates the top assets display with separate realized and unrealized P/L
              * @param {Array} trades - The array of trades
              */
-            function updateTopAssets(trades) {
+            function updateTopAssets(trades, accountAssets) {
                 try {
                     // Use our new function to get detailed position information
                     const { tradePairs, openPositions } = findTradePositions(trades);
