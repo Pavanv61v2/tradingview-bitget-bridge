@@ -24,9 +24,8 @@ jobs:
           path: gh-pages-repo
       - name: Copy trading data to gh-pages
         run: >
-          # Copy trade_history.json if it exists
-
-          if [ -f "main-repo/trade_history.json" ]; then
+          # Copy trade_history.json if it exists if [ -f
+          "main-repo/trade_history.json" ]; then
             echo "Found trade history in main branch"
             cp main-repo/trade_history.json gh-pages-repo/
             echo "Copied trade history to gh-pages"
@@ -34,10 +33,8 @@ jobs:
             echo "No trade_history.json found in main branch"
           fi
 
-
-          # Copy account_assets.json if it exists
-
-          if [ -f "main-repo/account_assets.json" ]; then
+          # Copy account_assets.json if it exists if [ -f
+          "main-repo/account_assets.json" ]; then
             echo "Found account assets in main branch"
             cp main-repo/account_assets.json gh-pages-repo/
             echo "Copied account assets to gh-pages"
@@ -45,24 +42,11 @@ jobs:
             echo "No account_assets.json found in main branch"
           fi
 
+          # Setup git in gh-pages directory cd gh-pages-repo git config
+          user.name "GitHub Action" git config user.email "action@github.com"
 
-          # Setup git in gh-pages directory
-
-          cd gh-pages-repo
-
-          git config user.name "GitHub Action"
-
-          git config user.email "action@github.com"
-
-
-          # Add, commit, and push
-
-          git add trade_history.json account_assets.json || true
-
-          git commit -m "Update dashboard data [skip ci]" || echo "No changes to
-          commit"
-
-          git push || echo "Failed to push changes"
-
+          # Add, commit, and push git add trade_history.json account_assets.json
+          || true git commit -m "Update dashboard data [skip ci]" || echo "No
+          changes to commit" git push || echo "Failed to push changes"
 
           echo "Completed updating dashboard data on gh-pages"
