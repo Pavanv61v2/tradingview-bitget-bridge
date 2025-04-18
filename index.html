@@ -1765,25 +1765,33 @@
                         const plClass = asset.totalPnL >= 0 ? 'buy-text' : 'sell-text';
                         const baseCurrency = asset.symbol.replace('USDT', '');
                         
-                        // Create a "Status" text that shows whether the position is open or closed
-                        let statusText = 'Neutral';
+                         // Create a proper status based on actual remaining amount
+                        let statusText = 'Closed';
                         let statusClass = 'indicator-neutral';
                         
-                        // Consider a position closed if the remaining value is less than 1 USDT
-                        const remainingValue = asset.remainingAmount * asset.lastPrice;
-                        const isEffectivelyClosed = remainingValue < 1;
-                        
-                        if (asset.remainingAmount > 0 && !isEffectivelyClosed) {
+                        // Consider a position open ONLY if there's a meaningful remaining amount
+                        // (anything less than 0.001 units is considered dust/rounding error)
+                        if (asset.remainingAmount > 0.001) {
                             statusText = 'Open';
-                            statusClass = asset.unrealizedPnL >= 0 ? 'indicator-positive' : 'indicator-negative';
-                        } else if (asset.realizedPnL > 0) {
-                            statusText = 'Closed (Profit)';
-                            statusClass = 'indicator-positive';
-                        } else if (asset.realizedPnL < 0) {
-                            statusText = 'Closed (Loss)';
-                            statusClass = 'indicator-negative';
+                            if (asset.unrealizedPnL >= 0) {
+                                statusClass = 'indicator-positive';
+                                statusText = 'Open';
+                            } else {
+                                statusClass = 'indicator-negative';
+                                statusText = 'Open';
+                            }
                         } else {
-                            statusText = 'Closed (Neutral)';
+                            // Position is closed - determine profit/loss status
+                            if (asset.realizedPnL > 0.01) {
+                                statusText = 'Closed (Profit)';
+                                statusClass = 'indicator-positive';
+                            } else if (asset.realizedPnL < -0.01) {
+                                statusText = 'Closed (Loss)';
+                                statusClass = 'indicator-negative'; 
+                            } else {
+                                statusText = 'Closed';
+                                statusClass = 'indicator-neutral';
+                            }
                         }
                         
                         row.innerHTML = `
