@@ -971,7 +971,48 @@
                  });
              });
          }
-         
+
+               function calculateRealizedProfitLoss(trades, symbolFilter = null) {
+                const buys = [];
+                let realizedProfit = 0;
+            
+                const sortedTrades = trades
+                    .filter(t => t.status === 'success' && (!symbolFilter || t.symbol === symbolFilter))
+                    .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+            
+                sortedTrades.forEach(trade => {
+                    const baseAmount = parseFloat(trade.filledBaseVolume || trade.orderSize || 0);
+                    const usdtValue = parseFloat(trade.filledQuoteVolume || trade.usdtEquivalent || 0);
+            
+                    if (trade.action === 'buy') {
+                        buys.push({ amount: baseAmount, cost: usdtValue });
+                    } else if (trade.action === 'sell') {
+                        let remainingSell = baseAmount;
+                        const sellValue = usdtValue;
+            
+                        while (remainingSell > 0 && buys.length > 0) {
+                            const currentBuy = buys[0];
+                            const matchedAmount = Math.min(currentBuy.amount, remainingSell);
+            
+                            const costBasis = (matchedAmount / currentBuy.amount) * currentBuy.cost;
+                            const sellPortion = (matchedAmount / baseAmount) * sellValue;
+            
+                            realizedProfit += (sellPortion - costBasis);
+            
+                            currentBuy.amount -= matchedAmount;
+                            currentBuy.cost -= costBasis;
+                            remainingSell -= matchedAmount;
+            
+                            if (currentBuy.amount <= 0.000001) {
+                                buys.shift();
+                            }
+                        }
+                    }
+                });
+            
+                return realizedProfit;
+            }
+
          // Function to update statistics
          function updateStats(trades) {
              try {
@@ -1010,25 +1051,15 @@
                  document.getElementById('max-trade').textContent = maxTradeSize;
                  
                  // Calculate profit/loss 
-                 let totalProfitLoss = 0;
-                 let roiPercentage = 0;
          
-                 // Track total USDT spent on buys and received from sells
-                 const totalBuyUsdt = trades
-                     .filter(t => t.status === 'success' && t.action === 'buy')
-                     .reduce((sum, trade) => sum + (parseFloat(trade.filledQuoteVolume || trade.usdtEquivalent || trade.orderSize || 0)), 0);
+                  const totalProfitLoss = calculateRealizedProfitLoss(trades);
          
-                 const totalSellUsdt = trades
-                     .filter(t => t.status === 'success' && t.action === 'sell')
-                     .reduce((sum, trade) => sum + (parseFloat(trade.usdtEquivalent || 0)), 0);
-         
-                 // Calculate profit/loss
-                 totalProfitLoss = totalSellUsdt - totalBuyUsdt;
-         
-                 // Calculate ROI percentage
-                 if (totalBuyUsdt > 0) {
-                     roiPercentage = (totalProfitLoss / totalBuyUsdt * 100).toFixed(2);
-                 }
+                  const investedCapital = trades
+                      .filter(t => t.status === 'success' && t.action === 'buy')
+                      .reduce((sum, trade) => sum + parseFloat(trade.filledQuoteVolume || trade.usdtEquivalent || 0), 0);
+                  
+                  const roiPercentage = investedCapital > 0 ? (totalProfitLoss / investedCapital * 100).toFixed(2) : 0;
+
          
                  // Update UI elements
                  const profitLossElement = document.getElementById('profit-loss');
@@ -1705,8 +1736,17 @@
                  const sellVolume = sellTrades.reduce((sum, trade) => 
                      sum + parseFloat(trade.usdtEquivalent || 0), 0);
                  
-                 const profitLoss = sellVolume - buyVolume;
-                 const roi = buyVolume > 0 ? (profitLoss / buyVolume * 100) : 0;
+                 const profitLoss = calculateRealizedProfitLoss(assetTrades, symbol);
+
+                  // Calculate only the matched portion of capital used
+                  const matchedBuyVolume = assetTrades
+                      .filter(t => t.status === 'success' && t.action === 'buy')
+                      .reduce((sum, trade) => sum + parseFloat(trade.filledQuoteVolume || trade.usdtEquivalent || 0), 0);
+                  
+                  // You can optionally improve this further to sum only matched buy volume (from FIFO logic)
+                  // But for now, just do:
+                  const roi = matchedBuyVolume > 0 ? (profitLoss / matchedBuyVolume * 100) : 0;
+
                  
                  // Find trade pairs for win rate calculation
                  const tradePairs = findTradePairs(assetTrades);
