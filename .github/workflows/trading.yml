@@ -715,15 +715,22 @@ jobs:
           echo "Files in directory after script execution:"
 
           ls -la
-          - name: Commit updated files
-            run: |
-              # Configure git
-              git config --global user.name "GitHub Action"
-              git config --global user.email "action@github.com"
-          
-              # Add and commit both files if they exist
-              git add trade_history.json account_assets.json || true
-              git commit -m "Update trading data [skip ci]" || echo "No changes to commit"
+      - name: Commit updated files
+        run: >
+          # Configure git
+
+          git config --global user.name "GitHub Action"
+
+          git config --global user.email "action@github.com"
+
+
+          # Add and commit both files if they exist
+
+          git add trade_history.json account_assets.json || true
+
+          git commit -m "Update trading data [skip ci]" || echo "No changes to
+          commit"
               
-              # Push changes to the repository
-              git push || echo "Failed to push changes"
+          # Push changes to the repository
+
+          git push || echo "Failed to push changes"
