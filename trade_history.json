@@ -1,18 +1,5 @@
 [
   {
-    "timestamp": "2025-03-23T08:06:44.098Z",
-    "symbol": "SOLUSDT",
-    "action": "sell",
-    "originalAmount": 0.0228769,
-    "orderSize": "0.0228",
-    "price": 131.19,
-    "filledBaseVolume": 0.0228,
-    "filledQuoteVolume": 2.991132,
-    "usdtEquivalent": 2.991132,
-    "orderId": "1287614758338523137",
-    "status": "success"
-  },
-  {
     "timestamp": "2025-03-23T08:13:34.210Z",
     "symbol": "SOLUSDT",
     "action": "buy",
