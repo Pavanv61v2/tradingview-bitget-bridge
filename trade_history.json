@@ -194,14 +194,4 @@
     "orderId": "1296672856130400256",
     "status": "success"
   },
-  {
-    "timestamp": "2025-04-18T11:30:07.205Z",
-    "symbol": "SOLUSDT",
-    "action": "buy",
-    "orderSize": null,
-    "originalAmount": null,
-    "price": null,
-    "status": "failed",
-    "error": "All 3 attempts failed: Request failed with status code 400"
-  }
 ]
