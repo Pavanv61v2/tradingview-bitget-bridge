@@ -18,37 +18,23 @@ jobs:
           SIGNAL_DATA: '${{ toJson(github.event.client_payload) }}'
           NOTIFICATIONS_ENABLED: 'true'
           NOTIFICATION_EMAIL: '${{ secrets.NOTIFICATION_EMAIL }}'
-        run: >
+        run: |
           echo "Received trading signal"
-
           echo "Symbol: ${{ github.event.client_payload.symbol || 'N/A' }}"
-
           echo "Action: ${{ github.event.client_payload.action || 'N/A' }}"
-
-          echo "Order size: ${{ github.event.client_payload.order_size || 'N/A'
-          }}"
-
+          echo "Order size: ${{ github.event.client_payload.order_size || 'N/A' }}"
 
           # Install dependencies
-
           npm install axios crypto-js nodemailer
 
-
           # Create and run the trading script
-
           cat > trade.js << 'EOF'
-
           const axios = require('axios');
-
           const crypto = require('crypto');
-
           const nodemailer = require('nodemailer');
-
           const fs = require('fs');
 
-
           // Common scale (decimal places) for cryptocurrencies
-
           const coinScales = {
             'BTC': 6,
             'ETH': 5,
@@ -63,22 +49,14 @@ jobs:
             'DEFAULT': 2
           };
 
-
           // Trade log file
-
           const TRADE_LOG_FILE = 'trade_history.json';
 
-
           // Notification settings
-
-          const NOTIFICATIONS_ENABLED = process.env.NOTIFICATIONS_ENABLED ===
-          'true';
-
+          const NOTIFICATIONS_ENABLED = process.env.NOTIFICATIONS_ENABLED === 'true';
           const NOTIFICATION_EMAIL = process.env.NOTIFICATION_EMAIL;
 
-
           // Function to fetch precision scale for a specific symbol
-
           async function getSymbolPrecision(symbol) {
             try {
               console.log(`Fetching precision info for ${symbol}...`);
@@ -109,7 +87,6 @@ jobs:
               return null;
             }
           }
-
 
           async function placeOrder() {
             try {
@@ -533,9 +510,7 @@ jobs:
             }
           }
 
-
           // Helper function to get account assets
-
           async function getAccountAssets(symbol) {
             const timestamp = Date.now().toString();
             const requestPath = '/api/v2/spot/account/assets';
@@ -573,9 +548,7 @@ jobs:
             }
           }
 
-
           // Helper function to log trades
-
           async function logTrade(tradeInfo) {
             try {
               // Check if the log file exists
@@ -602,9 +575,7 @@ jobs:
             }
           }
 
-
           // Helper function to export account assets
-
           async function exportAccountAssets() {
             try {
               // Check if the log file exists
@@ -672,9 +643,7 @@ jobs:
             }
           }
 
-
           // Helper function to send email notifications
-
           async function sendNotification(subject, body) {
             if (!NOTIFICATIONS_ENABLED || !NOTIFICATION_EMAIL) {
               console.log("Notifications disabled or email not configured");
@@ -695,42 +664,28 @@ jobs:
             }
           }
 
-
           // Execute the function
-
           placeOrder().then(() => {
             console.log("Order process completed");
           }).catch(err => {
             console.error("Unhandled error:", err);
           });
-
           EOF
-
 
           node trade.js
 
-
           # Debug: List files after script execution
-
           echo "Files in directory after script execution:"
-
           ls -la
       - name: Commit updated files
-        run: >
+        run: |
           # Configure git
-
           git config --global user.name "GitHub Action"
-
           git config --global user.email "action@github.com"
 
-
           # Add and commit both files if they exist
-
           git add trade_history.json account_assets.json || true
-
-          git commit -m "Update trading data [skip ci]" || echo "No changes to
-          commit"
-              
+          git commit -m "Update trading data [skip ci]" || echo "No changes to commit"
+          
           # Push changes to the repository
-
           git push || echo "Failed to push changes"
