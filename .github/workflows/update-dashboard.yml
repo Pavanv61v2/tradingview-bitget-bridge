@@ -1,52 +1,68 @@
 name: Update Dashboard
-
-on:
-  workflow_dispatch:  # Manual trigger
+'on':
+  workflow_dispatch: null
   schedule:
-    - cron: '*/5 * * * *'  # Every 5 minutes
+    - cron: '*/5 * * * *'
   push:
     paths:
-      - 'trade_history.json'
-
+      - trade_history.json
+      - account_assets.json
 jobs:
   update-dashboard:
     runs-on: ubuntu-latest
-    
-    # Add permissions to ensure the workflow can push to gh-pages
     permissions:
       contents: write
-    
     steps:
       - name: Checkout main branch
         uses: actions/checkout@v3
         with:
           path: main-repo
-      
       - name: Checkout gh-pages branch
         uses: actions/checkout@v3
         with:
           ref: gh-pages
           path: gh-pages-repo
-      
-      - name: Copy trade history to gh-pages
-        run: |
+      - name: Copy trading data to gh-pages
+        run: >
+          # Copy trade_history.json if it exists
+
           if [ -f "main-repo/trade_history.json" ]; then
             echo "Found trade history in main branch"
-            
-            # Always copy the file to ensure it's up to date
             cp main-repo/trade_history.json gh-pages-repo/
-            
-            # Setup git in gh-pages directory
-            cd gh-pages-repo
-            git config user.name "GitHub Action"
-            git config user.email "action@github.com"
-            
-            # Add, commit, and push
-            git add trade_history.json
-            git commit -m "Update trade history [skip ci]" || echo "No changes to commit"
-            git push || echo "Failed to push changes"
-            
-            echo "Completed updating trade history on gh-pages"
+            echo "Copied trade history to gh-pages"
           else
             echo "No trade_history.json found in main branch"
           fi
+
+
+          # Copy account_assets.json if it exists
+
+          if [ -f "main-repo/account_assets.json" ]; then
+            echo "Found account assets in main branch"
+            cp main-repo/account_assets.json gh-pages-repo/
+            echo "Copied account assets to gh-pages"
+          else
+            echo "No account_assets.json found in main branch"
+          fi
+
+
+          # Setup git in gh-pages directory
+
+          cd gh-pages-repo
+
+          git config user.name "GitHub Action"
+
+          git config user.email "action@github.com"
+
+
+          # Add, commit, and push
+
+          git add trade_history.json account_assets.json || true
+
+          git commit -m "Update dashboard data [skip ci]" || echo "No changes to
+          commit"
+
+          git push || echo "Failed to push changes"
+
+
+          echo "Completed updating dashboard data on gh-pages"
