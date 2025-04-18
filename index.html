@@ -1769,7 +1769,11 @@
                         let statusText = 'Neutral';
                         let statusClass = 'indicator-neutral';
                         
-                        if (asset.remainingAmount > 0) {
+                        // Consider a position closed if the remaining value is less than 1 USDT
+                        const remainingValue = asset.remainingAmount * asset.lastPrice;
+                        const isEffectivelyClosed = remainingValue < 1;
+                        
+                        if (asset.remainingAmount > 0 && !isEffectivelyClosed) {
                             statusText = 'Open';
                             statusClass = asset.unrealizedPnL >= 0 ? 'indicator-positive' : 'indicator-negative';
                         } else if (asset.realizedPnL > 0) {
@@ -1778,6 +1782,8 @@
                         } else if (asset.realizedPnL < 0) {
                             statusText = 'Closed (Loss)';
                             statusClass = 'indicator-negative';
+                        } else {
+                            statusText = 'Closed (Neutral)';
                         }
                         
                         row.innerHTML = `
