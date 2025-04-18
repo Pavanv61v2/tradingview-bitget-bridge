@@ -23,17 +23,17 @@ jobs:
           echo "Symbol: ${{ github.event.client_payload.symbol || 'N/A' }}"
           echo "Action: ${{ github.event.client_payload.action || 'N/A' }}"
           echo "Order size: ${{ github.event.client_payload.order_size || 'N/A' }}"
-
+          
           # Install dependencies
           npm install axios crypto-js nodemailer
-
+          
           # Create and run the trading script
           cat > trade.js << 'EOF'
           const axios = require('axios');
           const crypto = require('crypto');
           const nodemailer = require('nodemailer');
           const fs = require('fs');
-
+          
           // Common scale (decimal places) for cryptocurrencies
           const coinScales = {
             'BTC': 6,
@@ -48,14 +48,14 @@ jobs:
             // Default scale for others
             'DEFAULT': 2
           };
-
+          
           // Trade log file
           const TRADE_LOG_FILE = 'trade_history.json';
-
+          
           // Notification settings
           const NOTIFICATIONS_ENABLED = process.env.NOTIFICATIONS_ENABLED === 'true';
           const NOTIFICATION_EMAIL = process.env.NOTIFICATION_EMAIL;
-
+          
           // Function to fetch precision scale for a specific symbol
           async function getSymbolPrecision(symbol) {
             try {
@@ -87,7 +87,7 @@ jobs:
               return null;
             }
           }
-
+          
           async function placeOrder() {
             try {
               const apiKey = process.env.BITGET_API_KEY;
@@ -420,9 +420,6 @@ jobs:
               };
               
               await logTrade(tradeInfo);
-
-              // Export current account assets
-              await exportAccountAssets();
               
               // Send notification
               if (isBuy) {
@@ -509,7 +506,7 @@ jobs:
               return { error: error.message };
             }
           }
-
+          
           // Helper function to get account assets
           async function getAccountAssets(symbol) {
             const timestamp = Date.now().toString();
@@ -547,7 +544,7 @@ jobs:
               throw new Error(`Failed to get account assets: ${response.data ? response.data.msg : 'Unknown error'}`);
             }
           }
-
+          
           // Helper function to log trades
           async function logTrade(tradeInfo) {
             try {
@@ -574,75 +571,7 @@ jobs:
               console.error("Error logging trade:", error.message);
             }
           }
-
-          // Helper function to export account assets
-          async function exportAccountAssets() {
-            try {
-              // Check if the log file exists
-              console.log("Exporting current account assets...");
-              
-              // Get all account assets from Bitget
-              const timestamp = Date.now().toString();
-              const requestPath = '/api/v2/spot/account/assets';
-              const method = 'GET';
-              
-              // Signature content: timestamp + method + requestPath
-              const preHash = timestamp + method.toUpperCase() + requestPath;
-              
-              // Generate signature
-              const signature = crypto.createHmac('sha256', process.env.BITGET_API_SECRET)
-                .update(preHash)
-                .digest('base64');
-              
-              const response = await axios({
-                method: method,
-                url: 'https://api.bitget.com' + requestPath,
-                headers: {
-                  'ACCESS-KEY': process.env.BITGET_API_KEY,
-                  'ACCESS-SIGN': signature,
-                  'ACCESS-TIMESTAMP': timestamp,
-                  'ACCESS-PASSPHRASE': process.env.BITGET_PASSPHRASE,
-                  'Content-Type': 'application/json'
-                },
-                timeout: 10000
-              });
-              
-              if (response.data && response.data.code === '00000') {
-                // Format the assets data for the dashboard
-                const assets = {};
-                
-                response.data.data.forEach(asset => {
-                  // Only include assets with non-zero balance
-                  const available = parseFloat(asset.available);
-                  const frozen = parseFloat(asset.frozen);
-                  
-                  if (available > 0 || frozen > 0) {
-                    // For consistent naming format with the dashboard
-                    const symbol = asset.coin === 'USDT' ? 'USDTUSDT' : `${asset.coin}USDT`;
-                    assets[symbol] = available + frozen;
-                  }
-                });
-                
-                // Create the final data structure with timestamp
-                const assetData = {
-                  timestamp: new Date().toISOString(),
-                  assets: assets
-                };
-                
-                // Write to file
-                fs.writeFileSync('account_assets.json', JSON.stringify(assetData, null, 2));
-                console.log("Account assets exported successfully!");
-                
-                return true;
-              } else {
-                throw new Error(`Failed to get account assets: ${response.data ? response.data.msg : 'Unknown error'}`);
-              }
-            } catch (error) {
-              console.error("Error exporting account assets:", error.message);
-              return false;
-            }
-          }
-
+          
           // Helper function to send email notifications
           async function sendNotification(subject, body) {
             if (!NOTIFICATIONS_ENABLED || !NOTIFICATION_EMAIL) {
@@ -663,7 +592,7 @@ jobs:
               console.error("Error sending notification:", error.message);
             }
           }
-
+          
           // Execute the function
           placeOrder().then(() => {
             console.log("Order process completed");
@@ -671,21 +600,26 @@ jobs:
             console.error("Unhandled error:", err);
           });
           EOF
-
+          
           node trade.js
-
+          
           # Debug: List files after script execution
           echo "Files in directory after script execution:"
           ls -la
-      - name: Commit updated files
+      - name: Commit updated trade history
         run: |
           # Configure git
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
-
-          # Add and commit both files if they exist
-          git add trade_history.json account_assets.json || true
-          git commit -m "Update trading data [skip ci]" || echo "No changes to commit"
           
-          # Push changes to the repository
-          git push || echo "Failed to push changes"
+          # Check if trade_history.json exists
+          if [ -f "trade_history.json" ]; then
+            # Add the file and commit
+            git add trade_history.json
+            git commit -m "Update trade history [skip ci]" || echo "No changes to commit"
+            
+            # Push changes to the repository
+            git push || echo "Failed to push changes"
+          else
+            echo "trade_history.json not found"
+          fi
