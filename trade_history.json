@@ -28,5 +28,18 @@
     "price": null,
     "status": "failed",
     "error": "All 3 attempts failed: Request failed with status code 400"
+  },
+  {
+    "timestamp": "2025-04-30T16:00:28.504Z",
+    "symbol": "SOLUSDT",
+    "action": "sell",
+    "originalAmount": 2.977948,
+    "orderSize": "2.9630",
+    "price": 142.01,
+    "filledBaseVolume": 2.963,
+    "filledQuoteVolume": 420.77563,
+    "usdtEquivalent": 420.77563,
+    "orderId": "1301504718187622400",
+    "status": "success"
   }
 ]
