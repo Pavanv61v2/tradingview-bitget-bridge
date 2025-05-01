@@ -153,7 +153,7 @@ jobs:
                 
                 if (signal.order_size && !isNaN(parseFloat(signal.order_size))) {
                   if (usdtAsset && usdtAsset.available && parseFloat(usdtAsset.available) > 0) {
-                    investmentAmount = (parseFloat(usdtAsset.available)*parseFloat(signal.order_size))/100
+                    investmentAmount = Math.floor((parseFloat(usdtAsset.available) * parseFloat(signal.order_size) / 100) * 100) / 100
                     }
                 }
                 
