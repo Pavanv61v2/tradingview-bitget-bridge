@@ -436,6 +436,7 @@ jobs:
                 // Store USDT equivalent for easy calculations
                 usdtEquivalent: usdtEquivalent,
                 orderId: orderId,
+                account: account,
                 status: 'success'
               };
               
