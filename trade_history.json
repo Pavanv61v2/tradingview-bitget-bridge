@@ -63,5 +63,15 @@
     "usdtEquivalent": 422.236254,
     "orderId": "1304403816372858910",
     "status": "success"
+  },
+  {
+    "timestamp": "2025-05-10T07:05:47.057Z",
+    "symbol": "BTCUSDT",
+    "action": "{{strategy.order.action}}",
+    "orderSize": null,
+    "originalAmount": null,
+    "price": null,
+    "status": "failed",
+    "error": "All 3 attempts failed: Request failed with status code 400"
   }
 ]
