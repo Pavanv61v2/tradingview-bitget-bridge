@@ -11,10 +11,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
       - name: Process Trading Signal
-        env:
+        env:          
+          # Main account credentials (existing)
           BITGET_API_KEY: '${{ secrets.BITGET_API_KEY }}'
           BITGET_API_SECRET: '${{ secrets.BITGET_API_SECRET }}'
           BITGET_PASSPHRASE: '${{ secrets.BITGET_PASSPHRASE }}'
+          
+          # Sub account credentials
+          BITGET_API_KEY_SUB1: '${{ secrets.BITGET_API_KEY_SUB1 }}'
+          BITGET_API_SECRET_SUB1: '${{ secrets.BITGET_API_SECRET_SUB1 }}'
+          BITGET_PASSPHRASE_SUB1: '${{ secrets.BITGET_PASSPHRASE_SUB1 }}'
+          
           SIGNAL_DATA: '${{ toJson(github.event.client_payload) }}'
           NOTIFICATIONS_ENABLED: 'true'
           NOTIFICATION_EMAIL: '${{ secrets.NOTIFICATION_EMAIL }}'
@@ -23,6 +30,7 @@ jobs:
           echo "Symbol: ${{ github.event.client_payload.symbol || 'N/A' }}"
           echo "Action: ${{ github.event.client_payload.action || 'N/A' }}"
           echo "Order size: ${{ github.event.client_payload.order_size || 'N/A' }}"
+          echo "Account: ${{ github.event.client_payload.account || 'main' }}"
           
           # Install dependencies
           npm install axios crypto-js nodemailer
@@ -90,10 +98,6 @@ jobs:
           
           async function placeOrder() {
             try {
-              const apiKey = process.env.BITGET_API_KEY;
-              const apiSecret = process.env.BITGET_API_SECRET;
-              const passphrase = process.env.BITGET_PASSPHRASE;
-              
               // Parse signal data
               let signal;
               try {
@@ -107,6 +111,22 @@ jobs:
               }
               
               console.log("Processing signal:", signal);
+
+              // Get API credentials based on account from signal
+              let apiKey, apiSecret, passphrase, accountId;
+              if (signal.account === 'sub1') {
+                console.log('Using Sub Account 1 credentials');
+                apiKey = process.env.BITGET_API_KEY_SUB1;
+                apiSecret = process.env.BITGET_API_SECRET_SUB1;
+                passphrase = process.env.BITGET_PASSPHRASE_SUB1;
+                accountId = 'sub1';
+              } else {
+                console.log('Using Main Account credentials');
+                apiKey = process.env.BITGET_API_KEY;
+                apiSecret = process.env.BITGET_API_SECRET;
+                passphrase = process.env.BITGET_PASSPHRASE;
+                accountId = 'main';
+              }
               
               // Format symbol
               let symbol = signal.symbol || signal.ticker;
@@ -416,6 +436,7 @@ jobs:
                 // Store USDT equivalent for easy calculations
                 usdtEquivalent: usdtEquivalent,
                 orderId: orderId,
+                account: accountId,
                 status: 'success'
               };
               
@@ -425,12 +446,12 @@ jobs:
               if (isBuy) {
                 await sendNotification(
                   `Buy Order Executed - ${symbol}`,
-                  `Successfully bought ${fillDetails.baseVolume} ${baseCoin} with ${fillDetails.quoteVolume} USDT\nAvg Price: ${fillDetails.priceAvg} USDT\nOrder ID: ${orderId}`
+                  `Successfully bought ${fillDetails.baseVolume} ${baseCoin} with ${fillDetails.quoteVolume} USDT\nAvg Price: ${fillDetails.priceAvg} USDT\nOrder ID: ${orderId}\nAccount: ${accountId}`
                 );
               } else {
                 await sendNotification(
                   `Sell Order Executed - ${symbol}`,
-                  `Successfully sold ${fillDetails.baseVolume} ${baseCoin} for ${usdtEquivalent.toFixed(2)} USDT\nAvg Price: ${fillDetails.priceAvg} USDT\nOrder ID: ${orderId}`
+                  `Successfully sold ${fillDetails.baseVolume} ${baseCoin} for ${usdtEquivalent.toFixed(2)} USDT\nAvg Price: ${fillDetails.priceAvg} USDT\nOrder ID: ${orderId}\nAccount: ${accountId}`
                 );
               }
               
@@ -496,6 +517,7 @@ jobs:
                 orderSize: errorOrderSize,
                 originalAmount: errorOriginalAmount,
                 price: null,
+                account: errorAccount || accountId || 'main',
                 status: 'failed',
                 error: error.message
               };
