@@ -93,10 +93,6 @@ jobs:
           
           async function placeOrder() {
             try {
-              const apiKey = process.env.BITGET_API_KEY;
-              const apiSecret = process.env.BITGET_API_SECRET;
-              const passphrase = process.env.BITGET_PASSPHRASE;
-              
               // Parse signal data
               let signal;
               try {
@@ -108,8 +104,24 @@ jobs:
                 console.error("Error parsing signal data:", e.message);
                 throw e;
               }
-              
               console.log("Processing signal:", signal);
+
+              const account = (signal.account || 'main').toLowerCase();
+              let apiKey, apiSecret, passphrase;
+              
+              if (account === 'main') {
+                apiKey = process.env.BITGET_API_KEY;
+                apiSecret = process.env.BITGET_API_SECRET;
+                passphrase = process.env.BITGET_PASSPHRASE;
+              } else {
+                apiKey = process.env[`BITGET_API_KEY_${account.toUpperCase()}`];
+                apiSecret = process.env[`BITGET_API_SECRET_${account.toUpperCase()}`];
+                passphrase = process.env[`BITGET_PASSPHRASE_${account.toUpperCase()}`];
+              }
+              
+              if (!apiKey || !apiSecret || !passphrase) {
+                throw new Error(`Missing API credentials for account: ${account}`);
+              }
               
               // Format symbol
               let symbol = signal.symbol || signal.ticker;
