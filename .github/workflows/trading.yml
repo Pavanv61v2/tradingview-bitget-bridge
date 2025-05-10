@@ -603,7 +603,7 @@ jobs:
           
           node trade.js
           
-          # Debug: List files after script execution
+          # Debug: List files after script execution 
           echo "Files in directory after script execution:"
           ls -la
       - name: Commit updated trade history
