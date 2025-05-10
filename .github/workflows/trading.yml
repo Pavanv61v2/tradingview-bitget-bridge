@@ -124,15 +124,6 @@ jobs:
               
               const creds = credentialMap[account];
               
-              if (!creds || !creds.apiKey || !creds.apiSecret || !creds.passphrase) {
-                throw new Error(`Missing API credentials for account: ${account}`);
-              }
-              
-              const apiKey = creds.apiKey;
-              const apiSecret = creds.apiSecret;
-              const passphrase = creds.passphrase;
-
-              
               // Format symbol
               let symbol = signal.symbol || signal.ticker;
               if (!symbol) {
