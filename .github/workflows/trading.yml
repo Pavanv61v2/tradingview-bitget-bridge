@@ -105,13 +105,13 @@ jobs:
                 apiSecret = process.env.BITGET_API_SECRET;
                 passphrase = process.env.BITGET_PASSPHRASE;
               } else {
-                apiKey = process.env['BITGET_API_KEY_${account.toUpperCase()}'];
-                apiSecret = process.env['BITGET_API_SECRET_${account.toUpperCase()}'];
-                passphrase = process.env['BITGET_PASSPHRASE_${account.toUpperCase()}'];
+                apiKey = process.env[`BITGET_API_KEY_${account.toUpperCase()}`];
+                apiSecret = process.env[`BITGET_API_SECRET_${account.toUpperCase()}`];
+                passphrase = process.env[`BITGET_PASSPHRASE_${account.toUpperCase()}`];
               }
 
               if (!apiKey || !apiSecret || !passphrase) {
-                throw new Error('Missing API credentials for account: ${account}');
+                throw new Error(`Missing API credentials for account: ${account}`);
               }
               
               // Parse signal data
