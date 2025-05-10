@@ -465,6 +465,7 @@ jobs:
               let errorAction = 'UNKNOWN';
               let errorOrderSize = null;
               let errorOriginalAmount = null;
+              let errorAccount = 'main';
               
               try {
                 // Use the variables if they were already defined in the function
@@ -535,7 +536,7 @@ jobs:
           }
           
           // Helper function to get account assets
-          async function getAccountAssets(symbol) {
+          async function getAccountAssets(symbol, accountId = 'main') {
             const timestamp = Date.now().toString();
             const requestPath = '/api/v2/spot/account/assets';
             const method = 'GET';
