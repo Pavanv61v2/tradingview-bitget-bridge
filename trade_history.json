@@ -123,5 +123,15 @@
     "price": null,
     "status": "failed",
     "error": "All 3 attempts failed: Request failed with status code 400"
+  },
+  {
+    "timestamp": "2025-05-10T10:18:46.445Z",
+    "symbol": "BTCUSDT",
+    "action": "buy",
+    "orderSize": null,
+    "originalAmount": null,
+    "price": null,
+    "status": "failed",
+    "error": "All 3 attempts failed: Request failed with status code 400"
   }
 ]
