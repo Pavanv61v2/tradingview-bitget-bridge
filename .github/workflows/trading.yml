@@ -112,11 +112,11 @@ jobs:
                   apiKey:process.env.BITGET_API_KEY,
                   apiSecret:process.env.BITGET_API_SECRET,
                   passphrase:process.env.BITGET_PASSPHRASE
-                  },
+                  }
                 sub1: {
                   apiKey:process.env.BITGET_API_KEY_SUB1,
                   apiSecret:process.env.BITGET_API_SECRET_SUB1,
-                  passphrase:process.env.BITGET_PASSPHRASE_SUB1
+                  passphrase:process.env.BITGET_PASSPHRASE
                   }
                 };
               
