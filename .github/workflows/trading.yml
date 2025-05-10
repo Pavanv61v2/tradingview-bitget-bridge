@@ -107,21 +107,31 @@ jobs:
               console.log("Processing signal:", signal);
 
               const account = (signal.account || 'main').toLowerCase();
-              let apiKey, apiSecret, passphrase;
               
-              if (account === 'main') {
-                apiKey = process.env.BITGET_API_KEY;
-                apiSecret = process.env.BITGET_API_SECRET;
-                passphrase = process.env.BITGET_PASSPHRASE;
-              } else {
-                apiKey = process.env[`BITGET_API_KEY_${account.toUpperCase()}`];
-                apiSecret = process.env[`BITGET_API_SECRET_${account.toUpperCase()}`];
-                passphrase = process.env[`BITGET_PASSPHRASE_${account.toUpperCase()}`];
-              }
+              const credentialMap = {
+                main: {
+                  apiKey: process.env.BITGET_API_KEY,
+                  apiSecret: process.env.BITGET_API_SECRET,
+                  passphrase: process.env.BITGET_PASSPHRASE
+                },
+                sub1: {
+                  apiKey: process.env.BITGET_API_KEY_SUB1,
+                  apiSecret: process.env.BITGET_API_SECRET_SUB1,
+                  passphrase: process.env.BITGET_PASSPHRASE_SUB1
+                }
+                // Add sub2, sub3 etc. as needed
+              };
               
-              if (!apiKey || !apiSecret || !passphrase) {
+              const creds = credentialMap[account];
+              
+              if (!creds || !creds.apiKey || !creds.apiSecret || !creds.passphrase) {
                 throw new Error(`Missing API credentials for account: ${account}`);
               }
+              
+              const apiKey = creds.apiKey;
+              const apiSecret = creds.apiSecret;
+              const passphrase = creds.passphrase;
+
               
               // Format symbol
               let symbol = signal.symbol || signal.ticker;
