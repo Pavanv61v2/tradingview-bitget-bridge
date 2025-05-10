@@ -105,24 +105,8 @@ jobs:
                 throw e;
               }
               console.log("Processing signal:", signal);
-
+              
               const account = (signal.account || 'main').toLowerCase();
-              
-              const credentialMap = {
-                main: {
-                  apiKey: process.env.BITGET_API_KEY,
-                  apiSecret: process.env.BITGET_API_SECRET,
-                  passphrase: process.env.BITGET_PASSPHRASE
-                },
-                sub1: {
-                  apiKey: process.env.BITGET_API_KEY_SUB1,
-                  apiSecret: process.env.BITGET_API_SECRET_SUB1,
-                  passphrase: process.env.BITGET_PASSPHRASE_SUB1
-                }
-                // Add sub2, sub3 etc. as needed
-              };
-              
-              const creds = credentialMap[account];
               
               // Format symbol
               let symbol = signal.symbol || signal.ticker;
