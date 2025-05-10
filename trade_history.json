@@ -93,5 +93,15 @@
     "price": null,
     "status": "failed",
     "error": "apiSecret is not defined"
+  },
+  {
+    "timestamp": "2025-05-10T07:43:33.102Z",
+    "symbol": "BTCUSDT",
+    "action": "buy",
+    "orderSize": null,
+    "originalAmount": null,
+    "price": null,
+    "status": "failed",
+    "error": "apiSecret is not defined"
   }
 ]
