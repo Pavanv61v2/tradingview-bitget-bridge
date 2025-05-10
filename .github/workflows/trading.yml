@@ -15,6 +15,9 @@ jobs:
           BITGET_API_KEY: '${{ secrets.BITGET_API_KEY }}'
           BITGET_API_SECRET: '${{ secrets.BITGET_API_SECRET }}'
           BITGET_PASSPHRASE: '${{ secrets.BITGET_PASSPHRASE }}'
+          BITGET_API_KEY_SUB1: '${{ secrets.BITGET_API_KEY_SUB1 }}'
+          BITGET_API_SECRET_SUB1: '${{ secrets.BITGET_API_SECRET_SUB1 }}'
+          BITGET_PASSPHRASE_SUB1: '${{ secrets.BITGET_PASSPHRASE_SUB1 }}'
           SIGNAL_DATA: '${{ toJson(github.event.client_payload) }}'
           NOTIFICATIONS_ENABLED: 'true'
           NOTIFICATION_EMAIL: '${{ secrets.NOTIFICATION_EMAIL }}'
@@ -90,9 +93,26 @@ jobs:
           
           async function placeOrder() {
             try {
-              const apiKey = process.env.BITGET_API_KEY;
-              const apiSecret = process.env.BITGET_API_SECRET;
-              const passphrase = process.env.BITGET_PASSPHRASE;
+              // Parse signal and determine account
+              const signal = JSON.parse(process.env.SIGNAL_DATA || '{}');
+              const account = (signal.account || 'main').toLowerCase();
+
+              // Use main secrets or dynamic subaccount secrets
+              let apiKey, apiSecret, passphrase;
+
+              if (account === 'main') {
+                apiKey = process.env.BITGET_API_KEY;
+                apiSecret = process.env.BITGET_API_SECRET;
+                passphrase = process.env.BITGET_PASSPHRASE;
+              } else {
+                apiKey = process.env['BITGET_API_KEY_${account.toUpperCase()}'];
+                apiSecret = process.env['BITGET_API_SECRET_${account.toUpperCase()}'];
+                passphrase = process.env['BITGET_PASSPHRASE_${account.toUpperCase()}'];
+              }
+
+              if (!apiKey || !apiSecret || !passphrase) {
+                throw new Error('Missing API credentials for account: ${account}');
+              }
               
               // Parse signal data
               let signal;
