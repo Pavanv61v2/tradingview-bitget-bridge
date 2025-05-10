@@ -1,33 +1,16 @@
 [
   {
-    "timestamp": "2025-04-19T03:01:13.231Z",
+    "timestamp": "2025-04-17T18:00:20.464Z",
     "symbol": "SOLUSDT",
     "action": "buy",
-    "orderSize": null,
-    "originalAmount": null,
-    "price": null,
-    "status": "failed",
-    "error": "All 3 attempts failed: Request failed with status code 400"
-  },
-  {
-    "timestamp": "2025-04-19T03:07:42.599Z",
-    "symbol": "SOLUSDT",
-    "action": "buy",
-    "orderSize": null,
-    "originalAmount": null,
-    "price": null,
-    "status": "failed",
-    "error": "All 3 attempts failed: Request failed with status code 400"
-  },
-  {
-    "timestamp": "2025-04-19T03:19:14.729Z",
-    "symbol": "SOLUSDT",
-    "action": "buy",
-    "orderSize": null,
-    "originalAmount": null,
-    "price": null,
-    "status": "failed",
-    "error": "All 3 attempts failed: Request failed with status code 400"
+    "originalAmount": 399.99,
+    "orderSize": "399.99",
+    "price": 134.21,
+    "filledBaseVolume": 2.9804,
+    "filledQuoteVolume": 399.999484,
+    "usdtEquivalent": 399.999484,
+    "orderId": "1296672856130400256",
+    "status": "success"
   },
   {
     "timestamp": "2025-04-30T16:00:28.504Z",
@@ -43,14 +26,17 @@
     "status": "success"
   },
   {
-    "timestamp": "2025-05-01T00:00:29.840Z",
+    "timestamp": "2025-05-01T12:31:12.124Z",
     "symbol": "SOLUSDT",
     "action": "buy",
-    "orderSize": null,
-    "originalAmount": null,
-    "price": null,
-    "status": "failed",
-    "error": "All 3 attempts failed: Request failed with status code 400"
+    "originalAmount": 420.35,
+    "orderSize": "420.35",
+    "price": 149.4,
+    "filledBaseVolume": 2.8136,
+    "filledQuoteVolume": 420.35184,
+    "usdtEquivalent": 420.35184,
+    "orderId": "1301663456718581766",
+    "status": "success"
   },
   {
     "timestamp": "2025-05-03T08:00:18.131Z",
