@@ -107,6 +107,11 @@ jobs:
               console.log("Processing signal:", signal);
               
               const account = (signal.account || 'main').toLowerCase();
+              const credentialMap = {
+                main: {
+                  apiKey:process.env.BITGET_API_KEY
+                  }
+                };
               
               // Format symbol
               let symbol = signal.symbol || signal.ticker;
