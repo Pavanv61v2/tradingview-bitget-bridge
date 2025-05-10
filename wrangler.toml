@@ -1,3 +1,0 @@
-name = "tradingview-bitget-main-forwarder"
-main = "worker.js"
-compatibility_date = "2025-05-10"
