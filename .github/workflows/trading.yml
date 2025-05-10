@@ -115,16 +115,6 @@ jobs:
               }
               
               // Parse signal data
-              let signal;
-              try {
-                signal = process.env.SIGNAL_DATA ? JSON.parse(process.env.SIGNAL_DATA) : null;
-                if (!signal) {
-                  throw new Error("No signal data provided");
-                }
-              } catch(e) {
-                console.error("Error parsing signal data:", e.message);
-                throw e;
-              }
               
               console.log("Processing signal:", signal);
               
