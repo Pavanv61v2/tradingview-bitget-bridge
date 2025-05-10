@@ -166,7 +166,7 @@ jobs:
                 // BUY ORDER: Use the order_size directly as USDT amount 
                 // For market buy, size is the amount of USDT to spend
 
-                const usdtAsset = await getAccountAssets('USDTUSDT');
+                const usdtAsset = await getAccountAssets('USDTUSDT', accountId);
                 
                 // Get the specified order size (in USDT)
                 let investmentAmount = 100; // Default amount in USDT
@@ -188,7 +188,7 @@ jobs:
                 // For market sell, size is the amount of base currency (e.g., BTC) to sell
                 
                 // Get current position for the symbol
-                const position = await getAccountAssets(symbol);
+                const position = await getAccountAssets(symbol, accountId);
                 
                 // For SELL orders in the placeOrder function:
                 if (position && position.available && parseFloat(position.available) > 0) {
@@ -483,6 +483,11 @@ jobs:
                 if (typeof originalAmount !== 'undefined') {
                   errorOriginalAmount = originalAmount;
                 }
+
+                // Add this block to capture the account ID if it was defined
+                if (typeof accountId !== 'undefined') {
+                  errorAccount = accountId;
+                }
                 
                 // If we don't have the values from the function,
                 // try to extract them from the signal
@@ -534,12 +539,24 @@ jobs:
             const timestamp = Date.now().toString();
             const requestPath = '/api/v2/spot/account/assets';
             const method = 'GET';
+
+              // Determine which API credentials to use
+            let apiKey, apiSecret, passphrase;
+            if (accountId === 'sub1') {
+              apiKey = process.env.BITGET_API_KEY_SUB1;
+              apiSecret = process.env.BITGET_API_SECRET_SUB1;
+              passphrase = process.env.BITGET_PASSPHRASE_SUB1;
+            } else {
+              apiKey = process.env.BITGET_API_KEY;
+              apiSecret = process.env.BITGET_API_SECRET;
+              passphrase = process.env.BITGET_PASSPHRASE;
+            }
             
             // Signature content: timestamp + method + requestPath
             const preHash = timestamp + method.toUpperCase() + requestPath;
             
             // Generate signature
-            const signature = crypto.createHmac('sha256', process.env.BITGET_API_SECRET)
+            const signature = crypto.createHmac('sha256', apiSecret)
               .update(preHash)
               .digest('base64');
             
@@ -547,10 +564,10 @@ jobs:
               method: method,
               url: 'https://api.bitget.com' + requestPath,
               headers: {
-                'ACCESS-KEY': process.env.BITGET_API_KEY,
+                'ACCESS-KEY': apiKey,
                 'ACCESS-SIGN': signature,
                 'ACCESS-TIMESTAMP': timestamp,
-                'ACCESS-PASSPHRASE': process.env.BITGET_PASSPHRASE,
+                'ACCESS-PASSPHRASE': passphrase,
                 'Content-Type': 'application/json'
               },
               timeout: 10000
