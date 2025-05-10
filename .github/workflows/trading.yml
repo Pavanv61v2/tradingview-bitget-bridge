@@ -15,43 +15,26 @@ jobs:
           BITGET_API_KEY: '${{ secrets.BITGET_API_KEY }}'
           BITGET_API_SECRET: '${{ secrets.BITGET_API_SECRET }}'
           BITGET_PASSPHRASE: '${{ secrets.BITGET_PASSPHRASE }}'
-          BITGET_API_KEY_SUB1: '${{ secrets.BITGET_API_KEY_SUB1 }}'
-          BITGET_API_SECRET_SUB1: '${{ secrets.BITGET_API_SECRET_SUB1 }}'
-          BITGET_PASSPHRASE_SUB1: '${{ secrets.BITGET_PASSPHRASE_SUB1 }}'
           SIGNAL_DATA: '${{ toJson(github.event.client_payload) }}'
           NOTIFICATIONS_ENABLED: 'true'
           NOTIFICATION_EMAIL: '${{ secrets.NOTIFICATION_EMAIL }}'
-        run: >
+        run: |
           echo "Received trading signal"
-
           echo "Symbol: ${{ github.event.client_payload.symbol || 'N/A' }}"
-
           echo "Action: ${{ github.event.client_payload.action || 'N/A' }}"
-
-          echo "Order size: ${{ github.event.client_payload.order_size || 'N/A'
-          }}"
-
-
+          echo "Order size: ${{ github.event.client_payload.order_size || 'N/A' }}"
+          
           # Install dependencies
-
           npm install axios crypto-js nodemailer
-
-
+          
           # Create and run the trading script
-
-          cat > trade.js <<EOF
-
+          cat > trade.js << 'EOF'
           const axios = require('axios');
-
           const crypto = require('crypto');
-
           const nodemailer = require('nodemailer');
-
           const fs = require('fs');
-
-
+          
           // Common scale (decimal places) for cryptocurrencies
-
           const coinScales = {
             'BTC': 6,
             'ETH': 5,
@@ -65,23 +48,15 @@ jobs:
             // Default scale for others
             'DEFAULT': 2
           };
-
-
+          
           // Trade log file
-
           const TRADE_LOG_FILE = 'trade_history.json';
-
-
+          
           // Notification settings
-
-          const NOTIFICATIONS_ENABLED = process.env.NOTIFICATIONS_ENABLED ===
-          'true';
-
+          const NOTIFICATIONS_ENABLED = process.env.NOTIFICATIONS_ENABLED === 'true';
           const NOTIFICATION_EMAIL = process.env.NOTIFICATION_EMAIL;
-
-
+          
           // Function to fetch precision scale for a specific symbol
-
           async function getSymbolPrecision(symbol) {
             try {
               console.log(`Fetching precision info for ${symbol}...`);
@@ -112,32 +87,24 @@ jobs:
               return null;
             }
           }
-
-
+          
           async function placeOrder() {
             try {
-              // Parse signal and determine account
-              const signal = JSON.parse(process.env.SIGNAL_DATA || '{}');
-              const account = (signal.account || 'main').toLowerCase();
-
-              // Use main secrets or dynamic subaccount secrets
-              let apiKey, apiSecret, passphrase;
-
-              if (account === 'main') {
-                apiKey = process.env.BITGET_API_KEY;
-                apiSecret = process.env.BITGET_API_SECRET;
-                passphrase = process.env.BITGET_PASSPHRASE;
-              } else {
-                apiKey = process.env[`BITGET_API_KEY_${account.toUpperCase()}`];
-                apiSecret = process.env[`BITGET_API_SECRET_${account.toUpperCase()}`];
-                passphrase = process.env[`BITGET_PASSPHRASE_${account.toUpperCase()}`];
-              }
-
-              if (!apiKey || !apiSecret || !passphrase) {
-                throw new Error(`Missing API credentials for account: ${account}`);
-              }
+              const apiKey = process.env.BITGET_API_KEY;
+              const apiSecret = process.env.BITGET_API_SECRET;
+              const passphrase = process.env.BITGET_PASSPHRASE;
               
               // Parse signal data
+              let signal;
+              try {
+                signal = process.env.SIGNAL_DATA ? JSON.parse(process.env.SIGNAL_DATA) : null;
+                if (!signal) {
+                  throw new Error("No signal data provided");
+                }
+              } catch(e) {
+                console.error("Error parsing signal data:", e.message);
+                throw e;
+              }
               
               console.log("Processing signal:", signal);
               
@@ -449,7 +416,6 @@ jobs:
                 // Store USDT equivalent for easy calculations
                 usdtEquivalent: usdtEquivalent,
                 orderId: orderId,
-                account: account,
                 status: 'success'
               };
               
@@ -540,10 +506,8 @@ jobs:
               return { error: error.message };
             }
           }
-
-
+          
           // Helper function to get account assets
-
           async function getAccountAssets(symbol) {
             const timestamp = Date.now().toString();
             const requestPath = '/api/v2/spot/account/assets';
@@ -580,10 +544,8 @@ jobs:
               throw new Error(`Failed to get account assets: ${response.data ? response.data.msg : 'Unknown error'}`);
             }
           }
-
-
+          
           // Helper function to log trades
-
           async function logTrade(tradeInfo) {
             try {
               // Check if the log file exists
@@ -609,10 +571,8 @@ jobs:
               console.error("Error logging trade:", error.message);
             }
           }
-
-
+          
           // Helper function to send email notifications
-
           async function sendNotification(subject, body) {
             if (!NOTIFICATIONS_ENABLED || !NOTIFICATION_EMAIL) {
               console.log("Notifications disabled or email not configured");
@@ -632,33 +592,26 @@ jobs:
               console.error("Error sending notification:", error.message);
             }
           }
-
-
+          
           // Execute the function
-
           placeOrder().then(() => {
             console.log("Order process completed");
           }).catch(err => {
             console.error("Unhandled error:", err);
           });
-
           EOF
-
-
+          
           node trade.js
-
-
+          
           # Debug: List files after script execution 
-
           echo "Files in directory after script execution:"
-
           ls -la
       - name: Commit updated trade history
         run: |
           # Configure git
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
-
+          
           # Check if trade_history.json exists
           if [ -f "trade_history.json" ]; then
             # Add the file and commit
