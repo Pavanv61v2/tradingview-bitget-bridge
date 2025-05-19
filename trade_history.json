@@ -63,5 +63,18 @@
     "usdtEquivalent": 422.236254,
     "orderId": "1304403816372858910",
     "status": "success"
+  },
+  {
+    "timestamp": "2025-05-19T08:00:25.451Z",
+    "symbol": "SOLUSDT",
+    "action": "sell",
+    "originalAmount": 2.6416043,
+    "orderSize": "2.6284",
+    "price": 161.75,
+    "filledBaseVolume": 2.6284,
+    "filledQuoteVolume": 425.1437,
+    "usdtEquivalent": 425.1437,
+    "orderId": "1308269278462570497",
+    "status": "success"
   }
 ]
